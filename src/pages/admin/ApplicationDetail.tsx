@@ -220,6 +220,31 @@ export function AdminApplicationDetail() {
         </div>
 
       </div>
+
+      {app.resumeUrl && (
+        <div className="bg-white dark:bg-evolw-slate p-6 rounded-2xl border border-evolw-gray-200 dark:border-white/10 shadow-sm mt-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-bold text-evolw-gray-400 uppercase tracking-wider flex items-center gap-2">
+              <FileText className="w-4 h-4 text-evolw-accent" /> Resume Preview
+            </h3>
+            <a 
+              href={app.resumeUrl} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-xs font-semibold text-evolw-accent hover:underline"
+            >
+              Open in new tab
+            </a>
+          </div>
+          <div className="w-full h-[600px] md:h-[800px] rounded-xl overflow-hidden border border-evolw-gray-200 dark:border-white/10 bg-evolw-gray-50 dark:bg-evolw-black relative">
+            <iframe
+              src={`${app.resumeUrl}#toolbar=0`}
+              className="w-full h-full absolute inset-0"
+              title={`${app.name}'s Resume`}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
