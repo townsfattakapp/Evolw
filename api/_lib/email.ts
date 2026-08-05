@@ -13,7 +13,7 @@ export function getResendClient() {
   return resend;
 }
 
-const FROM_EMAIL = 'Evolw Careers <careers@evolw.in>';
+const FROM_EMAIL = 'EVOLW Careers <hello@evolw.in>';
 
 export async function sendStatusUpdateEmail(
   applicantEmail: string,
@@ -101,6 +101,7 @@ export async function sendStatusUpdateEmail(
   try {
     const { error } = await client.emails.send({
       from: FROM_EMAIL,
+      replyTo: 'hello@evolw.in',
       to: [applicantEmail],
       subject,
       html,
