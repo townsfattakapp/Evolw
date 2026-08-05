@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate, Link, useLocation } from "react-router-dom";
-import { ArrowLeft, Mail, Phone, Calendar, Briefcase, Trash2, Globe, Link2, Star, FileText } from "lucide-react";
+import { ArrowLeft, Mail, Phone, Calendar, Briefcase, Trash2, Globe, Link2, Star, FileText, Loader2, Download } from "lucide-react";
 import { api, ApiError, type Application } from "../../lib/api";
 
 const STATUS_OPTIONS = ["new", "reviewing", "shortlisted", "rejected", "hired"] as const;
@@ -13,12 +13,52 @@ export function AdminApplicationDetail() {
   const [app, setApp] = useState<Application | null>(location.state?.app || null);
   const [loading, setLoading] = useState(!app);
   const [error, setError] = useState<string | null>(null);
+  const [resumeBlobUrl, setResumeBlobUrl] = useState<string | null>(null);
+  const [resumeLoading, setResumeLoading] = useState(false);
+  const [resumeError, setResumeError] = useState<string | null>(null);
+  const blobUrlRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (!app) {
       fetchApp();
     }
   }, [id]);
+
+  // Fetch resume PDF as a blob URL to bypass CSP frame-ancestors restrictions
+  useEffect(() => {
+    if (!app?.resumeUrl) return;
+    let cancelled = false;
+    setResumeLoading(true);
+    setResumeError(null);
+
+    fetch(`/api/proxy-resume?url=${encodeURIComponent(app.resumeUrl)}`)
+      .then(res => {
+        if (!res.ok) throw new Error('Failed to load resume');
+        return res.blob();
+      })
+      .then(blob => {
+        if (cancelled) return;
+        // Revoke previous blob URL if any
+        if (blobUrlRef.current) URL.revokeObjectURL(blobUrlRef.current);
+        const url = URL.createObjectURL(blob);
+        blobUrlRef.current = url;
+        setResumeBlobUrl(url);
+      })
+      .catch(err => {
+        if (!cancelled) setResumeError(err.message || 'Failed to load resume preview');
+      })
+      .finally(() => {
+        if (!cancelled) setResumeLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+      if (blobUrlRef.current) {
+        URL.revokeObjectURL(blobUrlRef.current);
+        blobUrlRef.current = null;
+      }
+    };
+  }, [app?.resumeUrl]);
 
   const fetchApp = async () => {
     setLoading(true);
@@ -227,21 +267,53 @@ export function AdminApplicationDetail() {
             <h3 className="text-sm font-bold text-evolw-gray-400 uppercase tracking-wider flex items-center gap-2">
               <FileText className="w-4 h-4 text-evolw-accent" /> Resume Preview
             </h3>
-            <a 
-              href={app.resumeUrl} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-xs font-semibold text-evolw-accent hover:underline"
-            >
-              Open in new tab
-            </a>
+            <div className="flex items-center gap-3">
+              {resumeBlobUrl && (
+                <a
+                  href={resumeBlobUrl}
+                  download={app.resumeName || 'resume.pdf'}
+                  className="flex items-center gap-1 text-xs font-semibold text-evolw-gray-500 hover:text-evolw-accent transition-colors"
+                >
+                  <Download className="w-3.5 h-3.5" /> Download
+                </a>
+              )}
+              <a 
+                href={app.resumeUrl} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-xs font-semibold text-evolw-accent hover:underline"
+              >
+                Open in new tab
+              </a>
+            </div>
           </div>
           <div className="w-full h-[600px] md:h-[800px] rounded-xl overflow-hidden border border-evolw-gray-200 dark:border-white/10 bg-evolw-gray-50 dark:bg-evolw-black relative">
-            <iframe
-              src={`/api/proxy-resume?url=${encodeURIComponent(app.resumeUrl)}#toolbar=0`}
-              className="w-full h-full absolute inset-0"
-              title={`${app.name}'s Resume`}
-            />
+            {resumeLoading && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <Loader2 className="w-8 h-8 text-evolw-accent animate-spin" />
+                <span className="ml-3 text-sm text-evolw-gray-500">Loading resume…</span>
+              </div>
+            )}
+            {resumeError && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <p className="text-sm text-red-500">{resumeError}</p>
+              </div>
+            )}
+            {resumeBlobUrl && (
+              <object
+                data={resumeBlobUrl}
+                type="application/pdf"
+                className="w-full h-full absolute inset-0"
+                aria-label={`${app.name}'s Resume`}
+              >
+                <p className="p-6 text-center text-evolw-gray-500">
+                  Your browser cannot display PDFs inline.{' '}
+                  <a href={app.resumeUrl} target="_blank" rel="noopener noreferrer" className="text-evolw-accent hover:underline">
+                    Download the resume instead
+                  </a>.
+                </p>
+              </object>
+            )}
           </div>
         </div>
       )}
