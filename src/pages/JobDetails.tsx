@@ -157,13 +157,19 @@ export function JobDetails() {
           const result = await api.parseResume({ resumeText });
           
           if (result.data) {
+            const normalizeUrl = (url: string) => {
+              if (!url) return "";
+              if (url.startsWith("http://") || url.startsWith("https://")) return url;
+              return `https://${url}`;
+            };
+
             setFormData(prev => ({
               ...prev,
               name: result.data.name || prev.name,
               email: result.data.email || prev.email,
               phone: result.data.phone || prev.phone,
-              linkedin: result.data.linkedin || prev.linkedin,
-              portfolio: result.data.portfolio || prev.portfolio,
+              linkedin: normalizeUrl(result.data.linkedin) || prev.linkedin,
+              portfolio: normalizeUrl(result.data.portfolio) || prev.portfolio,
               experience: result.data.experience || prev.experience,
               skills: result.data.skills || prev.skills,
             }));
