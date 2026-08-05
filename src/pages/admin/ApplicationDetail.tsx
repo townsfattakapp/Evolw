@@ -238,7 +238,7 @@ export function AdminApplicationDetail() {
           </div>
           <div className="w-full h-[600px] md:h-[800px] rounded-xl overflow-hidden border border-evolw-gray-200 dark:border-white/10 bg-evolw-gray-50 dark:bg-evolw-black relative">
             <iframe
-              src={`${app.resumeUrl}#toolbar=0`}
+              src={`/api/proxy-resume?url=${encodeURIComponent(app.resumeUrl)}#toolbar=0`}
               className="w-full h-full absolute inset-0"
               title={`${app.name}'s Resume`}
             />
