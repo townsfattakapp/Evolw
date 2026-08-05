@@ -96,9 +96,9 @@ export function Home() {
                 <h3 className="text-4xl font-bold mb-6 tracking-tighter leading-tight text-white">Modern Web Platforms</h3>
                 <p className="text-xl text-white/70 font-medium leading-relaxed">Modern, responsive, and high-performance web applications built on cutting-edge stacks like React and Node.</p>
               </div>
-              <div className="relative z-10 flex items-center text-white/90 font-semibold group-hover:translate-x-2 transition-transform duration-500 mt-12">
+              <Link to="/products" className="relative z-10 flex items-center text-white/90 font-semibold group-hover:translate-x-2 transition-transform duration-500 mt-12 w-fit cursor-pointer">
                 Learn more <ArrowRight className="ml-3 w-5 h-5" />
-              </div>
+              </Link>
             </motion.div>
             
             {/* Bento Box 3 */}

@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Outlet, useNavigate, Link, useLocation } from "react-router-dom";
-import { LayoutDashboard, Users, MessageSquare, Settings, LogOut, FileText, Award } from "lucide-react";
+import { LayoutDashboard, Users, MessageSquare, Settings, LogOut, FileText, Award, Package } from "lucide-react";
 import { ThemeToggle } from "../../components/theme-toggle";
 
 export function AdminLayout() {
@@ -21,6 +21,7 @@ export function AdminLayout() {
 
   const navItems = [
     { name: "Overview", path: "/admin/dashboard", icon: LayoutDashboard },
+    { name: "Products", path: "/admin/products", icon: Package },
     { name: "Form Leads", path: "/admin/contacts", icon: MessageSquare },
     { name: "Website Content", path: "/admin/content", icon: Settings },
     { name: "Job Openings", path: "/admin/jobs", icon: Users },

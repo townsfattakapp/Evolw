@@ -21,6 +21,7 @@ import { AdminJobs } from "./pages/admin/Jobs";
 import { AdminApplications } from "./pages/admin/Applications";
 import { AdminOfferLetters } from "./pages/admin/OfferLetters";
 import { AdminCertificates } from "./pages/admin/Certificates";
+import { AdminProducts } from "./pages/admin/Products";
 import { JobDetails } from "./pages/JobDetails";
 
 import { ThemeProvider } from "./components/theme-provider";
@@ -58,6 +59,7 @@ function App() {
             <Route path="applications" element={<AdminApplications />} />
             <Route path="offer-letters" element={<AdminOfferLetters />} />
             <Route path="certificates" element={<AdminCertificates />} />
+            <Route path="products" element={<AdminProducts />} />
             {/* Catch-all redirect for missing admin routes (e.g. /admin/users) */}
             <Route path="*" element={<AdminDashboard />} />
           </Route>

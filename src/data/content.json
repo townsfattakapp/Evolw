@@ -6,5 +6,19 @@
     "titleHighlight": "forward.",
     "subtitle": "EVOLW designs and builds modern software products, digital platforms and technology infrastructure for businesses ready to scale."
   },
-  "jobs": []
+  "jobs": [],
+  "products": [
+    {
+      "id": "fattakse",
+      "name": "Fattakse",
+      "tagline": "A Unit of Evolw",
+      "description": "A connected commerce platform designed to bring local businesses, customers and commerce infrastructure together natively.",
+      "websiteUrl": "https://fattakse.in",
+      "appStoreUrl": "https://apps.apple.com/in/app/fattakse/id6785628271",
+      "playStoreUrl": "https://play.google.com/store/apps/details?id=com.fattakse.user&hl=en_IN",
+      "features": ["Local Commerce", "Business OS", "Smart Ordering", "Live Inventory", "Mobile POS", "Real-time Data"],
+      "status": "live",
+      "isFeatured": true
+    }
+  ]
 }

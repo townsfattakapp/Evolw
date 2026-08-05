@@ -1,7 +1,7 @@
 import initialContent from '../data/content.json';
 
 // Version key — bump this to force-clear stale localStorage data on deploy
-const DATA_VERSION = 'v3';
+const DATA_VERSION = 'v4';
 
 // Utility to create a Response object
 const createResponse = (body: any, status = 200) => {
