@@ -1,8 +1,7 @@
 import initialContent from '../data/content.json';
-import initialLeads from '../data/leads.json';
-import initialApps from '../data/applications.json';
-import initialOffers from '../data/offer-letters.json';
-import initialCerts from '../data/certificates.json';
+
+// Version key — bump this to force-clear stale localStorage data on deploy
+const DATA_VERSION = 'v2';
 
 // Utility to create a Response object
 const createResponse = (body: any, status = 200) => {
@@ -15,33 +14,42 @@ const createResponse = (body: any, status = 200) => {
 export function setupMockApi() {
   const originalFetch = window.fetch;
 
-  // 1. Seed localStorage with initial data if it doesn't exist
+  // 1. Check data version and clear if stale (removes old test data)
+  if (localStorage.getItem('evolw_data_version') !== DATA_VERSION) {
+    localStorage.removeItem('evolw_content');
+    localStorage.removeItem('evolw_leads');
+    localStorage.removeItem('evolw_applications');
+    localStorage.removeItem('evolw_offers');
+    localStorage.removeItem('evolw_certs');
+    localStorage.setItem('evolw_data_version', DATA_VERSION);
+  }
+
+  // 2. Seed localStorage with fresh empty data if not present
   if (!localStorage.getItem('evolw_content')) {
     localStorage.setItem('evolw_content', JSON.stringify(initialContent));
   }
   if (!localStorage.getItem('evolw_leads')) {
-    localStorage.setItem('evolw_leads', JSON.stringify(initialLeads));
+    localStorage.setItem('evolw_leads', JSON.stringify([]));
   }
   if (!localStorage.getItem('evolw_applications')) {
-    localStorage.setItem('evolw_applications', JSON.stringify(initialApps));
+    localStorage.setItem('evolw_applications', JSON.stringify([]));
   }
   if (!localStorage.getItem('evolw_offers')) {
-    localStorage.setItem('evolw_offers', JSON.stringify(initialOffers));
+    localStorage.setItem('evolw_offers', JSON.stringify([]));
   }
   if (!localStorage.getItem('evolw_certs')) {
-    localStorage.setItem('evolw_certs', JSON.stringify(initialCerts));
+    localStorage.setItem('evolw_certs', JSON.stringify([]));
   }
 
-  // 2. Intercept global fetch
+  // 3. Intercept global fetch
   window.fetch = async (input, init) => {
-    // Determine the URL string
     let urlString = '';
     if (typeof input === 'string') {
       urlString = input;
     } else if (input instanceof URL) {
       urlString = input.toString();
     } else {
-      urlString = input.url;
+      urlString = (input as Request).url;
     }
 
     // Only intercept /api/ routes
@@ -49,16 +57,15 @@ export function setupMockApi() {
       return originalFetch(input, init);
     }
 
-    const method = init?.method || 'GET';
+    const method = init?.method?.toUpperCase() || 'GET';
     const url = new URL(urlString, window.location.origin);
     const path = url.pathname;
 
-    // Helper to read/write JSON body
     let parsedBody: any = null;
     if (init?.body && typeof init.body === 'string') {
       try {
         parsedBody = JSON.parse(init.body);
-      } catch (e) {
+      } catch {
         return createResponse({ error: 'Invalid JSON' }, 400);
       }
     }
@@ -85,7 +92,7 @@ export function setupMockApi() {
     // --- /api/leads ---
     if (path === '/api/leads') {
       let leads = JSON.parse(localStorage.getItem('evolw_leads') || '[]');
-      
+
       if (method === 'GET') {
         return createResponse(leads);
       } else if (method === 'POST') {
@@ -109,11 +116,10 @@ export function setupMockApi() {
     // --- /api/applications ---
     if (path === '/api/applications') {
       let apps = JSON.parse(localStorage.getItem('evolw_applications') || '[]');
-      
+
       if (method === 'GET') {
         return createResponse(apps);
       } else if (method === 'POST') {
-        // Handle Base64 Resume directly as data URI instead of file upload
         if (parsedBody.resumeBase64 && parsedBody.resumeName) {
           parsedBody.resumeUrl = parsedBody.resumeBase64;
           delete parsedBody.resumeBase64;
@@ -139,7 +145,7 @@ export function setupMockApi() {
     // --- /api/offer-letters ---
     if (path === '/api/offer-letters') {
       let offers = JSON.parse(localStorage.getItem('evolw_offers') || '[]');
-      
+
       if (method === 'GET') {
         return createResponse(offers);
       } else if (method === 'POST') {
@@ -147,28 +153,30 @@ export function setupMockApi() {
         const count = offers.length + 1;
         const paddedCount = count.toString().padStart(3, '0');
         const refId = `EV/HR/${year}/${paddedCount}`;
-        
+
         parsedBody.id = Date.now().toString();
         parsedBody.refId = refId;
         parsedBody.createdAt = new Date().toISOString();
-        
+
         offers.unshift(parsedBody);
         localStorage.setItem('evolw_offers', JSON.stringify(offers));
         return createResponse({ success: true, offer: parsedBody });
+      } else if (method === 'DELETE') {
+        offers = offers.filter((o: any) => o.id !== parsedBody.id);
+        localStorage.setItem('evolw_offers', JSON.stringify(offers));
+        return createResponse({ success: true });
       }
     }
 
     // --- /api/certificates ---
     if (path === '/api/certificates') {
       let certs = JSON.parse(localStorage.getItem('evolw_certs') || '[]');
-      
+
       if (method === 'GET') {
         const queryCertId = url.searchParams.get('certId');
         if (queryCertId) {
           const found = certs.find((c: any) => c.certId === queryCertId);
-          if (found) {
-            return createResponse({ valid: true, data: found });
-          }
+          if (found) return createResponse({ valid: true, data: found });
           return createResponse({ valid: false });
         }
         return createResponse(certs);
@@ -177,18 +185,21 @@ export function setupMockApi() {
         const count = certs.length + 1;
         const paddedCount = count.toString().padStart(3, '0');
         const certId = `EV/CERT/${year}/${paddedCount}`;
-        
+
         parsedBody.id = Date.now().toString();
         parsedBody.certId = certId;
         parsedBody.createdAt = new Date().toISOString();
-        
+
         certs.unshift(parsedBody);
         localStorage.setItem('evolw_certs', JSON.stringify(certs));
         return createResponse({ success: true, certificate: parsedBody });
+      } else if (method === 'DELETE') {
+        certs = certs.filter((c: any) => c.id !== parsedBody.id);
+        localStorage.setItem('evolw_certs', JSON.stringify(certs));
+        return createResponse({ success: true });
       }
     }
 
-    // Fallback for unmatched API routes
     return createResponse({ error: 'Not Found' }, 404);
   };
 }

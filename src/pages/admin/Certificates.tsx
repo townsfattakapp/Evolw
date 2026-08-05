@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { User, Calendar, Star, Download, Save, History, Award } from 'lucide-react';
+import { User, Calendar, Star, Download, Save, History, Award, Trash2 } from 'lucide-react';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import { CertificatePDF } from './CertificatePDF';
 
@@ -20,10 +20,10 @@ export function AdminCertificates() {
   const [isSaving, setIsSaving] = useState(false);
   
   const [data, setData] = useState<CertificateData>({
-    internName: 'Aarav Sharma',
-    role: 'Frontend Development',
-    startDate: new Date(Date.now() - 180 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 6 months ago
-    endDate: new Date().toISOString().split('T')[0], // today
+    internName: '',
+    role: '',
+    startDate: new Date(Date.now() - 180 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    endDate: new Date().toISOString().split('T')[0],
     performance: 'Outstanding',
   });
 
@@ -38,6 +38,20 @@ export function AdminCertificates() {
       const res = await fetch('/api/certificates');
       const json = await res.json();
       setHistory(json);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const deleteCertificate = async (id: string) => {
+    if (!window.confirm('Are you sure you want to permanently delete this certificate?')) return;
+    try {
+      await fetch('/api/certificates', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id })
+      });
+      setHistory(prev => prev.filter(h => h.id !== id));
     } catch (e) {
       console.error(e);
     }
@@ -96,28 +110,36 @@ export function AdminCertificates() {
 
       {activeTab === 'history' ? (
         <div className="p-8 overflow-y-auto">
-          <h2 className="text-2xl font-bold mb-6">Generated Certificates</h2>
+          <h2 className="text-2xl font-bold mb-6 text-evolw-black dark:text-white">Generated Certificates</h2>
           {history.length === 0 ? (
-            <p className="text-gray-500">No certificates have been generated yet.</p>
+            <p className="text-evolw-gray-500 dark:text-evolw-gray-400">No certificates have been generated yet.</p>
           ) : (
             <div className="grid gap-4">
               {history.map((h, i) => (
-                <div key={i} className="bg-white dark:bg-white/5 p-4 rounded-xl border border-evolw-gray-200 dark:border-white/10 flex justify-between items-center">
+                <div key={i} className="bg-white dark:bg-evolw-gray-900 p-5 rounded-xl border border-evolw-gray-200 dark:border-white/10 flex justify-between items-center">
                   <div>
-                    <div className="font-bold text-lg">{h.internName}</div>
-                    <div className="text-sm text-gray-500">{h.role} Intern</div>
-                    <div className="text-xs text-gray-400 mt-1">ID: {h.certId} • Issued: {new Date(h.createdAt!).toLocaleDateString()}</div>
+                    <div className="font-bold text-lg text-evolw-black dark:text-white">{h.internName}</div>
+                    <div className="text-sm text-evolw-gray-500 dark:text-evolw-gray-400 mt-0.5">{h.role} Intern</div>
+                    <div className="text-xs text-evolw-gray-400 dark:text-evolw-gray-500 mt-1">ID: {h.certId} • Issued: {new Date(h.createdAt!).toLocaleDateString('en-IN')}</div>
                   </div>
-                  <PDFDownloadLink
-                    document={<CertificatePDF data={h} />}
-                    fileName={`Certificate_${h.internName.replace(/\s+/g, '_')}.pdf`}
-                    className="flex items-center bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 px-4 py-2 rounded-lg font-medium transition-colors text-sm"
-                  >
-                    {/* @ts-ignore */}
-                    {({ loading }) => (
-                      <><Download className="w-4 h-4 mr-2" /> {loading ? '...' : 'Download'}</>
-                    )}
-                  </PDFDownloadLink>
+                  <div className="flex items-center gap-3">
+                    <PDFDownloadLink
+                      document={<CertificatePDF data={h} />}
+                      fileName={`Certificate_${h.internName.replace(/\s+/g, '_')}.pdf`}
+                      className="flex items-center bg-evolw-gray-100 dark:bg-white/10 hover:bg-evolw-gray-200 dark:hover:bg-white/20 px-4 py-2 rounded-lg font-medium transition-colors text-sm text-evolw-black dark:text-white"
+                    >
+                      {/* @ts-ignore */}
+                      {({ loading }) => (
+                        <><Download className="w-4 h-4 mr-2" /> {loading ? '...' : 'Download'}</>
+                      )}
+                    </PDFDownloadLink>
+                    <button
+                      onClick={() => deleteCertificate(h.id!)}
+                      className="flex items-center bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 text-red-600 dark:text-red-400 px-3 py-2 rounded-lg font-medium transition-colors text-sm"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>

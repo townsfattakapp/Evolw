@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Calculator, Briefcase, User, IndianRupee, Download, Save, History, FileText } from 'lucide-react';
+import { Calculator, Briefcase, User, IndianRupee, Download, Save, History, FileText, Trash2 } from 'lucide-react';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import { OfferLetterPDF } from './OfferLetterPDF';
 
@@ -32,21 +32,21 @@ export function AdminOfferLetters() {
   
   const [data, setData] = useState<OfferData>({
     employmentType: 'Full-Time',
-    candidateName: 'Aarav Sharma',
-    address: '402, Palm Heights, Indiranagar,\nBangalore, Karnataka 560038',
-    email: 'aarav.sharma@example.in',
-    phone: '+91 9876543210',
-    designation: 'Senior Frontend Engineer',
-    department: 'Engineering',
+    candidateName: '',
+    address: '',
+    email: '',
+    phone: '',
+    designation: '',
+    department: '',
     doj: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
     probation: '6',
     notice: '30',
-    reportingTo: 'Chief Technology Officer (CTO)',
-    annualCtc: '1800000',
-    basic: '900000',
-    hra: '450000',
-    pf: '21600',
-    specialAllowance: '428400'
+    reportingTo: '',
+    annualCtc: '',
+    basic: '',
+    hra: '',
+    pf: '',
+    specialAllowance: ''
   });
 
   useEffect(() => {
@@ -60,6 +60,20 @@ export function AdminOfferLetters() {
       const res = await fetch('/api/offer-letters');
       const json = await res.json();
       setHistory(json);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const deleteOfferLetter = async (id: string) => {
+    if (!window.confirm('Are you sure you want to permanently delete this offer letter?')) return;
+    try {
+      await fetch('/api/offer-letters', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id })
+      });
+      setHistory(prev => prev.filter(h => h.id !== id));
     } catch (e) {
       console.error(e);
     }
@@ -169,28 +183,36 @@ export function AdminOfferLetters() {
 
       {activeTab === 'history' ? (
         <div className="p-8 overflow-y-auto">
-          <h2 className="text-2xl font-bold mb-6">Generated Offer Letters</h2>
+          <h2 className="text-2xl font-bold mb-6 text-evolw-black dark:text-white">Generated Offer Letters</h2>
           {history.length === 0 ? (
-            <p className="text-gray-500">No offer letters have been generated yet.</p>
+            <p className="text-evolw-gray-500 dark:text-evolw-gray-400">No offer letters have been generated yet.</p>
           ) : (
             <div className="grid gap-4">
               {history.map((h, i) => (
-                <div key={i} className="bg-white dark:bg-white/5 p-4 rounded-xl border border-evolw-gray-200 dark:border-white/10 flex justify-between items-center">
+                <div key={i} className="bg-white dark:bg-evolw-gray-900 p-5 rounded-xl border border-evolw-gray-200 dark:border-white/10 flex justify-between items-center">
                   <div>
-                    <div className="font-bold text-lg">{h.candidateName}</div>
-                    <div className="text-sm text-gray-500">{h.designation} ({h.employmentType})</div>
-                    <div className="text-xs text-gray-400 mt-1">Ref: {h.refId} • Generated: {new Date(h.createdAt!).toLocaleDateString()}</div>
+                    <div className="font-bold text-lg text-evolw-black dark:text-white">{h.candidateName}</div>
+                    <div className="text-sm text-evolw-gray-500 dark:text-evolw-gray-400 mt-0.5">{h.designation} • <span className="font-medium">{h.employmentType}</span></div>
+                    <div className="text-xs text-evolw-gray-400 dark:text-evolw-gray-500 mt-1">Ref: {h.refId} • Generated: {new Date(h.createdAt!).toLocaleDateString('en-IN')}</div>
                   </div>
-                  <PDFDownloadLink
-                    document={<OfferLetterPDF data={h} />}
-                    fileName={`Offer_Letter_${h.candidateName.replace(/\s+/g, '_')}.pdf`}
-                    className="flex items-center bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 px-4 py-2 rounded-lg font-medium transition-colors text-sm"
-                  >
-                    {/* @ts-ignore */}
-                    {({ loading }) => (
-                      <><Download className="w-4 h-4 mr-2" /> {loading ? '...' : 'Download'}</>
-                    )}
-                  </PDFDownloadLink>
+                  <div className="flex items-center gap-3">
+                    <PDFDownloadLink
+                      document={<OfferLetterPDF data={h} />}
+                      fileName={`Offer_Letter_${h.candidateName.replace(/\s+/g, '_')}.pdf`}
+                      className="flex items-center bg-evolw-gray-100 dark:bg-white/10 hover:bg-evolw-gray-200 dark:hover:bg-white/20 px-4 py-2 rounded-lg font-medium transition-colors text-sm text-evolw-black dark:text-white"
+                    >
+                      {/* @ts-ignore */}
+                      {({ loading }) => (
+                        <><Download className="w-4 h-4 mr-2" /> {loading ? '...' : 'Download'}</>
+                      )}
+                    </PDFDownloadLink>
+                    <button
+                      onClick={() => deleteOfferLetter(h.id!)}
+                      className="flex items-center bg-red-50 dark:bg-red-900/20 hover:bg-red-100 dark:hover:bg-red-900/40 text-red-600 dark:text-red-400 px-3 py-2 rounded-lg font-medium transition-colors text-sm"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
