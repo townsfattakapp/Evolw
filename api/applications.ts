@@ -109,15 +109,27 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return json(res, 401, { error: 'Unauthorized' });
       }
 
-      const body = readBody<{ id?: string; status?: string }>(req);
+      const body = readBody<{ id?: string; status?: string; resumeSummary?: string }>(req);
       if (!body.id) return json(res, 400, { error: 'Application id is required' });
 
-      const status = normalizeApplicationStatus(body.status || 'new');
-      await sql`
-        UPDATE applications SET status = ${status}, updated_at = NOW()
-        WHERE id = ${body.id}
-      `;
-      return json(res, 200, { success: true });
+      if (body.resumeSummary !== undefined) {
+        await sql`
+          UPDATE applications SET resume_summary = ${body.resumeSummary}, updated_at = NOW()
+          WHERE id = ${body.id}
+        `;
+        return json(res, 200, { success: true });
+      }
+
+      if (body.status !== undefined) {
+        const status = normalizeApplicationStatus(body.status || 'new');
+        await sql`
+          UPDATE applications SET status = ${status}, updated_at = NOW()
+          WHERE id = ${body.id}
+        `;
+        return json(res, 200, { success: true });
+      }
+      
+      return json(res, 400, { error: 'No update fields provided' });
     }
 
     if (req.method === 'DELETE') {

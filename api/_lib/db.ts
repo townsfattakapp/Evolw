@@ -69,10 +69,16 @@ export async function ensureSchema(): Promise<NeonQueryFunction<false, false>> {
           resume_url TEXT,
           resume_name TEXT,
           resume_key TEXT,
+          resume_summary TEXT,
           status TEXT NOT NULL DEFAULT 'new',
           created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
           updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
         )
+      `;
+
+      // Add resume_summary column to existing tables
+      await sql`
+        ALTER TABLE applications ADD COLUMN IF NOT EXISTS resume_summary TEXT
       `;
 
       await sql`

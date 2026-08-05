@@ -27,15 +27,18 @@ export function AdminApplicationDetail() {
   const [resumeError, setResumeError] = useState<string | null>(null);
   const blobUrlRef = useRef<string | null>(null);
   
-  const [aiSummary, setAiSummary] = useState<string | null>(null);
+  const [aiSummary, setAiSummary] = useState<string | null>(app?.resumeSummary || null);
   const [aiSummaryLoading, setAiSummaryLoading] = useState(false);
   const [aiSummaryError, setAiSummaryError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!app) {
       fetchApp();
+    } else if (app.resumeSummary && !aiSummary) {
+      // Sync aiSummary if app was loaded from network
+      setAiSummary(DOMPurify.sanitize(app.resumeSummary));
     }
-  }, [id]);
+  }, [id, app]);
 
   // Fetch resume PDF as a blob URL to bypass CSP frame-ancestors restrictions
   useEffect(() => {
@@ -143,7 +146,16 @@ export function AdminApplicationDetail() {
 
       const result = await api.summarizeResume({ resumeText });
       if (result.html) {
-        setAiSummary(DOMPurify.sanitize(result.html));
+        const sanitizedHtml = DOMPurify.sanitize(result.html);
+        setAiSummary(sanitizedHtml);
+        
+        // Persist the generated summary so we don't have to generate it again
+        try {
+          await api.updateApplicationSummary(app.id, result.html);
+          setApp(prev => prev ? { ...prev, resumeSummary: result.html } : null);
+        } catch (saveErr) {
+          console.error("Failed to save generated summary to database:", saveErr);
+        }
       } else {
         throw new Error("Invalid response from summary API.");
       }

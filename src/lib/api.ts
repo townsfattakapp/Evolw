@@ -73,6 +73,7 @@ export interface Application {
   message?: string | null;
   resumeUrl?: string | null;
   resumeName?: string | null;
+  resumeSummary?: string | null;
   status: ApplicationStatus | string;
   date?: string;
   createdAt?: string;
@@ -257,6 +258,14 @@ export const api = {
     return apiRequest<{ success: boolean }>('/api/applications', {
       method: 'PUT',
       body: { id, status },
+      auth: true,
+    });
+  },
+
+  updateApplicationSummary(id: string, resumeSummary: string) {
+    return apiRequest<{ success: boolean }>('/api/applications', {
+      method: 'PUT',
+      body: { id, resumeSummary },
       auth: true,
     });
   },

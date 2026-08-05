@@ -47,6 +47,7 @@ export interface ApplicationRecord {
   message: string | null;
   resumeUrl: string | null;
   resumeName: string | null;
+  resumeSummary: string | null;
   status: ApplicationStatus;
   date: string;
   createdAt: string;
@@ -99,6 +100,7 @@ export function mapApplication(row: Record<string, unknown>): ApplicationRecord 
     message: row.message != null ? String(row.message) : null,
     resumeUrl: row.resume_url != null ? String(row.resume_url) : null,
     resumeName: row.resume_name != null ? String(row.resume_name) : null,
+    resumeSummary: row.resume_summary != null ? String(row.resume_summary) : null,
     status: normalizeApplicationStatus(String(row.status ?? 'new')),
     date: createdAt ? createdAt.split('T')[0] : '',
     createdAt,
