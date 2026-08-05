@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { Search, Download, Filter, Trash2, RefreshCw, ChevronRight } from "lucide-react";
+import { Search, Download, Filter, Trash2, RefreshCw, ChevronRight, ChevronLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { api, ApiError, type Application } from "../../lib/api";
 
@@ -13,6 +13,8 @@ export function AdminApplications() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 10;
   const [loadState, setLoadState] = useState<LoadState>("loading");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -42,6 +44,10 @@ export function AdminApplications() {
   useEffect(() => {
     fetchApps();
   }, []);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, statusFilter]);
 
   const updateAppStatus = async (app: Application, newStatus: string) => {
     try {
@@ -87,6 +93,13 @@ export function AdminApplications() {
       return matchesSearch && matchesFilter;
     });
   }, [apps, searchQuery, statusFilter]);
+
+  const paginatedApps = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredApps.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [filteredApps, currentPage]);
+
+  const totalPages = Math.ceil(filteredApps.length / ITEMS_PER_PAGE);
 
   const exportToCSV = () => {
     if (filteredApps.length === 0) {
@@ -258,7 +271,7 @@ export function AdminApplications() {
 
           {filteredApps.length > 0 && (
             <div className="md:hidden divide-y divide-evolw-gray-100 dark:divide-white/10">
-              {filteredApps.map((app) => {
+              {paginatedApps.map((app) => {
                 const status = String(app.status || "new").toLowerCase();
                 return (
                   <div key={app.id} className="p-4 space-y-3">
@@ -313,7 +326,7 @@ export function AdminApplications() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-evolw-gray-100 dark:divide-white/10">
-                {filteredApps.map((app) => {
+                {paginatedApps.map((app) => {
                   const status = String(app.status || "new").toLowerCase();
                   return (
                     <tr
@@ -369,6 +382,33 @@ export function AdminApplications() {
                 })}
               </tbody>
             </table>
+            </div>
+          )}
+
+          {totalPages > 1 && (
+            <div className="p-4 sm:p-6 border-t border-evolw-gray-200 dark:border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 bg-evolw-gray-50/50 dark:bg-white/5">
+              <span className="text-sm text-evolw-gray-500 dark:text-evolw-gray-400 font-medium">
+                Showing {((currentPage - 1) * ITEMS_PER_PAGE) + 1} to {Math.min(currentPage * ITEMS_PER_PAGE, filteredApps.length)} of {filteredApps.length} entries
+              </span>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                  disabled={currentPage === 1}
+                  className="p-2 rounded-xl border border-evolw-gray-200 dark:border-white/10 bg-white dark:bg-evolw-slate disabled:opacity-50 disabled:cursor-not-allowed hover:bg-evolw-gray-50 dark:hover:bg-white/5 transition-colors shadow-sm"
+                >
+                  <ChevronLeft className="w-5 h-5 text-evolw-gray-600 dark:text-evolw-gray-300" />
+                </button>
+                <div className="flex items-center px-4 py-2 rounded-xl bg-white dark:bg-evolw-slate border border-evolw-gray-200 dark:border-white/10 shadow-sm text-sm font-bold text-evolw-black dark:text-white">
+                  {currentPage} <span className="text-evolw-gray-400 mx-1 font-normal">/</span> {totalPages}
+                </div>
+                <button
+                  onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                  disabled={currentPage === totalPages}
+                  className="p-2 rounded-xl border border-evolw-gray-200 dark:border-white/10 bg-white dark:bg-evolw-slate disabled:opacity-50 disabled:cursor-not-allowed hover:bg-evolw-gray-50 dark:hover:bg-white/5 transition-colors shadow-sm"
+                >
+                  <ChevronRight className="w-5 h-5 text-evolw-gray-600 dark:text-evolw-gray-300" />
+                </button>
+              </div>
             </div>
           )}
         </div>
