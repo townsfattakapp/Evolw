@@ -322,6 +322,14 @@ export const api = {
     });
   },
 
+  summarizeResume(payload: { resumeText: string }) {
+    return apiRequest<{ html: string }>('/api/summarize-resume', {
+      method: 'POST',
+      body: payload,
+      auth: true,
+    });
+  },
+
   generateCoverLetter(payload: { resumeData: Record<string, string>; jobTitle: string; jobDescription: string; department?: string }) {
     return apiRequest<{ coverLetter: string }>('/api/generate-cover-letter', {
       method: 'POST',

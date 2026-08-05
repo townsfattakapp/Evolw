@@ -1,7 +1,16 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate, Link, useLocation } from "react-router-dom";
-import { ArrowLeft, Mail, Phone, Calendar, Briefcase, Trash2, Globe, Link2, Star, FileText, Loader2, Download } from "lucide-react";
+import { ArrowLeft, Mail, Phone, Calendar, Briefcase, Trash2, Globe, Link2, Star, FileText, Loader2, Download, Sparkles } from "lucide-react";
 import { api, ApiError, type Application } from "../../lib/api";
+import * as pdfjsLib from "pdfjs-dist";
+import DOMPurify from "dompurify";
+
+if (typeof window !== "undefined") {
+  pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+    "pdfjs-dist/build/pdf.worker.min.mjs",
+    import.meta.url
+  ).toString();
+}
 
 const STATUS_OPTIONS = ["new", "reviewing", "shortlisted", "rejected", "hired"] as const;
 
@@ -17,6 +26,10 @@ export function AdminApplicationDetail() {
   const [resumeLoading, setResumeLoading] = useState(false);
   const [resumeError, setResumeError] = useState<string | null>(null);
   const blobUrlRef = useRef<string | null>(null);
+  
+  const [aiSummary, setAiSummary] = useState<string | null>(null);
+  const [aiSummaryLoading, setAiSummaryLoading] = useState(false);
+  const [aiSummaryError, setAiSummaryError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!app) {
@@ -103,6 +116,40 @@ export function AdminApplicationDetail() {
     } catch (error) {
       console.error("[admin/application-detail] Failed to delete", error);
       alert(error instanceof ApiError ? error.message : "Failed to delete application");
+    }
+  };
+
+  const generateSummary = async () => {
+    if (!app?.resumeUrl || !resumeBlobUrl) return;
+    setAiSummaryLoading(true);
+    setAiSummaryError(null);
+    try {
+      const response = await fetch(resumeBlobUrl);
+      const arrayBuffer = await response.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      const numPages = Math.min(pdf.numPages, 5); // Max 5 pages
+      let resumeText = "";
+      
+      for (let i = 1; i <= numPages; i++) {
+        const page = await pdf.getPage(i);
+        const content = await page.getTextContent();
+        const strings = content.items.map((item: any) => item.str);
+        resumeText += strings.join(" ") + "\n";
+      }
+
+      if (!resumeText.trim()) throw new Error("Could not extract text from the PDF.");
+
+      const result = await api.summarizeResume({ resumeText });
+      if (result.html) {
+        setAiSummary(DOMPurify.sanitize(result.html));
+      } else {
+        throw new Error("Invalid response from summary API.");
+      }
+    } catch (err) {
+      console.error("Failed to generate summary:", err);
+      setAiSummaryError(err instanceof Error ? err.message : "Failed to generate summary");
+    } finally {
+      setAiSummaryLoading(false);
     }
   };
 
@@ -260,6 +307,41 @@ export function AdminApplicationDetail() {
         </div>
 
       </div>
+
+      {app.resumeUrl && (
+        <div className="bg-white dark:bg-evolw-slate p-6 rounded-2xl border border-evolw-gray-200 dark:border-white/10 shadow-sm mt-6">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-bold text-evolw-gray-400 uppercase tracking-wider flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-evolw-accent" /> AI Resume Summary
+            </h3>
+            {!aiSummary && (
+              <button
+                onClick={generateSummary}
+                disabled={aiSummaryLoading || !resumeBlobUrl || resumeLoading}
+                className="px-4 py-2 bg-evolw-accent text-white text-xs font-semibold rounded-xl hover:bg-evolw-accent-dark transition-colors disabled:opacity-50 flex items-center gap-2"
+              >
+                {aiSummaryLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
+                {aiSummaryLoading ? "Generating..." : "Generate Summary"}
+              </button>
+            )}
+          </div>
+          
+          {aiSummaryError && (
+            <p className="text-sm text-red-500 mb-4">{aiSummaryError}</p>
+          )}
+
+          {aiSummary && (
+            <div 
+              className="prose prose-sm dark:prose-invert max-w-none text-evolw-gray-700 dark:text-evolw-gray-300 leading-relaxed [&>p]:mb-4 [&>ul]:pl-5 [&>ul>li]:mb-1 [&_strong]:text-evolw-black dark:[&_strong]:text-white"
+              dangerouslySetInnerHTML={{ __html: aiSummary }} 
+            />
+          )}
+
+          {!aiSummary && !aiSummaryLoading && !aiSummaryError && (
+            <p className="text-sm text-evolw-gray-500 italic">Generate an AI summary to get a quick overview of this candidate's profile.</p>
+          )}
+        </div>
+      )}
 
       {app.resumeUrl && (
         <div className="bg-white dark:bg-evolw-slate p-6 rounded-2xl border border-evolw-gray-200 dark:border-white/10 shadow-sm mt-6">
