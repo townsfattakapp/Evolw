@@ -5,6 +5,7 @@ import { ensureSchema } from './_lib/db.js';
 import { handleOptions, json, logError, methodNotAllowed, readBody } from './_lib/http.js';
 import { mapApplication, normalizeApplicationStatus } from './_lib/mappers.js';
 import { deleteResume, parseDataUrl, uploadResume } from './_lib/storage.js';
+import { sendStatusUpdateEmail } from './_lib/email.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (handleOptions(req, res)) return;
@@ -122,10 +123,26 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
       if (body.status !== undefined) {
         const status = normalizeApplicationStatus(body.status || 'new');
-        await sql`
-          UPDATE applications SET status = ${status}, updated_at = NOW()
+        
+        // Update status and return applicant info needed for email
+        const rows = await sql`
+          UPDATE applications 
+          SET status = ${status}, updated_at = NOW()
           WHERE id = ${body.id}
+          RETURNING name, email, job_title
         `;
+        
+        if (rows.length > 0) {
+          const applicant = rows[0];
+          // Asynchronously attempt to send the email (don't block or fail the response)
+          sendStatusUpdateEmail(
+            applicant.email as string, 
+            applicant.name as string, 
+            applicant.job_title as string, 
+            status
+          ).catch(console.error);
+        }
+
         return json(res, 200, { success: true });
       }
       
