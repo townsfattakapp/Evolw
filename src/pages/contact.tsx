@@ -1,25 +1,53 @@
 import React, { useState } from "react";
 import { SEO } from "../components/common/seo";
 import { Container } from "../components/ui/container";
-import { Button } from "../components/ui/button";
-import { Phone, MapPin, Send } from "lucide-react";
-import { motion } from "framer-motion";
+import { Phone, MapPin, Mail, ArrowRight, CheckCircle2, Sparkles } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
-const appleEase = [0.32, 0.72, 0, 1];
+const ease = [0.32, 0.72, 0, 1];
 
-const fadeInUp = {
-  initial: { opacity: 0, y: 40 },
-  whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true, margin: "-100px" },
-  transition: { duration: 1.2, ease: appleEase }
+const fadeUp = {
+  initial: { opacity: 0, y: 32 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.9, ease },
 };
 
-const staggerContainer = {
-  initial: { opacity: 0 },
-  whileInView: { opacity: 1 },
-  viewport: { once: true, margin: "-100px" },
-  transition: { staggerChildren: 0.15 }
+const stagger = {
+  animate: { transition: { staggerChildren: 0.1 } },
 };
+
+const contactInfo = [
+  {
+    icon: Mail,
+    label: "Email Us",
+    value: "hello@evolw.in",
+    href: "mailto:hello@evolw.in",
+    accent: "#2563eb",
+  },
+  {
+    icon: Phone,
+    label: "Call Us",
+    value: "+91 92092 50725",
+    href: "tel:+919209250725",
+    accent: "#7c3aed",
+  },
+  {
+    icon: MapPin,
+    label: "Office",
+    value: "Waraseoni, Balaghat\nMadhya Pradesh, India",
+    href: null,
+    accent: "#0891b2",
+  },
+];
+
+const services = [
+  "Software Development",
+  "Web Applications",
+  "Product Engineering",
+  "Tech Consulting",
+  "Careers",
+  "Other",
+];
 
 export function Contact() {
   const [formData, setFormData] = useState({
@@ -27,210 +55,397 @@ export function Contact() {
     email: "",
     phone: "",
     help: "",
-    message: ""
+    message: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [focused, setFocused] = useState<string | null>(null);
 
   const validate = () => {
-    const newErrors: Record<string, string> = {};
-    if (!formData.name.trim()) newErrors.name = "Name is required";
+    const e: Record<string, string> = {};
+    if (!formData.name.trim()) e.name = "Required";
     if (!formData.email.trim()) {
-      newErrors.email = "Email is required";
+      e.email = "Required";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = "Please enter a valid email";
+      e.email = "Invalid email";
     }
-    if (!formData.message.trim()) newErrors.message = "Message is required";
-    
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    if (!formData.message.trim()) e.message = "Required";
+    setErrors(e);
+    return Object.keys(e).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
-    
     setIsSubmitting(true);
-    
     try {
-      // Step 1: Send to Email via FormSubmit
-      const emailResponse = await fetch("https://formsubmit.co/ajax/fattaksein@gmail.com", {
+      await fetch("https://formsubmit.co/ajax/fattaksein@gmail.com", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json"
-        },
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify({
-          _subject: `New EVOLW Website Lead: ${formData.name}`,
+          _subject: `New EVOLW Lead: ${formData.name}`,
           _template: "table",
           Name: formData.name,
           Email: formData.email,
           Phone: formData.phone || "Not provided",
           Service_Needed: formData.help || "Not specified",
-          Message: formData.message
-        })
+          Message: formData.message,
+        }),
       });
-
-      if (!emailResponse.ok) {
-        throw new Error("Form email submission failed");
-      }
-
-      // Step 2: Save to Local Admin CMS
       await fetch("/api/leads", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: formData.name,
           email: formData.email,
           phone: formData.phone || "Not provided",
           service: formData.help || "Not specified",
           company: "Direct Lead",
-          message: formData.message
-        })
+          message: formData.message,
+        }),
       });
-
-      // Success
       setIsSuccess(true);
       setFormData({ name: "", email: "", phone: "", help: "", message: "" });
-      
-    } catch (error) {
-      console.error("Failed to submit", error);
-      alert("There was a problem sending your message. Please try again or contact us directly at +91 92092 50725.");
+    } catch {
+      alert("Failed to send. Please email us directly at hello@evolw.in");
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
-    if (errors[e.target.name]) {
-      setErrors(prev => ({ ...prev, [e.target.name]: "" }));
-    }
+    setFormData((p) => ({ ...p, [e.target.name]: e.target.value }));
+    if (errors[e.target.name]) setErrors((p) => ({ ...p, [e.target.name]: "" }));
   };
 
   return (
     <>
-      <SEO title="Contact | EVOLW" description="Let's build something meaningful together. Contact EVOLW." />
-      
-      <section className="pt-40 pb-32 md:pt-64 md:pb-48 bg-white dark:bg-black overflow-hidden relative">
+      <SEO title="Contact | EVOLW" description="Let's build something extraordinary together. Reach out to the EVOLW engineering team." />
+
+      {/* ─── HERO ─────────────────────────────────── */}
+      <section className="relative min-h-[60vh] flex items-end bg-evolw-black overflow-hidden pt-40 pb-20 md:pt-56 md:pb-32">
+        {/* Ambient blobs */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-[-10%] left-[-5%] w-[600px] h-[600px] rounded-full bg-evolw-accent/20 blur-[120px] opacity-60" />
+          <div className="absolute bottom-[-20%] right-[-5%] w-[500px] h-[500px] rounded-full bg-violet-600/20 blur-[120px] opacity-50" />
+        </div>
+
+        {/* Dot grid */}
+        <div
+          className="absolute inset-0 pointer-events-none opacity-[0.06]"
+          style={{
+            backgroundImage: "radial-gradient(circle, #fff 1px, transparent 1px)",
+            backgroundSize: "40px 40px",
+          }}
+        />
+
         <Container className="relative z-10">
-          <motion.div 
-            className="text-center max-w-4xl mx-auto mb-20"
-            initial="initial"
-            animate="whileInView"
-            variants={staggerContainer}
-          >
-            <motion.h1 variants={fadeInUp} className="text-6xl md:text-8xl lg:text-[7rem] font-bold tracking-tighter mb-8 text-black dark:text-white leading-[1.02]">
-              Let's build something <span className="text-evolw-accent">meaningful.</span>
-            </motion.h1>
-            <motion.p variants={fadeInUp} className="text-2xl md:text-3xl text-evolw-gray-500 font-medium tracking-tight max-w-3xl mx-auto leading-snug">
-              Have a project in mind? Let's discuss how our engineering team can help bring your vision to life.
+          <motion.div initial="initial" animate="animate" variants={stagger}>
+            <motion.p
+              variants={fadeUp}
+              className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.3em] uppercase text-white/40 mb-8"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              Let's Talk
             </motion.p>
-          </motion.div>
-
-          <motion.div 
-            initial="initial"
-            whileInView="whileInView"
-            variants={staggerContainer}
-            className="grid grid-cols-1 lg:grid-cols-5 gap-12 lg:gap-8 items-start"
-          >
-            {/* Contact Information Cards */}
-            <div className="lg:col-span-2 space-y-6">
-              <motion.div variants={fadeInUp} className="p-10 rounded-[2.5rem] bg-[#050505] text-white border border-white/10 flex items-start space-x-6 group hover:border-white/30 transition-all duration-500">
-                <div className="p-4 bg-white/5 rounded-2xl">
-                  <Phone className="w-8 h-8 text-white" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-2xl mb-2 tracking-tighter">Call Us</h3>
-                  <p className="text-white/60 font-medium text-lg">+91 92092 50725</p>
-                </div>
-              </motion.div>
-
-              <motion.div variants={fadeInUp} className="p-10 rounded-[2.5rem] bg-evolw-gray-50 dark:bg-[#111] border border-black/5 dark:border-white/5 flex items-start space-x-6 group hover:border-black/20 dark:hover:border-white/20 transition-all duration-500">
-                <div className="p-4 bg-white dark:bg-white/5 rounded-2xl shadow-sm dark:shadow-none">
-                  <MapPin className="w-8 h-8 text-evolw-accent" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-2xl mb-2 tracking-tighter text-black dark:text-white">Office</h3>
-                  <p className="text-evolw-gray-500 font-medium text-lg leading-relaxed">
-                    Waraseoni, Dist Balaghat<br/>
-                    Madhya Pradesh, India<br/>
-                    481331
-                  </p>
-                </div>
-              </motion.div>
-            </div>
-
-            {/* Glassmorphic Contact Form */}
-            <motion.div variants={fadeInUp} className="lg:col-span-3 p-10 md:p-12 rounded-[2.5rem] bg-white dark:bg-[#111] border border-black/5 dark:border-white/5 shadow-2xl relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-96 h-96 bg-evolw-accent/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
-              
-              <div className="relative z-10">
-                <h2 className="text-4xl font-bold tracking-tighter mb-8 text-black dark:text-white">Send a message</h2>
-                
-                {isSuccess ? (
-                  <div className="p-12 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800/30 rounded-[2rem] text-center">
-                    <div className="w-20 h-20 bg-green-100 dark:bg-green-800/40 rounded-full flex items-center justify-center mx-auto mb-6">
-                      <Send className="w-10 h-10 text-green-600 dark:text-green-400" />
-                    </div>
-                    <h3 className="text-3xl font-bold text-green-800 dark:text-green-400 mb-4 tracking-tighter">Message Received</h3>
-                    <p className="text-green-600 dark:text-green-300 font-medium text-lg">Thank you for reaching out. Our engineering team will get back to you shortly.</p>
-                    <Button onClick={() => setIsSuccess(false)} variant="outline" className="mt-8 rounded-full">Send another message</Button>
-                  </div>
-                ) : (
-                  <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div>
-                        <label className="block text-sm font-bold text-evolw-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wider">Full Name</label>
-                        <input type="text" name="name" value={formData.name} onChange={handleChange} className={`w-full px-5 py-4 rounded-xl bg-evolw-gray-50 dark:bg-black border ${errors.name ? 'border-red-300 focus:ring-red-500' : 'border-black/5 dark:border-white/10 focus:ring-black dark:focus:ring-white'} focus:ring-2 focus:border-transparent outline-none transition-all text-lg`} placeholder="John Doe" />
-                        {errors.name && <p className="mt-2 text-sm text-red-500 font-medium">{errors.name}</p>}
-                      </div>
-                      <div>
-                        <label className="block text-sm font-bold text-evolw-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wider">Email Address</label>
-                        <input type="email" name="email" value={formData.email} onChange={handleChange} className={`w-full px-5 py-4 rounded-xl bg-evolw-gray-50 dark:bg-black border ${errors.email ? 'border-red-300 focus:ring-red-500' : 'border-black/5 dark:border-white/10 focus:ring-black dark:focus:ring-white'} focus:ring-2 focus:border-transparent outline-none transition-all text-lg`} placeholder="john@example.com" />
-                        {errors.email && <p className="mt-2 text-sm text-red-500 font-medium">{errors.email}</p>}
-                      </div>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div>
-                        <label className="block text-sm font-bold text-evolw-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wider">Phone Number <span className="text-evolw-gray-400 font-normal">(Optional)</span></label>
-                        <input type="tel" name="phone" value={formData.phone} onChange={handleChange} className="w-full px-5 py-4 rounded-xl bg-evolw-gray-50 dark:bg-black border border-black/5 dark:border-white/10 focus:ring-2 focus:ring-black dark:focus:ring-white focus:border-transparent outline-none transition-all text-lg" placeholder="+1 (555) 000-0000" />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-bold text-evolw-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wider">How can we help?</label>
-                        <select name="help" value={formData.help} onChange={handleChange} className="w-full px-5 py-4 rounded-xl bg-evolw-gray-50 dark:bg-black border border-black/5 dark:border-white/10 focus:ring-2 focus:ring-black dark:focus:ring-white focus:border-transparent outline-none transition-all text-lg appearance-none">
-                          <option value="">Select an option</option>
-                          <option value="Software Development">Software Development</option>
-                          <option value="Web Applications">Web Applications</option>
-                          <option value="Product Engineering">Product Engineering</option>
-                          <option value="Tech Consulting">Tech Consulting</option>
-                          <option value="Careers">Careers</option>
-                          <option value="Other">Other</option>
-                        </select>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-bold text-evolw-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wider">Message</label>
-                      <textarea name="message" value={formData.message} onChange={handleChange} rows={5} className={`w-full px-5 py-4 rounded-xl bg-evolw-gray-50 dark:bg-black border ${errors.message ? 'border-red-300 focus:ring-red-500' : 'border-black/5 dark:border-white/10 focus:ring-black dark:focus:ring-white'} focus:ring-2 focus:border-transparent outline-none transition-all resize-none text-lg`} placeholder="Tell us about your project or inquiry..."></textarea>
-                      {errors.message && <p className="mt-2 text-sm text-red-500 font-medium">{errors.message}</p>}
-                    </div>
-                    
-                    <Button type="submit" size="lg" disabled={isSubmitting} className="w-full h-16 text-lg rounded-full bg-black text-white hover:bg-black/90 dark:bg-white dark:text-black dark:hover:bg-white/90 transition-all font-bold">
-                      {isSubmitting ? "Sending Request..." : "Send Message"}
-                    </Button>
-                  </form>
-                )}
-              </div>
-            </motion.div>
+            <motion.h1
+              variants={fadeUp}
+              className="text-5xl sm:text-7xl md:text-8xl lg:text-[8rem] font-bold tracking-tighter text-white leading-[1.02] mb-8 max-w-5xl"
+            >
+              Let's build something{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-evolw-accent via-blue-400 to-violet-400">
+                extraordinary.
+              </span>
+            </motion.h1>
+            <motion.p
+              variants={fadeUp}
+              className="text-xl md:text-2xl text-white/50 font-medium max-w-2xl leading-relaxed tracking-tight"
+            >
+              Have an idea, a project, or just want to talk engineering? We're one message away.
+            </motion.p>
           </motion.div>
         </Container>
       </section>
+
+      {/* ─── MAIN CONTENT ─────────────────────────── */}
+      <section className="bg-white dark:bg-evolw-black relative">
+        <Container className="relative z-10">
+          {/* Negative margin pulls the cards up over the hero */}
+          <div className="relative -mt-12 pb-32 md:pb-48 grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 items-start">
+
+            {/* ── Left Column: Contact Info ── */}
+            <motion.div
+              initial="initial"
+              whileInView="animate"
+              viewport={{ once: true }}
+              variants={stagger}
+              className="lg:col-span-1 space-y-4"
+            >
+              {contactInfo.map((item, i) => (
+                <motion.div key={i} variants={fadeUp}>
+                  {item.href ? (
+                    <a href={item.href} className="group flex items-start gap-5 p-7 rounded-2xl bg-evolw-gray-50 dark:bg-white/5 border border-evolw-gray-100 dark:border-white/5 hover:border-evolw-gray-300 dark:hover:border-white/15 hover:shadow-lg transition-all duration-500">
+                      <div className="mt-0.5 w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: `${item.accent}18` }}>
+                        <item.icon className="w-5 h-5" style={{ color: item.accent }} />
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold uppercase tracking-widest text-evolw-gray-400 mb-1">{item.label}</p>
+                        <p className="text-base font-bold text-evolw-black dark:text-white leading-snug whitespace-pre-line group-hover:text-evolw-accent transition-colors">
+                          {item.value}
+                        </p>
+                        <span className="inline-flex items-center gap-1 text-xs font-semibold mt-2 opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: item.accent }}>
+                          Open <ArrowRight className="w-3 h-3" />
+                        </span>
+                      </div>
+                    </a>
+                  ) : (
+                    <div className="flex items-start gap-5 p-7 rounded-2xl bg-evolw-gray-50 dark:bg-white/5 border border-evolw-gray-100 dark:border-white/5">
+                      <div className="mt-0.5 w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: `${item.accent}18` }}>
+                        <item.icon className="w-5 h-5" style={{ color: item.accent }} />
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold uppercase tracking-widest text-evolw-gray-400 mb-1">{item.label}</p>
+                        <p className="text-base font-bold text-evolw-black dark:text-white leading-snug whitespace-pre-line">
+                          {item.value}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </motion.div>
+              ))}
+
+              {/* Quick CTA */}
+              <motion.div variants={fadeUp} className="p-7 rounded-2xl bg-evolw-black text-white border border-white/10 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-evolw-accent/30 blur-3xl -translate-y-1/3 translate-x-1/3 pointer-events-none" />
+                <p className="text-xs font-bold uppercase tracking-widest text-white/40 mb-3">Prefer email?</p>
+                <a href="mailto:hello@evolw.in" className="text-xl font-bold text-evolw-accent hover:underline break-all">
+                  hello@evolw.in
+                </a>
+                <p className="text-sm text-white/50 mt-2">We respond within 24 hours.</p>
+              </motion.div>
+            </motion.div>
+
+            {/* ── Right Column: Form ── */}
+            <motion.div
+              initial={{ opacity: 0, y: 48 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 1, ease, delay: 0.15 }}
+              className="lg:col-span-2"
+            >
+              <div className="bg-white dark:bg-[#0d0d0d] rounded-3xl border border-evolw-gray-100 dark:border-white/8 shadow-2xl overflow-hidden">
+                {/* Form Header */}
+                <div className="px-8 md:px-10 pt-8 md:pt-10 pb-6 border-b border-evolw-gray-100 dark:border-white/5 relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-64 h-64 bg-evolw-accent/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+                  <h2 className="text-3xl md:text-4xl font-bold tracking-tighter text-evolw-black dark:text-white relative z-10">
+                    Send a message
+                  </h2>
+                  <p className="text-evolw-gray-500 mt-2 relative z-10">Fill in the details and we'll be in touch soon.</p>
+                </div>
+
+                <div className="px-8 md:px-10 py-8 md:py-10">
+                  <AnimatePresence mode="wait">
+                    {isSuccess ? (
+                      <motion.div
+                        key="success"
+                        initial={{ opacity: 0, scale: 0.96 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="py-16 text-center"
+                      >
+                        <div className="w-20 h-20 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
+                          <CheckCircle2 className="w-10 h-10 text-green-600 dark:text-green-400" />
+                        </div>
+                        <h3 className="text-3xl font-bold tracking-tighter text-evolw-black dark:text-white mb-3">Message received!</h3>
+                        <p className="text-evolw-gray-500 text-lg mb-8 max-w-sm mx-auto leading-relaxed">
+                          Our engineering team will get back to you within 24 hours.
+                        </p>
+                        <button
+                          onClick={() => setIsSuccess(false)}
+                          className="px-8 py-3 rounded-full border border-evolw-gray-200 dark:border-white/10 text-sm font-semibold hover:bg-evolw-gray-50 dark:hover:bg-white/5 transition-colors"
+                        >
+                          Send another message
+                        </button>
+                      </motion.div>
+                    ) : (
+                      <motion.form
+                        key="form"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        onSubmit={handleSubmit}
+                        className="space-y-5"
+                      >
+                        {/* Name + Email */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                          <Field label="Full Name" error={errors.name} required>
+                            <input
+                              type="text"
+                              name="name"
+                              value={formData.name}
+                              onChange={handleChange}
+                              onFocus={() => setFocused("name")}
+                              onBlur={() => setFocused(null)}
+                              placeholder="Your name"
+                              className={inputClass(!!errors.name, focused === "name")}
+                            />
+                          </Field>
+                          <Field label="Email Address" error={errors.email} required>
+                            <input
+                              type="email"
+                              name="email"
+                              value={formData.email}
+                              onChange={handleChange}
+                              onFocus={() => setFocused("email")}
+                              onBlur={() => setFocused(null)}
+                              placeholder="you@company.com"
+                              className={inputClass(!!errors.email, focused === "email")}
+                            />
+                          </Field>
+                        </div>
+
+                        {/* Phone + Service */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                          <Field label="Phone" optional>
+                            <input
+                              type="tel"
+                              name="phone"
+                              value={formData.phone}
+                              onChange={handleChange}
+                              onFocus={() => setFocused("phone")}
+                              onBlur={() => setFocused(null)}
+                              placeholder="+91 00000 00000"
+                              className={inputClass(false, focused === "phone")}
+                            />
+                          </Field>
+                          <Field label="How can we help?">
+                            <select
+                              name="help"
+                              value={formData.help}
+                              onChange={handleChange}
+                              className={inputClass(false, focused === "help") + " appearance-none cursor-pointer"}
+                              onFocus={() => setFocused("help")}
+                              onBlur={() => setFocused(null)}
+                            >
+                              <option value="">Select a service...</option>
+                              {services.map((s) => (
+                                <option key={s} value={s}>{s}</option>
+                              ))}
+                            </select>
+                          </Field>
+                        </div>
+
+                        {/* Message */}
+                        <Field label="Message" error={errors.message} required>
+                          <textarea
+                            name="message"
+                            value={formData.message}
+                            onChange={handleChange}
+                            onFocus={() => setFocused("message")}
+                            onBlur={() => setFocused(null)}
+                            rows={5}
+                            placeholder="Tell us about your project, idea, or question..."
+                            className={inputClass(!!errors.message, focused === "message") + " resize-none"}
+                          />
+                        </Field>
+
+                        {/* Submit */}
+                        <button
+                          type="submit"
+                          disabled={isSubmitting}
+                          className="group w-full relative h-14 md:h-16 rounded-2xl bg-evolw-black dark:bg-white text-white dark:text-black font-bold text-base md:text-lg overflow-hidden transition-all hover:shadow-2xl hover:shadow-evolw-accent/20 disabled:opacity-60"
+                        >
+                          {/* Gradient overlay on hover */}
+                          <span className="absolute inset-0 bg-gradient-to-r from-evolw-accent to-violet-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                          <span className="relative z-10 flex items-center justify-center gap-3">
+                            {isSubmitting ? (
+                              <span className="flex items-center gap-2">
+                                <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+                                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                                </svg>
+                                Sending...
+                              </span>
+                            ) : (
+                              <>
+                                Send Message
+                                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                              </>
+                            )}
+                          </span>
+                        </button>
+
+                        <p className="text-center text-xs text-evolw-gray-400">
+                          Or email directly at{" "}
+                          <a href="mailto:hello@evolw.in" className="text-evolw-accent font-semibold hover:underline">
+                            hello@evolw.in
+                          </a>
+                        </p>
+                      </motion.form>
+                    )}
+                  </AnimatePresence>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </Container>
+      </section>
     </>
+  );
+}
+
+// ── Helpers ──────────────────────────────────────────────
+
+function inputClass(hasError: boolean, isFocused: boolean) {
+  return [
+    "w-full px-5 py-4 rounded-xl text-base outline-none transition-all duration-300",
+    "bg-evolw-gray-50 dark:bg-black/60",
+    "text-evolw-black dark:text-white",
+    "placeholder:text-evolw-gray-400 dark:placeholder:text-white/20",
+    hasError
+      ? "border-2 border-red-400 dark:border-red-500"
+      : isFocused
+      ? "border-2 border-evolw-accent ring-4 ring-evolw-accent/10"
+      : "border border-evolw-gray-200 dark:border-white/8 hover:border-evolw-gray-300 dark:hover:border-white/15",
+  ]
+    .filter(Boolean)
+    .join(" ");
+}
+
+function Field({
+  label,
+  error,
+  required,
+  optional,
+  children,
+}: {
+  label: string;
+  error?: string;
+  required?: boolean;
+  optional?: boolean;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="space-y-2">
+      <label className="flex items-center gap-2 text-sm font-semibold text-evolw-gray-700 dark:text-gray-300">
+        {label}
+        {required && <span className="text-evolw-accent text-xs">*</span>}
+        {optional && <span className="text-xs font-normal text-evolw-gray-400">(Optional)</span>}
+      </label>
+      {children}
+      <AnimatePresence>
+        {error && (
+          <motion.p
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            className="text-xs text-red-500 font-medium"
+          >
+            {error}
+          </motion.p>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }
