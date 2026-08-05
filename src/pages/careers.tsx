@@ -1,11 +1,12 @@
+import { useEffect, useState } from "react";
 import { SEO } from "../components/common/seo";
 import { Container } from "../components/ui/container";
 import { Section } from "../components/ui/section";
 import { Button } from "../components/ui/button";
 import { Link } from "react-router-dom";
-import { useContent } from "../context/ContentContext";
 import { motion } from "framer-motion";
 import { fadeInUp, staggerContainer } from "../lib/animations";
+import { api, ApiError, type Job } from "../lib/api";
 
 export function Careers() {
   return (
@@ -94,8 +95,52 @@ export function Careers() {
 }
 
 function JobsList() {
-  const { content } = useContent();
-  const jobs = content.jobs || [];
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const loadJobs = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await api.getJobs();
+      setJobs(Array.isArray(data) ? data : [data]);
+    } catch (err) {
+      const message =
+        err instanceof ApiError
+          ? err.message
+          : "Failed to load open positions. Please try again.";
+      console.error("[careers] Failed to load jobs", err);
+      setError(message);
+      setJobs([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadJobs();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="bg-white dark:bg-evolw-black rounded-[2rem] md:rounded-[2.5rem] p-10 md:p-16 text-center border border-evolw-gray-200 dark:border-white/5 shadow-sm">
+        <p className="text-lg text-evolw-gray-500 dark:text-evolw-gray-400 font-medium">Loading open positions…</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-white dark:bg-evolw-black rounded-[2rem] md:rounded-[2.5rem] p-10 md:p-16 text-center border border-red-200 dark:border-red-900/40 shadow-sm">
+        <p className="text-xl font-bold text-evolw-black dark:text-white mb-3 tracking-tight">Couldn't load jobs</p>
+        <p className="text-evolw-gray-500 mb-8">{error}</p>
+        <Button onClick={loadJobs} size="lg" className="rounded-full">
+          Try again
+        </Button>
+      </div>
+    );
+  }
 
   if (jobs.length === 0) {
     return (
@@ -120,7 +165,7 @@ function JobsList() {
 
   return (
     <div className="space-y-4 md:space-y-6">
-      {jobs.map((job: any) => (
+      {jobs.map((job) => (
         <div key={job.id} className="bg-white dark:bg-evolw-black rounded-[2rem] md:rounded-[2.5rem] border border-evolw-gray-200 dark:border-white/5 p-8 md:p-14 hover:shadow-xl hover:border-evolw-gray-300 dark:hover:border-white/10 transition-all duration-500 group">
           <div className="flex flex-col md:flex-row md:items-start justify-between gap-8 md:gap-10">
             <div className="flex-1">

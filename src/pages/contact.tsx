@@ -2,14 +2,16 @@ import React, { useState } from "react";
 import { SEO } from "../components/common/seo";
 import { Container } from "../components/ui/container";
 import { Phone, MapPin, Mail, ArrowRight, CheckCircle2, Sparkles } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, type Transition, type Variants } from "framer-motion";
+import { api, ApiError } from "../lib/api";
 
-const ease = [0.32, 0.72, 0, 1];
+const ease = [0.32, 0.72, 0, 1] as const;
 
-const fadeUp = {
+const fadeUpTransition: Transition = { duration: 0.9, ease };
+
+const fadeUp: Variants = {
   initial: { opacity: 0, y: 32 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.9, ease },
+  animate: { opacity: 1, y: 0, transition: fadeUpTransition },
 };
 
 const stagger = {
@@ -83,35 +85,29 @@ export function Contact() {
     if (!validate()) return;
     setIsSubmitting(true);
     try {
-      await fetch("https://formsubmit.co/ajax/fattaksein@gmail.com", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify({
-          _subject: `New EVOLW Lead: ${formData.name}`,
-          _template: "table",
-          Name: formData.name,
-          Email: formData.email,
-          Phone: formData.phone || "Not provided",
-          Service_Needed: formData.help || "Not specified",
-          Message: formData.message,
-        }),
+      const result = await api.createLead({
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone || undefined,
+        service: formData.help || undefined,
+        subject: formData.help || undefined,
+        company: "Direct Lead",
+        message: formData.message,
       });
-      await fetch("/api/leads", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          phone: formData.phone || "Not provided",
-          service: formData.help || "Not specified",
-          company: "Direct Lead",
-          message: formData.message,
-        }),
-      });
+
+      if (!result.success) {
+        throw new Error("Server did not confirm the submission");
+      }
+
       setIsSuccess(true);
       setFormData({ name: "", email: "", phone: "", help: "", message: "" });
-    } catch {
-      alert("Failed to send. Please email us directly at hello@evolw.in");
+    } catch (err) {
+      console.error("[contact] Failed to submit lead", err);
+      const message =
+        err instanceof ApiError
+          ? err.message
+          : "Failed to send. Please email us directly at hello@evolw.in";
+      alert(message);
     } finally {
       setIsSubmitting(false);
     }
@@ -228,7 +224,7 @@ export function Contact() {
               initial={{ opacity: 0, y: 48 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 1, ease, delay: 0.15 }}
+              transition={{ duration: 1, ease, delay: 0.15 } satisfies Transition}
               className="lg:col-span-2"
             >
               <div className="bg-white dark:bg-[#0d0d0d] rounded-3xl border border-evolw-gray-100 dark:border-white/8 shadow-2xl overflow-hidden">

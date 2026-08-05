@@ -1,14 +1,5 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
-
-// Define the shape of our content
-export interface Job {
-  id: string;
-  title: string;
-  department: string;
-  location: string;
-  type: string;
-  description: string;
-}
+import { api } from '../lib/api';
 
 export interface ContentState {
   hero: {
@@ -18,25 +9,48 @@ export interface ContentState {
     titleHighlight: string;
     subtitle: string;
   };
-  jobs: Job[];
+  products?: unknown[];
+  [key: string]: unknown;
 }
 
-// Default fallback content in case the API fails
 const defaultContent: ContentState = {
   hero: {
-    badge: "Software • Products • Technology",
-    titleLine1: "We build technology",
-    titleLine2: "that moves businesses",
-    titleHighlight: "forward.",
-    subtitle: "EVOLW designs and builds modern software products, digital platforms and technology infrastructure for businesses ready to scale."
+    badge: 'Software • Products • Technology',
+    titleLine1: 'We build technology',
+    titleLine2: 'that moves businesses',
+    titleHighlight: 'forward.',
+    subtitle:
+      'EVOLW designs and builds modern software products, digital platforms and technology infrastructure for businesses ready to scale.',
   },
-  jobs: []
+  products: [
+    {
+      id: 'fattakse',
+      name: 'Fattakse',
+      tagline: 'A Unit of Evolw',
+      description:
+        'A connected commerce platform designed to bring local businesses, customers and commerce infrastructure together natively.',
+      websiteUrl: 'https://fattakse.in',
+      appStoreUrl: 'https://apps.apple.com/in/app/fattakse/id6785628271',
+      playStoreUrl: 'https://play.google.com/store/apps/details?id=com.fattakse.user&hl=en_IN',
+      features: [
+        'Local Commerce',
+        'Business OS',
+        'Smart Ordering',
+        'Live Inventory',
+        'Mobile POS',
+        'Real-time Data',
+      ],
+      status: 'live',
+      isFeatured: true,
+    },
+  ],
 };
 
 interface ContentContextType {
   content: ContentState;
   updateContent: (newContent: ContentState) => Promise<boolean>;
   isLoading: boolean;
+  error: string | null;
 }
 
 const ContentContext = createContext<ContentContextType | undefined>(undefined);
@@ -44,18 +58,17 @@ const ContentContext = createContext<ContentContextType | undefined>(undefined);
 export function ContentProvider({ children }: { children: ReactNode }) {
   const [content, setContent] = useState<ContentState>(defaultContent);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Fetch content on mount
   useEffect(() => {
     const fetchContent = async () => {
       try {
-        const response = await fetch('/api/content');
-        if (response.ok) {
-          const data = await response.json();
-          setContent(data);
-        }
-      } catch (error) {
-        console.error("Failed to fetch content, using defaults:", error);
+        const data = await api.getContent();
+        setContent({ ...defaultContent, ...(data as ContentState) });
+        setError(null);
+      } catch (err) {
+        console.error('Failed to fetch content, using defaults:', err);
+        setError('Failed to load site content');
       } finally {
         setIsLoading(false);
       }
@@ -64,30 +77,19 @@ export function ContentProvider({ children }: { children: ReactNode }) {
     fetchContent();
   }, []);
 
-  // Function to save content back to the local CMS
   const updateContent = async (newContent: ContentState) => {
     try {
-      const response = await fetch('/api/content', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(newContent)
-      });
-      
-      if (response.ok) {
-        setContent(newContent);
-        return true;
-      }
-      return false;
-    } catch (error) {
-      console.error("Failed to save content:", error);
+      await api.saveContent(newContent);
+      setContent(newContent);
+      return true;
+    } catch (err) {
+      console.error('Failed to save content:', err);
       return false;
     }
   };
 
   return (
-    <ContentContext.Provider value={{ content, updateContent, isLoading }}>
+    <ContentContext.Provider value={{ content, updateContent, isLoading, error }}>
       {children}
     </ContentContext.Provider>
   );
@@ -96,7 +98,7 @@ export function ContentProvider({ children }: { children: ReactNode }) {
 export function useContent() {
   const context = useContext(ContentContext);
   if (context === undefined) {
-    throw new Error("useContent must be used within a ContentProvider");
+    throw new Error('useContent must be used within a ContentProvider');
   }
   return context;
 }

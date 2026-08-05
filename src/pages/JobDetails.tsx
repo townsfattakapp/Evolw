@@ -1,53 +1,91 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useParams, useNavigate, Link, useLocation } from "react-router-dom";
 import { SEO } from "../components/common/seo";
 import { Container } from "../components/ui/container";
 import { Button } from "../components/ui/button";
 import { ArrowLeft, Briefcase, MapPin, CheckCircle, Upload } from "lucide-react";
-import { useContent } from "../context/ContentContext";
+import { api, ApiError, fileToDataUrl, type Job } from "../lib/api";
 
 export function JobDetails() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { hash } = useLocation();
-  const { content, isLoading } = useContent();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+
+  const [job, setJob] = useState<Job | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
     linkedin: "",
     portfolio: "",
-    message: ""
+    experience: "",
+    skills: "",
+    message: "",
   });
   const [resumeFile, setResumeFile] = useState<File | null>(null);
-  
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // Auto scroll to apply form if hash is #apply
-  React.useEffect(() => {
-    if (hash === '#apply') {
+  useEffect(() => {
+    if (hash === "#apply") {
       setTimeout(() => {
-        document.getElementById('apply-form')?.scrollIntoView({ behavior: 'smooth' });
+        document.getElementById("apply-form")?.scrollIntoView({ behavior: "smooth" });
       }, 100);
     }
-  }, [hash]);
+  }, [hash, job]);
+
+  useEffect(() => {
+    const load = async () => {
+      if (!id) {
+        setIsLoading(false);
+        return;
+      }
+      setIsLoading(true);
+      setLoadError(null);
+      try {
+        const data = await api.getJobs({ id });
+        setJob(Array.isArray(data) ? data[0] || null : data);
+      } catch (err) {
+        console.error("[job-details] Failed to load job", err);
+        if (err instanceof ApiError && err.status === 404) {
+          setJob(null);
+        } else {
+          setLoadError(err instanceof ApiError ? err.message : "Failed to load job details");
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    load();
+  }, [id]);
 
   if (isLoading) {
     return <div className="min-h-screen pt-32 pb-20 flex items-center justify-center">Loading...</div>;
   }
 
-  const job = content.jobs?.find(j => j.id === id);
+  if (loadError) {
+    return (
+      <div className="min-h-screen pt-32 pb-20 flex flex-col items-center justify-center text-center px-4">
+        <h1 className="text-4xl font-bold mb-4">Unable to load role</h1>
+        <p className="text-evolw-gray-500 mb-8">{loadError}</p>
+        <Button onClick={() => navigate("/careers")}>Back to Careers</Button>
+      </div>
+    );
+  }
 
   if (!job) {
     return (
       <div className="min-h-screen pt-32 pb-20 flex flex-col items-center justify-center text-center px-4">
         <h1 className="text-4xl font-bold mb-4">Job Not Found</h1>
         <p className="text-evolw-gray-500 mb-8">This position may have been filled or no longer exists.</p>
-        <Button onClick={() => navigate('/careers')}>Back to Careers</Button>
+        <Button onClick={() => navigate("/careers")}>Back to Careers</Button>
       </div>
     );
   }
@@ -57,7 +95,7 @@ export function JobDetails() {
     if (!formData.name.trim()) newErrors.name = "Name is required";
     if (!formData.email.trim()) newErrors.email = "Email is required";
     if (!resumeFile) newErrors.resume = "Resume is required";
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -65,9 +103,8 @@ export function JobDetails() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
-      // Check file size (max 5MB for FormSubmit)
-      if (file.size > 5 * 1024 * 1024) {
-        setErrors({ ...errors, resume: "File is too large (max 5MB)" });
+      if (file.size > 4 * 1024 * 1024) {
+        setErrors({ ...errors, resume: "File is too large (max 4MB)" });
         return;
       }
       setResumeFile(file);
@@ -79,99 +116,58 @@ export function JobDetails() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validate()) return;
-    
+    if (!validate() || !resumeFile) return;
+
     setIsSubmitting(true);
-    
+    setSubmitError(null);
+
     try {
-      // Step 1: Save metadata & File to the Admin CMS Database
-      // Convert the file to Base64 so we can upload it as JSON
-      let resumeBase64 = null;
-      let resumeName = null;
-      
-      if (resumeFile) {
-        resumeName = resumeFile.name;
-        resumeBase64 = await new Promise((resolve) => {
-          const reader = new FileReader();
-          reader.onloadend = () => resolve(reader.result);
-          reader.readAsDataURL(resumeFile);
-        });
-      }
+      const resumeBase64 = await fileToDataUrl(resumeFile);
 
-      await fetch("/api/applications", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          jobId: job.id,
-          jobTitle: job.title,
-          name: formData.name,
-          email: formData.email,
-          phone: formData.phone,
-          linkedin: formData.linkedin,
-          portfolio: formData.portfolio,
-          message: formData.message,
-          resumeAttached: resumeFile ? true : false,
-          resumeBase64: resumeBase64,
-          resumeName: resumeName
-        })
+      await api.createApplication({
+        jobId: job.id,
+        jobTitle: job.title,
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        linkedin: formData.linkedin,
+        portfolio: formData.portfolio,
+        experience: formData.experience,
+        skills: formData.skills,
+        message: formData.message,
+        resumeBase64,
+        resumeName: resumeFile.name,
+        resumeContentType: resumeFile.type || undefined,
       });
-
-      // Step 2: Prepare FormData for FormSubmit API
-      const submitData = new FormData();
-      submitData.append("_subject", `New Job Application: ${job.title} - ${formData.name}`);
-      submitData.append("_template", "table");
-      submitData.append("_captcha", "false");
-      submitData.append("Name", formData.name);
-      submitData.append("Email", formData.email);
-      submitData.append("Phone", formData.phone || "Not provided");
-      submitData.append("LinkedIn", formData.linkedin || "Not provided");
-      submitData.append("Portfolio", formData.portfolio || "Not provided");
-      submitData.append("Cover Letter", formData.message || "Not provided");
-      
-      // CRITICAL: FormSubmit requires the file field to be named exactly "attachment"
-      if (resumeFile) {
-        submitData.append("attachment", resumeFile, resumeFile.name);
-      }
-
-      // Step 3: Send Email via FormSubmit AJAX API
-      const emailResponse = await fetch("https://formsubmit.co/ajax/fattaksein@gmail.com", {
-        method: "POST",
-        headers: {
-          "Accept": "application/json"
-        },
-        body: submitData
-      });
-
-      if (!emailResponse.ok) {
-        throw new Error("Failed to send email application");
-      }
 
       setIsSuccess(true);
-      
     } catch (error) {
-      console.error(error);
-      alert("Failed to submit application. Please try again.");
+      console.error("[job-details] Application submit failed", error);
+      const message =
+        error instanceof ApiError
+          ? error.message
+          : "Failed to submit application. Please try again.";
+      setSubmitError(message);
     } finally {
       setIsSubmitting(false);
     }
   };
 
-
-
   return (
     <>
       <SEO title={`${job.title} | Careers | EVOLW`} description={`Apply for ${job.title} at EVOLW.`} />
-      
+
       <div className="min-h-screen pt-32 pb-20 bg-evolw-gray-50 dark:bg-evolw-black">
         <Container>
           <div className="max-w-4xl mx-auto">
-            {/* Back Button */}
-            <Link to="/careers" className="inline-flex items-center text-sm font-medium text-evolw-gray-500 hover:text-evolw-accent transition-colors mb-8">
+            <Link
+              to="/careers"
+              className="inline-flex items-center text-sm font-medium text-evolw-gray-500 hover:text-evolw-accent transition-colors mb-8"
+            >
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to all roles
             </Link>
 
-            {/* Job Header */}
             <div className="bg-white dark:bg-evolw-slate rounded-3xl p-8 md:p-12 shadow-sm border border-evolw-gray-200 dark:border-white/5 mb-8">
               <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 mb-8">
                 <div>
@@ -185,16 +181,16 @@ export function JobDetails() {
                       <MapPin className="w-4 h-4 mr-2" />
                       {job.location}
                     </span>
-                    <span className="flex items-center">
-                      • {job.type}
-                    </span>
+                    <span className="flex items-center">• {job.type}</span>
                   </div>
                 </div>
-                <Button 
-                  size="lg" 
-                  variant="accent" 
+                <Button
+                  size="lg"
+                  variant="accent"
                   className="w-full md:w-auto"
-                  onClick={() => document.getElementById('apply-form')?.scrollIntoView({ behavior: 'smooth' })}
+                  onClick={() =>
+                    document.getElementById("apply-form")?.scrollIntoView({ behavior: "smooth" })
+                  }
                 >
                   Apply for this role
                 </Button>
@@ -207,8 +203,10 @@ export function JobDetails() {
               </div>
             </div>
 
-            {/* Application Form */}
-            <div id="apply-form" className="bg-white dark:bg-evolw-slate rounded-3xl p-8 md:p-12 shadow-sm border border-evolw-gray-200 dark:border-white/5 scroll-mt-32">
+            <div
+              id="apply-form"
+              className="bg-white dark:bg-evolw-slate rounded-3xl p-8 md:p-12 shadow-sm border border-evolw-gray-200 dark:border-white/5 scroll-mt-32"
+            >
               <h2 className="text-2xl font-bold mb-2">Submit your application</h2>
               <p className="text-evolw-gray-500 mb-8">Apply for {job.title}</p>
 
@@ -219,7 +217,8 @@ export function JobDetails() {
                   </div>
                   <h3 className="text-3xl font-bold mb-2">Application Submitted!</h3>
                   <p className="text-evolw-gray-600 dark:text-evolw-gray-400 max-w-md">
-                    Thank you for applying to EVOLW. We have successfully received your application and resume. Our team will review your profile and get back to you soon.
+                    Thank you for applying to EVOLW. We have successfully received your application
+                    and resume. Our team will review your profile and get back to you soon.
                   </p>
                   <Button asChild variant="outline" className="mt-8 rounded-xl">
                     <Link to="/careers">Explore other roles</Link>
@@ -227,18 +226,27 @@ export function JobDetails() {
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} className="space-y-6">
-                  {/* File Upload Area */}
+                  {submitError && (
+                    <div className="p-4 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-sm font-medium">
+                      {submitError}
+                    </div>
+                  )}
+
                   <div className="space-y-2 mb-8">
                     <label className="text-sm font-medium">Resume / CV *</label>
-                    <div 
+                    <div
                       onClick={() => fileInputRef.current?.click()}
-                      className={`w-full p-8 border-2 border-dashed rounded-2xl flex flex-col items-center justify-center cursor-pointer transition-colors ${errors.resume ? 'border-red-500 bg-red-50 dark:bg-red-900/10' : 'border-evolw-gray-300 dark:border-white/10 hover:border-evolw-accent hover:bg-blue-50 dark:hover:bg-blue-900/10 bg-evolw-gray-50 dark:bg-white/5'}`}
+                      className={`w-full p-8 border-2 border-dashed rounded-2xl flex flex-col items-center justify-center cursor-pointer transition-colors ${
+                        errors.resume
+                          ? "border-red-500 bg-red-50 dark:bg-red-900/10"
+                          : "border-evolw-gray-300 dark:border-white/10 hover:border-evolw-accent hover:bg-blue-50 dark:hover:bg-blue-900/10 bg-evolw-gray-50 dark:bg-white/5"
+                      }`}
                     >
-                      <input 
-                        type="file" 
+                      <input
+                        type="file"
                         name="attachment"
-                        className="hidden" 
-                        ref={fileInputRef} 
+                        className="hidden"
+                        ref={fileInputRef}
                         onChange={handleFileChange}
                         accept=".pdf,.doc,.docx"
                       />
@@ -249,7 +257,9 @@ export function JobDetails() {
                         {resumeFile ? resumeFile.name : "Click to upload your resume"}
                       </p>
                       <p className="text-sm text-evolw-gray-500 text-center">
-                        {resumeFile ? `${(resumeFile.size / 1024 / 1024).toFixed(2)} MB` : "PDF, DOC, or DOCX (Max 5MB)"}
+                        {resumeFile
+                          ? `${(resumeFile.size / 1024 / 1024).toFixed(2)} MB`
+                          : "PDF, DOC, or DOCX (Max 4MB)"}
                       </p>
                     </div>
                     {errors.resume && <p className="text-red-500 text-xs mt-1">{errors.resume}</p>}
@@ -265,7 +275,9 @@ export function JobDetails() {
                           setFormData({ ...formData, name: e.target.value });
                           if (errors.name) setErrors({ ...errors, name: "" });
                         }}
-                        className={`w-full px-4 py-3 rounded-xl border bg-evolw-gray-50 dark:bg-evolw-black focus:ring-2 focus:ring-evolw-accent outline-none ${errors.name ? 'border-red-500' : 'border-transparent dark:border-white/10'}`}
+                        className={`w-full px-4 py-3 rounded-xl border bg-evolw-gray-50 dark:bg-evolw-black focus:ring-2 focus:ring-evolw-accent outline-none ${
+                          errors.name ? "border-red-500" : "border-transparent dark:border-white/10"
+                        }`}
                       />
                       {errors.name && <p className="text-red-500 text-xs">{errors.name}</p>}
                     </div>
@@ -278,7 +290,9 @@ export function JobDetails() {
                           setFormData({ ...formData, email: e.target.value });
                           if (errors.email) setErrors({ ...errors, email: "" });
                         }}
-                        className={`w-full px-4 py-3 rounded-xl border bg-evolw-gray-50 dark:bg-evolw-black focus:ring-2 focus:ring-evolw-accent outline-none ${errors.email ? 'border-red-500' : 'border-transparent dark:border-white/10'}`}
+                        className={`w-full px-4 py-3 rounded-xl border bg-evolw-gray-50 dark:bg-evolw-black focus:ring-2 focus:ring-evolw-accent outline-none ${
+                          errors.email ? "border-red-500" : "border-transparent dark:border-white/10"
+                        }`}
                       />
                       {errors.email && <p className="text-red-500 text-xs">{errors.email}</p>}
                     </div>
@@ -295,6 +309,30 @@ export function JobDetails() {
                       />
                     </div>
                     <div className="space-y-2">
+                      <label className="text-sm font-medium">Years of Experience</label>
+                      <input
+                        type="text"
+                        value={formData.experience}
+                        onChange={(e) => setFormData({ ...formData, experience: e.target.value })}
+                        className="w-full px-4 py-3 rounded-xl border border-transparent dark:border-white/10 bg-evolw-gray-50 dark:bg-evolw-black focus:ring-2 focus:ring-evolw-accent outline-none"
+                        placeholder="e.g. 3 years"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Skills</label>
+                    <input
+                      type="text"
+                      value={formData.skills}
+                      onChange={(e) => setFormData({ ...formData, skills: e.target.value })}
+                      className="w-full px-4 py-3 rounded-xl border border-transparent dark:border-white/10 bg-evolw-gray-50 dark:bg-evolw-black focus:ring-2 focus:ring-evolw-accent outline-none"
+                      placeholder="e.g. React, TypeScript, Node.js"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
                       <label className="text-sm font-medium">LinkedIn Profile URL (Optional)</label>
                       <input
                         type="url"
@@ -303,16 +341,15 @@ export function JobDetails() {
                         className="w-full px-4 py-3 rounded-xl border border-transparent dark:border-white/10 bg-evolw-gray-50 dark:bg-evolw-black focus:ring-2 focus:ring-evolw-accent outline-none"
                       />
                     </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium">Portfolio / GitHub URL (Optional)</label>
-                    <input
-                      type="url"
-                      value={formData.portfolio}
-                      onChange={(e) => setFormData({ ...formData, portfolio: e.target.value })}
-                      className="w-full px-4 py-3 rounded-xl border border-transparent dark:border-white/10 bg-evolw-gray-50 dark:bg-evolw-black focus:ring-2 focus:ring-evolw-accent outline-none"
-                    />
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium">Portfolio / GitHub URL (Optional)</label>
+                      <input
+                        type="url"
+                        value={formData.portfolio}
+                        onChange={(e) => setFormData({ ...formData, portfolio: e.target.value })}
+                        className="w-full px-4 py-3 rounded-xl border border-transparent dark:border-white/10 bg-evolw-gray-50 dark:bg-evolw-black focus:ring-2 focus:ring-evolw-accent outline-none"
+                      />
+                    </div>
                   </div>
 
                   <div className="space-y-2">
@@ -326,7 +363,13 @@ export function JobDetails() {
                   </div>
 
                   <div className="pt-4">
-                    <Button type="submit" size="lg" variant="accent" className="w-full md:w-auto px-12 rounded-xl" disabled={isSubmitting}>
+                    <Button
+                      type="submit"
+                      size="lg"
+                      variant="accent"
+                      className="w-full md:w-auto px-12 rounded-xl"
+                      disabled={isSubmitting}
+                    >
                       {isSubmitting ? "Uploading..." : "Submit Application"}
                     </Button>
                   </div>

@@ -48,7 +48,7 @@ export function AdminContent() {
     <div className="max-w-4xl mx-auto space-y-8">
       <div>
         <h2 className="text-3xl font-bold tracking-tight mb-2">Content Editor</h2>
-        <p className="text-evolw-gray-500">Edit the text on your live website. Changes will be saved locally.</p>
+        <p className="text-evolw-gray-500">Edit the text on your live website. Changes sync to the database immediately.</p>
       </div>
 
       <form onSubmit={handleSave} className="bg-white dark:bg-evolw-slate rounded-3xl border border-evolw-gray-200 dark:border-white/5 overflow-hidden shadow-sm">

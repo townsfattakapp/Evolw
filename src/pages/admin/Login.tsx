@@ -2,13 +2,14 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { SEO } from "../../components/common/seo";
 import { Loader2, AlertCircle, ArrowLeft } from "lucide-react";
+import { api, ApiError } from "../../lib/api";
 
 export function AdminLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -26,24 +27,21 @@ export function AdminLogin() {
     setError(null);
 
     try {
-      const res = await fetch("/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
+      const data = await api.login(email, password);
 
-      const data = await res.json();
-
-      if (res.ok && data.success) {
-        // Store the secure token
+      if (data.success && data.token) {
         localStorage.setItem("evolw_admin_auth", data.token);
         navigate("/admin/dashboard");
       } else {
-        // Display backend error inline
         setError(data.error || "Invalid credentials.");
       }
     } catch (err) {
-      setError("Network error. Please try again.");
+      console.error("[admin/login] Failed", err);
+      setError(
+        err instanceof ApiError
+          ? err.message
+          : "Network error. Please try again."
+      );
     } finally {
       setLoading(false);
     }

@@ -1,11 +1,20 @@
 import React, { useState } from 'react';
 import { Search, CheckCircle, XCircle, ShieldCheck, Award } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { api } from '../lib/api';
+
+interface CertificateVerifyData {
+  internName?: string;
+  role?: string;
+  startDate?: string;
+  endDate?: string;
+  performance?: string;
+}
 
 export function VerifyCertificate() {
   const [certId, setCertId] = useState('');
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<{ valid: boolean; data?: any } | null>(null);
+  const [result, setResult] = useState<{ valid: boolean; data?: CertificateVerifyData } | null>(null);
 
   const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -15,11 +24,13 @@ export function VerifyCertificate() {
     setResult(null);
 
     try {
-      const res = await fetch(`/api/certificates?certId=${encodeURIComponent(certId.trim())}`);
-      const data = await res.json();
-      setResult(data);
+      const data = await api.verifyCertificate(certId.trim());
+      setResult({
+        valid: Boolean(data.valid),
+        data: data.data as CertificateVerifyData | undefined,
+      });
     } catch (e) {
-      console.error(e);
+      console.error('[verify] Failed', e);
       setResult({ valid: false });
     } finally {
       setLoading(false);
@@ -84,22 +95,28 @@ export function VerifyCertificate() {
                   <div className="space-y-4">
                     <div>
                       <p className="text-xs font-bold text-green-800 uppercase tracking-wider mb-1">Intern Name</p>
-                      <p className="font-semibold text-lg text-green-950">{result.data.internName}</p>
+                      <p className="font-semibold text-lg text-green-950">{result.data?.internName}</p>
                     </div>
                     <div>
                       <p className="text-xs font-bold text-green-800 uppercase tracking-wider mb-1">Role / Department</p>
-                      <p className="font-medium text-green-900">{result.data.role}</p>
+                      <p className="font-medium text-green-900">{result.data?.role}</p>
                     </div>
                     <div className="flex gap-8">
                       <div>
                         <p className="text-xs font-bold text-green-800 uppercase tracking-wider mb-1">Tenure</p>
                         <p className="font-medium text-green-900">
-                          {new Date(result.data.startDate).toLocaleDateString('en-IN', { month: 'short', year: 'numeric'})} - {new Date(result.data.endDate).toLocaleDateString('en-IN', { month: 'short', year: 'numeric'})}
+                          {result.data?.startDate
+                            ? new Date(result.data.startDate).toLocaleDateString('en-IN', { month: 'short', year: 'numeric'})
+                            : '—'}{' '}
+                          -{' '}
+                          {result.data?.endDate
+                            ? new Date(result.data.endDate).toLocaleDateString('en-IN', { month: 'short', year: 'numeric'})
+                            : '—'}
                         </p>
                       </div>
                       <div>
                         <p className="text-xs font-bold text-green-800 uppercase tracking-wider mb-1">Rating</p>
-                        <p className="font-medium text-green-900">{result.data.performance}</p>
+                        <p className="font-medium text-green-900">{result.data?.performance}</p>
                       </div>
                     </div>
                   </div>

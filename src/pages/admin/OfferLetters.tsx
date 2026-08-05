@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Calculator, Briefcase, User, IndianRupee, Download, Save, History, FileText, Trash2 } from 'lucide-react';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import { OfferLetterPDF } from './OfferLetterPDF';
+import { api, ApiError } from '../../lib/api';
+import { useNavigate } from 'react-router-dom';
 
 export interface OfferData {
   id?: string;
@@ -26,6 +28,7 @@ export interface OfferData {
 }
 
 export function AdminOfferLetters() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'builder' | 'history'>('builder');
   const [history, setHistory] = useState<OfferData[]>([]);
   const [isSaving, setIsSaving] = useState(false);
@@ -57,25 +60,26 @@ export function AdminOfferLetters() {
 
   const fetchHistory = async () => {
     try {
-      const res = await fetch('/api/offer-letters');
-      const json = await res.json();
-      setHistory(json);
+      const json = await api.getOfferLetters();
+      setHistory(json as OfferData[]);
     } catch (e) {
-      console.error(e);
+      console.error('[admin/offer-letters] Failed to load history', e);
+      if (e instanceof ApiError && (e.status === 401 || e.status === 403)) {
+        navigate('/admin');
+      }
     }
   };
 
   const deleteOfferLetter = async (id: string) => {
     if (!window.confirm('Are you sure you want to permanently delete this offer letter?')) return;
     try {
-      await fetch('/api/offer-letters', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id })
-      });
+      await api.deleteOfferLetter(id);
       setHistory(prev => prev.filter(h => h.id !== id));
     } catch (e) {
-      console.error(e);
+      console.error('[admin/offer-letters] Failed to delete', e);
+      if (e instanceof ApiError && (e.status === 401 || e.status === 403)) {
+        navigate('/admin');
+      }
     }
   };
 
@@ -124,19 +128,18 @@ export function AdminOfferLetters() {
   const saveOfferLetter = async () => {
     setIsSaving(true);
     try {
-      const res = await fetch('/api/offer-letters', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
-      const result = await res.json();
+      const result = await api.createOfferLetter(data);
       if (result.success) {
-        setData(result.offer); // This updates the state with the generated Ref ID!
+        setData(result.offer as OfferData);
         alert("Offer Letter saved successfully! The Reference ID has been generated.");
       }
     } catch (e) {
-      console.error(e);
-      alert("Failed to save offer letter.");
+      console.error('[admin/offer-letters] Failed to save', e);
+      if (e instanceof ApiError && (e.status === 401 || e.status === 403)) {
+        navigate('/admin');
+        return;
+      }
+      alert(e instanceof ApiError ? e.message : "Failed to save offer letter.");
     } finally {
       setIsSaving(false);
     }

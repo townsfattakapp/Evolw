@@ -106,7 +106,7 @@ export function Navbar() {
             initial={{ opacity: 0, y: -10, filter: "blur(10px)" }}
             animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
             exit={{ opacity: 0, y: -10, filter: "blur(10px)" }}
-            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] as const }}
             className="fixed inset-0 z-40 bg-white/95 backdrop-blur-xl dark:bg-evolw-black/95 pt-28 px-6 md:hidden flex flex-col h-screen"
           >
             <nav className="flex flex-col space-y-6 text-2xl font-display font-medium tracking-tight">
@@ -115,7 +115,7 @@ export function Navbar() {
                   key={link.name}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.05 + 0.1, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                  transition={{ delay: i * 0.05 + 0.1, duration: 0.4, ease: [0.22, 1, 0.36, 1] as const }}
                 >
                   <Link
                     to={link.href}
@@ -134,7 +134,7 @@ export function Navbar() {
             <motion.div 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ delay: 0.4, duration: 0.4, ease: [0.22, 1, 0.36, 1] as const }}
               className="mt-12"
             >
               <Button asChild variant="default" className="w-full h-14 text-lg rounded-full">

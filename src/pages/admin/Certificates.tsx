@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { User, Calendar, Star, Download, Save, History, Award, Trash2, Upload, PenTool } from 'lucide-react';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import { CertificatePDF } from './CertificatePDF';
+import { api, ApiError } from '../../lib/api';
+import { useNavigate } from 'react-router-dom';
 
 export interface CertificateData {
   id?: string;
@@ -16,6 +18,7 @@ export interface CertificateData {
 }
 
 export function AdminCertificates() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'builder' | 'history'>('builder');
   const [history, setHistory] = useState<CertificateData[]>([]);
   const [isSaving, setIsSaving] = useState(false);
@@ -59,25 +62,26 @@ export function AdminCertificates() {
 
   const fetchHistory = async () => {
     try {
-      const res = await fetch('/api/certificates');
-      const json = await res.json();
-      setHistory(json);
+      const json = await api.getCertificates();
+      setHistory(json as CertificateData[]);
     } catch (e) {
-      console.error(e);
+      console.error('[admin/certificates] Failed to load history', e);
+      if (e instanceof ApiError && (e.status === 401 || e.status === 403)) {
+        navigate('/admin');
+      }
     }
   };
 
   const deleteCertificate = async (id: string) => {
     if (!window.confirm('Are you sure you want to permanently delete this certificate?')) return;
     try {
-      await fetch('/api/certificates', {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id })
-      });
+      await api.deleteCertificate(id);
       setHistory(prev => prev.filter(h => h.id !== id));
     } catch (e) {
-      console.error(e);
+      console.error('[admin/certificates] Failed to delete', e);
+      if (e instanceof ApiError && (e.status === 401 || e.status === 403)) {
+        navigate('/admin');
+      }
     }
   };
 
@@ -88,19 +92,18 @@ export function AdminCertificates() {
   const saveCertificate = async () => {
     setIsSaving(true);
     try {
-      const res = await fetch('/api/certificates', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
-      const result = await res.json();
+      const result = await api.createCertificate(data);
       if (result.success) {
-        setData(result.certificate); // Updates state with the generated Cert ID!
+        setData(result.certificate as CertificateData);
         alert("Certificate saved successfully! The Certificate ID has been generated.");
       }
     } catch (e) {
-      console.error(e);
-      alert("Failed to save certificate.");
+      console.error('[admin/certificates] Failed to save', e);
+      if (e instanceof ApiError && (e.status === 401 || e.status === 403)) {
+        navigate('/admin');
+        return;
+      }
+      alert(e instanceof ApiError ? e.message : "Failed to save certificate.");
     } finally {
       setIsSaving(false);
     }

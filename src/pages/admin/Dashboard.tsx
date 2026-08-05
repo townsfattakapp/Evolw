@@ -1,20 +1,30 @@
 import { Users, TrendingUp, Activity, MessageSquare, ArrowRight } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { api, ApiError, type Lead } from "../../lib/api";
 
 export function AdminDashboard() {
+  const navigate = useNavigate();
   const [leadCount, setLeadCount] = useState(0);
-  const [recentLeads, setRecentLeads] = useState<any[]>([]);
+  const [recentLeads, setRecentLeads] = useState<Lead[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch('/api/leads')
-      .then(res => res.json())
-      .then(data => {
+    api
+      .getLeads()
+      .then((data) => {
         setLeadCount(data.length || 0);
         setRecentLeads((data || []).slice(0, 3));
       })
-      .catch(console.error);
-  }, []);
+      .catch((err) => {
+        console.error("[admin/dashboard] Failed to load leads", err);
+        if (err instanceof ApiError && (err.status === 401 || err.status === 403)) {
+          navigate("/admin");
+          return;
+        }
+        setError(err instanceof ApiError ? err.message : "Failed to load dashboard data");
+      });
+  }, [navigate]);
 
   const stats = [
     { label: "Total Form Leads", value: leadCount.toString(), change: "Live", icon: MessageSquare },
@@ -36,6 +46,12 @@ export function AdminDashboard() {
           </p>
         </div>
       </div>
+
+      {error && (
+        <div className="p-4 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-sm font-medium">
+          {error}
+        </div>
+      )}
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -77,10 +93,10 @@ export function AdminDashboard() {
                 </div>
                 <div className="flex-1">
                   <p className="font-semibold text-lg text-evolw-black dark:text-white">{lead.name}</p>
-                  <p className="text-sm text-evolw-gray-500 dark:text-evolw-gray-400">{lead.company} • {lead.service}</p>
+                  <p className="text-sm text-evolw-gray-500 dark:text-evolw-gray-400">{lead.company} • {lead.service || lead.subject}</p>
                 </div>
                 <div className="text-sm font-medium text-evolw-gray-400 dark:text-evolw-gray-500 bg-evolw-gray-100 dark:bg-white/5 px-3 py-1 rounded-full">
-                  {lead.date}
+                  {lead.date || lead.createdAt?.split("T")[0]}
                 </div>
               </div>
             ))}

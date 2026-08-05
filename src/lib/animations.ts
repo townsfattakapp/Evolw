@@ -14,7 +14,7 @@ export const spring: Record<string, Transition> = {
 
 // Premium Cubic Bezier (for opacity/color transitions where springs aren't appropriate)
 export const ease = {
-  premium: [0.22, 1, 0.36, 1], // Custom smooth ease-out
+  premium: [0.22, 1, 0.36, 1] as const, // Custom smooth ease-out
 };
 
 // Shared Animation Variants
