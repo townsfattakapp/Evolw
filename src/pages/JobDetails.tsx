@@ -10,9 +10,12 @@ import { richTextToPlain } from "../lib/richText";
 import { breadcrumbSchema, jobPostingSchema } from "../lib/seo/schema";
 import * as pdfjsLib from "pdfjs-dist";
 
-// Set worker source to CDN to avoid Vite/Vercel bundling issues with the web worker
+// Use Vite's URL import to bundle the worker locally and respect CSP
 if (typeof window !== "undefined") {
-  pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
+  pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+    "pdfjs-dist/build/pdf.worker.min.mjs",
+    import.meta.url
+  ).toString();
 }
 
 export function JobDetails() {
