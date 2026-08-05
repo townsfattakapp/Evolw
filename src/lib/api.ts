@@ -133,7 +133,9 @@ async function apiRequest<T>(path: string, options: RequestOptions = {}): Promis
     }
     const message =
       typeof data === 'object' && data && 'error' in data
-        ? String((data as { error: unknown }).error)
+        ? (typeof (data as { error: unknown }).error === 'string' 
+            ? (data as { error: string }).error 
+            : JSON.stringify((data as { error: unknown }).error))
         : `Request failed (${response.status})`;
     console.error('[evolw] API error', { path, status: response.status, message });
     throw new ApiError(message, response.status, data);
