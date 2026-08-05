@@ -120,11 +120,13 @@ export function AdminApplicationDetail() {
   };
 
   const generateSummary = async () => {
-    if (!app?.resumeUrl || !resumeBlobUrl) return;
+    if (!app?.resumeUrl) return;
     setAiSummaryLoading(true);
     setAiSummaryError(null);
     try {
-      const response = await fetch(resumeBlobUrl);
+      // Fetch PDF directly from our proxy (same-origin, no CSP issues)
+      const response = await fetch(`/api/proxy-resume?url=${encodeURIComponent(app.resumeUrl)}`);
+      if (!response.ok) throw new Error('Failed to load resume for summarization');
       const arrayBuffer = await response.arrayBuffer();
       const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
       const numPages = Math.min(pdf.numPages, 5); // Max 5 pages
