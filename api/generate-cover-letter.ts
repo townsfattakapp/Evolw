@@ -47,7 +47,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     const chatCompletion = await groq.chat.completions.create({
       messages: [{ role: 'user', content: prompt }],
-      model: 'llama3-8b-8192', // Llama 3 8B is fast and suitable for cover letters, or could use 70b
+      model: 'llama-3.1-8b-instant',
       temperature: 0.7,
     });
 
