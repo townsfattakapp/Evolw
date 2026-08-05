@@ -19,6 +19,7 @@ import { AdminContacts } from "./pages/admin/Contacts";
 import { AdminContent } from "./pages/admin/Content";
 import { AdminJobs } from "./pages/admin/Jobs";
 import { AdminApplications } from "./pages/admin/Applications";
+import { AdminApplicationDetail } from "./pages/admin/ApplicationDetail";
 import { AdminOfferLetters } from "./pages/admin/OfferLetters";
 import { AdminCertificates } from "./pages/admin/Certificates";
 import { AdminProducts } from "./pages/admin/Products";
@@ -57,6 +58,7 @@ function App() {
             <Route path="content" element={<AdminContent />} />
             <Route path="jobs" element={<AdminJobs />} />
             <Route path="applications" element={<AdminApplications />} />
+            <Route path="applications/:id" element={<AdminApplicationDetail />} />
             <Route path="offer-letters" element={<AdminOfferLetters />} />
             <Route path="certificates" element={<AdminCertificates />} />
             <Route path="products" element={<AdminProducts />} />

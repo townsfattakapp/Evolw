@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { Search, Download, Filter, Trash2, ExternalLink, RefreshCw } from "lucide-react";
+import { Search, Download, Filter, Trash2, RefreshCw, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { api, ApiError, type Application } from "../../lib/api";
 
@@ -13,7 +13,6 @@ export function AdminApplications() {
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [expandedMsgId, setExpandedMsgId] = useState<string | null>(null);
   const [loadState, setLoadState] = useState<LoadState>("loading");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -264,8 +263,14 @@ export function AdminApplications() {
                 return (
                   <div key={app.id} className="p-4 space-y-3">
                     <div className="flex justify-between items-start gap-3">
-                      <div className="min-w-0">
-                        <p className="font-bold text-evolw-black dark:text-white truncate">{app.name}</p>
+                      <div 
+                        className="min-w-0 flex-1 cursor-pointer group"
+                        onClick={() => navigate(`/admin/applications/${app.id}`, { state: { app } })}
+                      >
+                        <div className="flex items-center justify-between">
+                          <p className="font-bold text-evolw-black dark:text-white truncate group-hover:text-evolw-accent transition-colors">{app.name}</p>
+                          <ChevronRight className="w-4 h-4 text-evolw-gray-400 group-hover:text-evolw-accent transition-colors" />
+                        </div>
                         <p className="text-sm text-evolw-gray-500 dark:text-evolw-gray-400 truncate">{app.email}</p>
                         <p className="text-xs text-evolw-gray-400 mt-1">{app.date || app.createdAt?.split("T")[0]}</p>
                       </div>
@@ -279,27 +284,6 @@ export function AdminApplications() {
                     <span className="inline-block text-xs font-medium bg-evolw-gray-100 dark:bg-white/10 px-2.5 py-1 rounded-lg">
                       {app.jobTitle || "Unknown role"}
                     </span>
-                    <p className="text-sm text-evolw-black dark:text-white">{app.experience || "—"}</p>
-                    <p className="text-xs text-evolw-gray-500 dark:text-evolw-gray-400">{app.skills || "No skills listed"}</p>
-                    {app.resumeUrl && (
-                      <a
-                        href={app.resumeUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center text-sm font-medium text-evolw-accent"
-                      >
-                        <ExternalLink className="w-3.5 h-3.5 mr-1.5" />
-                        {app.resumeName || "View Resume"}
-                      </a>
-                    )}
-                    <p
-                      className={`text-sm text-evolw-gray-600 dark:text-evolw-gray-400 ${
-                        expandedMsgId === app.id ? "" : "line-clamp-2"
-                      }`}
-                      onClick={() => setExpandedMsgId(expandedMsgId === app.id ? null : app.id)}
-                    >
-                      {app.message || "No cover letter provided."}
-                    </p>
                     <select
                       value={STATUS_OPTIONS.includes(status as (typeof STATUS_OPTIONS)[number]) ? status : "new"}
                       onChange={(e) => updateAppStatus(app, e.target.value)}
@@ -323,10 +307,7 @@ export function AdminApplications() {
               <thead>
                 <tr className="bg-white dark:bg-evolw-slate text-sm uppercase tracking-wider text-evolw-gray-500 dark:text-evolw-gray-400 border-b border-evolw-gray-200 dark:border-white/10">
                   <th className="px-6 lg:px-8 py-4 font-semibold">Applicant</th>
-                  <th className="px-6 lg:px-8 py-4 font-semibold">Role</th>
-                  <th className="px-6 lg:px-8 py-4 font-semibold">Experience / Skills</th>
-                  <th className="px-6 lg:px-8 py-4 font-semibold">Resume & Links</th>
-                  <th className="px-6 lg:px-8 py-4 font-semibold">Cover Letter</th>
+                  <th className="px-6 lg:px-8 py-4 font-semibold">Role & Date</th>
                   <th className="px-6 lg:px-8 py-4 font-semibold">Status</th>
                   <th className="px-6 lg:px-8 py-4 font-semibold text-right">Actions</th>
                 </tr>
@@ -337,89 +318,25 @@ export function AdminApplications() {
                   return (
                     <tr
                       key={app.id}
-                      className="hover:bg-evolw-gray-50/80 dark:hover:bg-white/5 transition-colors group"
+                      className="hover:bg-evolw-gray-50/80 dark:hover:bg-white/5 transition-colors group cursor-pointer"
+                      onClick={() => navigate(`/admin/applications/${app.id}`, { state: { app } })}
                     >
                       <td className="px-6 lg:px-8 py-5">
-                        <p className="font-bold text-base text-evolw-black dark:text-white">{app.name}</p>
+                        <p className="font-bold text-base text-evolw-black dark:text-white group-hover:text-evolw-accent transition-colors">{app.name}</p>
                         <p className="text-sm text-evolw-gray-500 dark:text-evolw-gray-400">{app.email}</p>
                         <p className="text-xs text-evolw-gray-400 font-mono mt-1">
                           {app.phone || "No phone"}
-                        </p>
-                        <p className="text-xs text-evolw-gray-400 mt-1">
-                          {app.date || app.createdAt?.split("T")[0]}
                         </p>
                       </td>
                       <td className="px-6 lg:px-8 py-5">
                         <span className="text-sm font-medium bg-evolw-gray-100 dark:bg-white/10 px-3 py-1.5 rounded-lg border border-evolw-gray-200 dark:border-white/10 shadow-sm text-evolw-black dark:text-white">
                           {app.jobTitle || "Unknown role"}
                         </span>
-                        {app.jobId && (
-                          <p className="text-xs text-evolw-gray-400 mt-2 font-mono">ID: {app.jobId}</p>
-                        )}
+                        <p className="text-xs text-evolw-gray-500 mt-3">
+                          Applied: {app.date || app.createdAt?.split("T")[0]}
+                        </p>
                       </td>
-                      <td className="px-6 lg:px-8 py-5 max-w-xs">
-                        <p className="text-sm font-medium text-evolw-black dark:text-white">{app.experience || "—"}</p>
-                        <p className="text-xs text-evolw-gray-500 dark:text-evolw-gray-400 mt-1">{app.skills || "No skills listed"}</p>
-                      </td>
-                      <td className="px-6 lg:px-8 py-5 space-y-2">
-                        {app.resumeUrl ? (
-                          <a
-                            href={app.resumeUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center text-sm font-medium text-evolw-accent hover:underline bg-evolw-accent/10 px-2 py-1 rounded-md w-fit mb-2"
-                          >
-                            <ExternalLink className="w-3.5 h-3.5 mr-1.5" />
-                            {app.resumeName || "View Resume"}
-                          </a>
-                        ) : (
-                          <span className="text-xs text-evolw-gray-400">No resume</span>
-                        )}
-                        {app.linkedin && app.linkedin !== "Not provided" && (
-                          <a
-                            href={app.linkedin}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline"
-                          >
-                            <ExternalLink className="w-3.5 h-3.5 mr-1.5" />
-                            LinkedIn
-                          </a>
-                        )}
-                        {app.portfolio && (
-                          <a
-                            href={app.portfolio}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center text-sm font-medium text-evolw-gray-600 dark:text-evolw-gray-400 hover:underline"
-                          >
-                            <ExternalLink className="w-3.5 h-3.5 mr-1.5" />
-                            Portfolio
-                          </a>
-                        )}
-                      </td>
-                      <td className="px-6 lg:px-8 py-5 max-w-xs">
-                        <div
-                          className="cursor-pointer group/msg relative"
-                          onClick={() =>
-                            setExpandedMsgId(expandedMsgId === app.id ? null : app.id)
-                          }
-                        >
-                          <p
-                            className={`text-sm text-evolw-gray-600 dark:text-evolw-gray-400 ${
-                              expandedMsgId === app.id ? "whitespace-normal" : "truncate"
-                            } transition-all`}
-                          >
-                            {app.message || "No cover letter provided."}
-                          </p>
-                          {expandedMsgId !== app.id && (app.message?.length || 0) > 40 && (
-                            <span className="text-xs text-evolw-accent opacity-0 group-hover/msg:opacity-100 transition-opacity mt-1 inline-block">
-                              Click to expand
-                            </span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-6 lg:px-8 py-5">
+                      <td className="px-6 lg:px-8 py-5" onClick={(e) => e.stopPropagation()}>
                         <select
                           value={STATUS_OPTIONS.includes(status as (typeof STATUS_OPTIONS)[number]) ? status : "new"}
                           onChange={(e) => updateAppStatus(app, e.target.value)}
@@ -433,13 +350,19 @@ export function AdminApplications() {
                         </select>
                       </td>
                       <td className="px-6 lg:px-8 py-5 text-right">
-                        <button
-                          onClick={() => deleteApp(app.id)}
-                          className="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-colors text-evolw-gray-400 hover:text-red-500"
-                          title="Delete Application"
-                        >
-                          <Trash2 className="w-5 h-5" />
-                        </button>
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              deleteApp(app.id);
+                            }}
+                            className="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-colors text-evolw-gray-400 hover:text-red-500"
+                            title="Delete Application"
+                          >
+                            <Trash2 className="w-5 h-5" />
+                          </button>
+                          <ChevronRight className="w-5 h-5 text-evolw-gray-300 group-hover:text-evolw-accent transition-colors" />
+                        </div>
                       </td>
                     </tr>
                   );
