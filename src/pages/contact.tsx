@@ -21,6 +21,7 @@ const contactInfo = [
     icon: Mail,
     label: "Email Us",
     value: "hello@evolw.in",
+    subtext: "We respond within 24 hours",
     href: "mailto:hello@evolw.in",
     accent: "#2563eb",
   },
@@ -28,6 +29,7 @@ const contactInfo = [
     icon: Phone,
     label: "Call Us",
     value: "+91 92092 50725",
+    subtext: null,
     href: "tel:+919209250725",
     accent: "#7c3aed",
   },
@@ -35,6 +37,7 @@ const contactInfo = [
     icon: MapPin,
     label: "Office",
     value: "Waraseoni, Balaghat\nMadhya Pradesh, India",
+    subtext: null,
     href: null,
     accent: "#0891b2",
   },
@@ -147,7 +150,7 @@ export function Contact() {
               className="inline-flex items-center gap-2 text-[11px] font-bold tracking-[0.3em] uppercase text-white/40 mb-8"
             >
               <Sparkles className="w-3.5 h-3.5" />
-              Let's Talk
+              Get In Touch
             </motion.p>
             <motion.h1
               variants={fadeUp}
@@ -194,6 +197,9 @@ export function Contact() {
                         <p className="text-base font-bold text-evolw-black dark:text-white leading-snug whitespace-pre-line group-hover:text-evolw-accent transition-colors">
                           {item.value}
                         </p>
+                        {(item as any).subtext && (
+                          <p className="text-xs text-evolw-gray-400 mt-1">{(item as any).subtext}</p>
+                        )}
                         <span className="inline-flex items-center gap-1 text-xs font-semibold mt-2 opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: item.accent }}>
                           Open <ArrowRight className="w-3 h-3" />
                         </span>
@@ -215,15 +221,6 @@ export function Contact() {
                 </motion.div>
               ))}
 
-              {/* Quick CTA */}
-              <motion.div variants={fadeUp} className="p-7 rounded-2xl bg-evolw-black text-white border border-white/10 relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 rounded-full bg-evolw-accent/30 blur-3xl -translate-y-1/3 translate-x-1/3 pointer-events-none" />
-                <p className="text-xs font-bold uppercase tracking-widest text-white/40 mb-3">Prefer email?</p>
-                <a href="mailto:hello@evolw.in" className="text-xl font-bold text-evolw-accent hover:underline break-all">
-                  hello@evolw.in
-                </a>
-                <p className="text-sm text-white/50 mt-2">We respond within 24 hours.</p>
-              </motion.div>
             </motion.div>
 
             {/* ── Right Column: Form ── */}
@@ -376,12 +373,7 @@ export function Contact() {
                           </span>
                         </button>
 
-                        <p className="text-center text-xs text-evolw-gray-400">
-                          Or email directly at{" "}
-                          <a href="mailto:hello@evolw.in" className="text-evolw-accent font-semibold hover:underline">
-                            hello@evolw.in
-                          </a>
-                        </p>
+
                       </motion.form>
                     )}
                   </AnimatePresence>
