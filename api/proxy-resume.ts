@@ -22,7 +22,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', 'inline; filename="resume.pdf"');
-    // We intentionally omit X-Frame-Options here to allow the iframe on our admin panel to render it.
+    // Explicitly allow this response to be framed by our own domain
+    res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+    res.setHeader('Content-Security-Policy', "frame-ancestors 'self' https://www.evolw.in https://evolw.in");
 
     const arrayBuffer = await response.arrayBuffer();
     return res.status(200).send(Buffer.from(arrayBuffer));
