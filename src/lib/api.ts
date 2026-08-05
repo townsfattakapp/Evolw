@@ -316,14 +316,14 @@ export const api = {
   },
 
   parseResume(payload: { resumeText: string }) {
-    return apiRequest<{ data: Record<string, string> }>('/api/parse-resume', {
+    return apiRequest<{ data: Record<string, string> }>('/api/ai?action=parse', {
       method: 'POST',
       body: payload,
     });
   },
 
   summarizeResume(payload: { resumeText: string }) {
-    return apiRequest<{ html: string }>('/api/summarize-resume', {
+    return apiRequest<{ html: string }>('/api/ai?action=summarize', {
       method: 'POST',
       body: payload,
       auth: true,
@@ -331,7 +331,7 @@ export const api = {
   },
 
   generateCoverLetter(payload: { resumeData: Record<string, string>; jobTitle: string; jobDescription: string; department?: string }) {
-    return apiRequest<{ coverLetter: string }>('/api/generate-cover-letter', {
+    return apiRequest<{ coverLetter: string }>('/api/ai?action=cover-letter', {
       method: 'POST',
       body: payload,
     });
