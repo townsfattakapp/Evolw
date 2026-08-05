@@ -134,13 +134,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         
         if (rows.length > 0) {
           const applicant = rows[0];
-          // Asynchronously attempt to send the email (don't block or fail the response)
-          sendStatusUpdateEmail(
+          // We MUST await this so Vercel does not terminate the lambda before the email fires
+          await sendStatusUpdateEmail(
             applicant.email as string, 
             applicant.name as string, 
             applicant.job_title as string, 
             status
-          ).catch(console.error);
+          );
         }
 
         return json(res, 200, { success: true });

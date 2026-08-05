@@ -21,6 +21,7 @@ export function json(
   body: unknown
 ): void {
   setCors(res);
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
   res.status(status).json(body);
 }
 
