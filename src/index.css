@@ -54,22 +54,72 @@
   p {
     @apply leading-relaxed;
   }
-  
-  /* Global form input styles — ensures text is always visible in both modes */
-  input, textarea, select {
-    @apply text-evolw-black dark:text-white bg-white dark:bg-evolw-gray-900 border-evolw-gray-200 dark:border-white/10 placeholder:text-evolw-gray-400 dark:placeholder:text-evolw-gray-600;
-  }
+}
 
-  /* Ensure date inputs show proper text color */
-  input[type="date"],
-  input[type="time"],
-  input[type="number"] {
-    @apply text-evolw-black dark:text-white;
-    color-scheme: light;
-  }
-  .dark input[type="date"],
-  .dark input[type="time"],
-  .dark input[type="number"] {
-    color-scheme: dark;
-  }
+/*
+ * CRITICAL: Input text visibility fix.
+ * Using raw CSS (not @apply) to guarantee higher specificity than inherited 
+ * text colors from parent sections (e.g. dark hero sections with text-white).
+ * These rules use !important to override inherited color from dark parent containers.
+ */
+
+/* Light mode inputs — always dark text on light background */
+input,
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="password"],
+input[type="number"],
+input[type="date"],
+input[type="time"],
+input[type="search"],
+textarea,
+select {
+  color: #09090b !important;
+  background-color: #ffffff;
+  -webkit-text-fill-color: #09090b !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #a1a1aa !important;
+  -webkit-text-fill-color: #a1a1aa !important;
+  opacity: 1;
+}
+
+/* Dark mode inputs — always light text on dark background */
+.dark input,
+.dark input[type="text"],
+.dark input[type="email"],
+.dark input[type="tel"],
+.dark input[type="password"],
+.dark input[type="number"],
+.dark input[type="date"],
+.dark input[type="time"],
+.dark input[type="search"],
+.dark textarea,
+.dark select {
+  color: #ffffff !important;
+  background-color: #18181b;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #52525b !important;
+  -webkit-text-fill-color: #52525b !important;
+  opacity: 1;
+}
+
+/* Date/number color-scheme for browser native pickers */
+input[type="date"],
+input[type="time"],
+input[type="number"] {
+  color-scheme: light;
+}
+
+.dark input[type="date"],
+.dark input[type="time"],
+.dark input[type="number"] {
+  color-scheme: dark;
 }
