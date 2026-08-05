@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider } from "react-helmet-async";
 import { PageWrapper } from "./components/layout/page-wrapper";
+import { ScrollToTop } from "./components/layout/scroll-to-top";
 import { Home } from "./pages/home";
 import { Products } from "./pages/products";
 import { Services } from "./pages/services";
@@ -31,6 +32,7 @@ function App() {
       <HelmetProvider>
       <ThemeProvider defaultTheme="system" storageKey="evolw-theme">
         <BrowserRouter>
+          <ScrollToTop />
           <Routes>
           <Route path="/" element={<PageWrapper />}>
             <Route index element={<Home />} />
