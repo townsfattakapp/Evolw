@@ -315,7 +315,7 @@ export const api = {
     });
   },
 
-  parseResume(payload: { resumeBase64: string; resumeContentType?: string }) {
+  parseResume(payload: { resumeText: string }) {
     return apiRequest<{ data: Record<string, string> }>('/api/parse-resume', {
       method: 'POST',
       body: payload,

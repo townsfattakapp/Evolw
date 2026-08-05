@@ -8,6 +8,12 @@ import { ArrowLeft, Briefcase, MapPin, CheckCircle, Upload, Sparkles, Loader2 } 
 import { api, ApiError, fileToDataUrl, type Job } from "../lib/api";
 import { richTextToPlain } from "../lib/richText";
 import { breadcrumbSchema, jobPostingSchema } from "../lib/seo/schema";
+import * as pdfjsLib from "pdfjs-dist";
+
+// Set worker source to CDN to avoid Vite/Vercel bundling issues with the web worker
+if (typeof window !== "undefined") {
+  pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
+}
 
 export function JobDetails() {
   const { id } = useParams<{ id: string }>();
@@ -127,23 +133,38 @@ export function JobDetails() {
 
       try {
         setIsParsing(true);
-        const resumeBase64 = await fileToDataUrl(file);
-        const result = await api.parseResume({ 
-          resumeBase64, 
-          resumeContentType: file.type 
-        });
+        let resumeText = "";
         
-        if (result.data) {
-          setFormData(prev => ({
-            ...prev,
-            name: result.data.name || prev.name,
-            email: result.data.email || prev.email,
-            phone: result.data.phone || prev.phone,
-            linkedin: result.data.linkedin || prev.linkedin,
-            portfolio: result.data.portfolio || prev.portfolio,
-            experience: result.data.experience || prev.experience,
-            skills: result.data.skills || prev.skills,
-          }));
+        if (file.type === "application/pdf" || file.name.endsWith(".pdf")) {
+          // Extract text from PDF on the client side to avoid server payload limits and 500 errors
+          const arrayBuffer = await file.arrayBuffer();
+          const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+          
+          // Only parse first 5 pages to save time/bandwidth
+          const numPages = Math.min(pdf.numPages, 5); 
+          for (let i = 1; i <= numPages; i++) {
+            const page = await pdf.getPage(i);
+            const content = await page.getTextContent();
+            const strings = content.items.map((item: any) => item.str);
+            resumeText += strings.join(" ") + "\n";
+          }
+        }
+
+        if (resumeText.trim()) {
+          const result = await api.parseResume({ resumeText });
+          
+          if (result.data) {
+            setFormData(prev => ({
+              ...prev,
+              name: result.data.name || prev.name,
+              email: result.data.email || prev.email,
+              phone: result.data.phone || prev.phone,
+              linkedin: result.data.linkedin || prev.linkedin,
+              portfolio: result.data.portfolio || prev.portfolio,
+              experience: result.data.experience || prev.experience,
+              skills: result.data.skills || prev.skills,
+            }));
+          }
         }
       } catch (err) {
         console.error("Failed to parse resume:", err);

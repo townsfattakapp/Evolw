@@ -1,6 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import Groq from 'groq-sdk';
-import pdfParse from 'pdf-parse';
 import { handleOptions, json, logError, readBody } from './_lib/http.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
@@ -17,39 +16,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       return json(res, 500, { error: 'Groq API key not configured' });
     }
 
-    const body = readBody<{ resumeBase64?: string; resumeContentType?: string }>(req);
-    if (!body.resumeBase64) {
-      return json(res, 400, { error: 'Resume base64 data is required' });
-    }
-
-    let base64Data = body.resumeBase64;
-    let mimeType = body.resumeContentType || 'application/pdf';
-
-    if (base64Data.startsWith('data:')) {
-      const parts = base64Data.split(';base64,');
-      if (parts.length === 2) {
-        mimeType = parts[0].replace('data:', '') || mimeType;
-        base64Data = parts[1];
-      }
-    }
-    
-    let resumeText = "";
-    
-    if (mimeType === 'application/pdf' || mimeType.includes('pdf')) {
-      try {
-        const pdfBuffer = Buffer.from(base64Data, 'base64');
-        const data = await pdfParse(pdfBuffer);
-        resumeText = data.text;
-      } catch (err) {
-        logError('parse-resume', 'Failed to extract text from PDF', err);
-        return json(res, 500, { error: 'Failed to read PDF file content.' });
-      }
-    } else {
-      return json(res, 400, { error: 'Only PDF format is currently supported for resume parsing.' });
-    }
+    const body = readBody<{ resumeText?: string }>(req);
+    const resumeText = body.resumeText;
 
     if (!resumeText || !resumeText.trim()) {
-      return json(res, 400, { error: 'Could not extract text from the provided PDF.' });
+      return json(res, 400, { error: 'Resume text is required' });
     }
 
     const groq = new Groq({ apiKey });
