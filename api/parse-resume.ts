@@ -17,11 +17,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     const body = readBody<{ resumeText?: string }>(req);
-    const resumeText = body.resumeText;
+    const rawText = body.resumeText;
 
-    if (!resumeText || !resumeText.trim()) {
+    if (!rawText || !rawText.trim()) {
       return json(res, 400, { error: 'Resume text is required' });
     }
+
+    // Truncate to avoid Groq context window limits (llama3-70b has 8192 token limit)
+    const resumeText = rawText.slice(0, 12000);
 
     const groq = new Groq({ apiKey });
     
@@ -63,7 +66,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     return json(res, 200, { data: parsedData });
   } catch (error) {
+    const message = error instanceof Error ? error.message : JSON.stringify(error);
     logError('parse-resume', error);
-    return json(res, 500, { error: 'Failed to process resume' });
+    return json(res, 500, { error: `Failed to process resume: ${message}` });
   }
 }
