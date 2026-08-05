@@ -54,4 +54,22 @@
   p {
     @apply leading-relaxed;
   }
+  
+  /* Global form input styles — ensures text is always visible in both modes */
+  input, textarea, select {
+    @apply text-evolw-black dark:text-white bg-white dark:bg-evolw-gray-900 border-evolw-gray-200 dark:border-white/10 placeholder:text-evolw-gray-400 dark:placeholder:text-evolw-gray-600;
+  }
+
+  /* Ensure date inputs show proper text color */
+  input[type="date"],
+  input[type="time"],
+  input[type="number"] {
+    @apply text-evolw-black dark:text-white;
+    color-scheme: light;
+  }
+  .dark input[type="date"],
+  .dark input[type="time"],
+  .dark input[type="number"] {
+    color-scheme: dark;
+  }
 }

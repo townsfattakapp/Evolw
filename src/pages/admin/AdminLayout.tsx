@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Outlet, useNavigate, Link, useLocation } from "react-router-dom";
 import { LayoutDashboard, Users, MessageSquare, Settings, LogOut, FileText, Award } from "lucide-react";
+import { ThemeToggle } from "../../components/theme-toggle";
 
 export function AdminLayout() {
   const navigate = useNavigate();
@@ -31,7 +32,7 @@ export function AdminLayout() {
   return (
     <div className="flex h-screen bg-evolw-gray-50 dark:bg-evolw-black overflow-hidden font-sans print:h-auto print:overflow-visible print:bg-white print:block">
       {/* Sidebar */}
-      <aside className="w-72 bg-white dark:bg-evolw-slate border-r border-evolw-gray-200 dark:border-white/5 flex flex-col shadow-sm print:hidden">
+      <aside className="w-72 bg-white dark:bg-evolw-gray-900 border-r border-evolw-gray-200 dark:border-white/5 flex flex-col shadow-sm print:hidden">
         <div className="h-20 flex items-center px-8 border-b border-evolw-gray-200 dark:border-white/5">
           <Link to="/" className="text-2xl font-bold tracking-tight hover:text-evolw-accent transition-colors">EVOLW</Link>
           <span className="ml-2 text-xs font-semibold px-2 py-1 bg-evolw-gray-100 dark:bg-white/10 rounded-md">ADMIN</span>
@@ -76,9 +77,10 @@ export function AdminLayout() {
           <h2 className="text-xl font-bold tracking-tight capitalize">
             {location.pathname.split("/").pop() || "Dashboard"}
           </h2>
-          <div className="flex items-center space-x-6">
+          <div className="flex items-center space-x-4">
+            <ThemeToggle />
             <div className="text-right hidden md:block">
-              <p className="text-sm font-medium">Admin User</p>
+              <p className="text-sm font-medium text-evolw-black dark:text-white">Admin User</p>
               <p className="text-xs text-evolw-gray-500">admin@evolw.in</p>
             </div>
             <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-evolw-accent to-blue-400 flex items-center justify-center text-white font-bold shadow-md cursor-pointer hover:shadow-lg transition-shadow">
