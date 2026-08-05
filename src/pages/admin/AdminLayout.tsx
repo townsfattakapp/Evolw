@@ -34,7 +34,7 @@ export function AdminLayout() {
       {/* Sidebar */}
       <aside className="w-72 bg-white dark:bg-evolw-gray-900 border-r border-evolw-gray-200 dark:border-white/5 flex flex-col shadow-sm print:hidden">
         <div className="h-20 flex items-center px-8 border-b border-evolw-gray-200 dark:border-white/5">
-          <Link to="/" className="text-2xl font-bold tracking-tight hover:text-evolw-accent transition-colors">EVOLW</Link>
+          <Link to="/admin/dashboard" className="text-2xl font-bold tracking-tight hover:text-evolw-accent transition-colors">EVOLW</Link>
           <span className="ml-2 text-xs font-semibold px-2 py-1 bg-evolw-gray-100 dark:bg-white/10 rounded-md">ADMIN</span>
         </div>
         

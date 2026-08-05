@@ -1,7 +1,7 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import { SEO } from "../../components/common/seo";
-import { Loader2, AlertCircle } from "lucide-react";
+import { Loader2, AlertCircle, ArrowLeft } from "lucide-react";
 
 export function AdminLogin() {
   const [email, setEmail] = useState("");
@@ -10,6 +10,13 @@ export function AdminLogin() {
   const [error, setError] = useState<string | null>(null);
   
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const isAuthenticated = localStorage.getItem("evolw_admin_auth");
+    if (isAuthenticated) {
+      navigate("/admin/dashboard");
+    }
+  }, [navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,9 +58,15 @@ export function AdminLogin() {
         <div className="absolute top-0 right-0 w-96 h-96 bg-evolw-accent/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl translate-y-1/3 -translate-x-1/4"></div>
 
-        <div className="w-full max-w-md bg-white dark:bg-evolw-slate rounded-[2rem] shadow-2xl p-10 border border-evolw-gray-200 dark:border-white/10 relative z-10 backdrop-blur-xl">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold mb-2 tracking-tight">EVOLW Admin</h1>
+        <div className="w-full max-w-md relative z-10 flex flex-col items-center">
+          <Link to="/" className="inline-flex items-center text-sm font-medium text-evolw-gray-600 dark:text-evolw-gray-400 hover:text-evolw-accent dark:hover:text-white transition-colors mb-6 group bg-white/50 dark:bg-white/5 backdrop-blur-md px-5 py-2.5 rounded-full border border-evolw-gray-200 dark:border-white/10 shadow-sm">
+            <ArrowLeft className="w-4 h-4 mr-2 transition-transform group-hover:-translate-x-1" />
+            Back to Website
+          </Link>
+
+          <div className="w-full bg-white dark:bg-evolw-slate rounded-[2rem] shadow-2xl p-10 border border-evolw-gray-200 dark:border-white/10 backdrop-blur-xl">
+            <div className="text-center mb-8">
+              <h1 className="text-3xl font-bold mb-2 tracking-tight">EVOLW Admin</h1>
             <p className="text-evolw-gray-500">Sign in to manage your platform</p>
           </div>
           
@@ -110,6 +123,7 @@ export function AdminLogin() {
 
           <div className="mt-8 text-center text-sm text-evolw-gray-500">
             <p>Secure connection established.</p>
+          </div>
           </div>
         </div>
       </div>

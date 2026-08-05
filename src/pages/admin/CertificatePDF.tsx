@@ -1,4 +1,4 @@
-import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer';
+import { Document, Page, Text, View, StyleSheet, Svg, Path, Circle, Image } from '@react-pdf/renderer';
 
 interface CertificateData {
   id?: string;
@@ -8,6 +8,7 @@ interface CertificateData {
   startDate: string;
   endDate: string;
   performance: string;
+  hrSignature?: string;
 }
 
 const styles = StyleSheet.create({
@@ -27,7 +28,16 @@ const styles = StyleSheet.create({
     flex: 1, // Take full height inside outer border
     display: 'flex',
     flexDirection: 'column',
-    position: 'relative'
+    position: 'relative',
+    overflow: 'hidden'
+  },
+  backgroundGraphics: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    opacity: 0.08,
   },
   contentWrapper: {
     flex: 1, // Pushes footer to the bottom
@@ -129,6 +139,12 @@ const styles = StyleSheet.create({
     width: 150,
     alignItems: 'center',
   },
+  signatureImage: {
+    width: 120,
+    height: 40,
+    objectFit: 'contain',
+    marginBottom: 5,
+  },
   signatureLine: {
     borderTop: '1pt solid #000',
     width: '100%',
@@ -169,6 +185,48 @@ export const CertificatePDF = ({ data }: { data: CertificateData }) => {
         <View style={styles.borderOuter}>
           <View style={styles.borderInner}>
             
+            {/* Techy Background Design */}
+            <View style={styles.backgroundGraphics}>
+              <Svg viewBox="0 0 842 595" width="100%" height="100%" opacity={0.3}>
+                {/* Left side tech circuit */}
+                <Path d="M 0 100 L 150 100 L 200 150 L 200 250 L 250 300" fill="none" stroke="#93c5fd" strokeWidth="1.5" />
+                <Circle cx="250" cy="300" r="4" fill="#93c5fd" />
+                
+                <Path d="M 0 150 L 100 150 L 120 170 L 120 400 L 150 430" fill="none" stroke="#93c5fd" strokeWidth="0.5" />
+                <Circle cx="150" cy="430" r="2" fill="#93c5fd" />
+                
+                <Path d="M 50 595 L 50 500 L 150 400 L 300 400 L 350 350" fill="none" stroke="#93c5fd" strokeWidth="1" />
+                <Circle cx="350" cy="350" r="3" fill="none" stroke="#93c5fd" strokeWidth="1" />
+
+                {/* Right side tech circuit */}
+                <Path d="M 842 450 L 700 450 L 650 400 L 650 250 L 600 200" fill="none" stroke="#93c5fd" strokeWidth="1.5" />
+                <Circle cx="600" cy="200" r="4" fill="#93c5fd" />
+                
+                <Path d="M 842 500 L 750 500 L 700 450 L 700 200 L 650 150" fill="none" stroke="#93c5fd" strokeWidth="0.5" />
+                <Circle cx="650" cy="150" r="2" fill="#93c5fd" />
+                
+                <Path d="M 750 0 L 750 100 L 650 200 L 500 200 L 450 250" fill="none" stroke="#93c5fd" strokeWidth="1" />
+                <Circle cx="450" cy="250" r="3" fill="none" stroke="#93c5fd" strokeWidth="1" />
+                
+                {/* Geometric accents / dots */}
+                <Circle cx="50" cy="50" r="1" fill="#e2e8f0" />
+                <Circle cx="90" cy="50" r="1" fill="#e2e8f0" />
+                <Circle cx="130" cy="50" r="1" fill="#e2e8f0" />
+                <Circle cx="170" cy="50" r="1" fill="#e2e8f0" />
+                <Circle cx="210" cy="50" r="1" fill="#e2e8f0" />
+                
+                <Circle cx="630" cy="550" r="1" fill="#e2e8f0" />
+                <Circle cx="670" cy="550" r="1" fill="#e2e8f0" />
+                <Circle cx="710" cy="550" r="1" fill="#e2e8f0" />
+                <Circle cx="750" cy="550" r="1" fill="#e2e8f0" />
+                <Circle cx="790" cy="550" r="1" fill="#e2e8f0" />
+                
+                {/* Subtitle Tech Box */}
+                <Path d="M 350 480 L 492 480 L 492 500 L 350 500 Z" fill="none" stroke="#e2e8f0" strokeWidth="0.5" />
+                <Path d="M 352 482 L 358 482 M 490 498 L 484 498" fill="none" stroke="#93c5fd" strokeWidth="1" />
+              </Svg>
+            </View>
+
             <View style={styles.contentWrapper}>
               <View style={styles.headerGroup}>
                 <Text style={styles.logo}>EVOLW</Text>
@@ -209,7 +267,11 @@ export const CertificatePDF = ({ data }: { data: CertificateData }) => {
               </View>
 
               <View style={styles.signatureBlock}>
-                <Text style={{ fontSize: 12, marginBottom: 5, color: '#fff' }}>HiddenText</Text>
+                {data.hrSignature ? (
+                  <Image src={data.hrSignature} style={styles.signatureImage} />
+                ) : (
+                  <Text style={{ fontSize: 12, marginBottom: 5, color: '#fff' }}>HiddenText</Text>
+                )}
                 <View style={styles.signatureLine}>
                   <Text style={styles.signatureName}>Authorized Signatory</Text>
                   <Text style={styles.signatureTitle}>Human Resources</Text>

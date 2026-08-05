@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { User, Calendar, Star, Download, Save, History, Award, Trash2 } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { User, Calendar, Star, Download, Save, History, Award, Trash2, Upload, PenTool } from 'lucide-react';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import { CertificatePDF } from './CertificatePDF';
 
@@ -11,6 +11,7 @@ export interface CertificateData {
   startDate: string;
   endDate: string;
   performance: string;
+  hrSignature?: string;
   createdAt?: string;
 }
 
@@ -27,11 +28,34 @@ export function AdminCertificates() {
     performance: 'Outstanding',
   });
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    // Load saved signature automatically on mount
+    const savedSignature = localStorage.getItem('evolw_hr_signature');
+    if (savedSignature) {
+      setData(prev => ({ ...prev, hrSignature: savedSignature }));
+    }
+  }, []);
+
   useEffect(() => {
     if (activeTab === 'history') {
       fetchHistory();
     }
   }, [activeTab]);
+
+  const handleSignatureUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        localStorage.setItem('evolw_hr_signature', base64String);
+        setData(prev => ({ ...prev, hrSignature: base64String }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const fetchHistory = async () => {
     try {
@@ -236,6 +260,38 @@ export function AdminCertificates() {
                   </div>
                 </div>
               </div>
+
+              <div className="bg-white dark:bg-white/5 p-6 rounded-2xl border border-evolw-gray-200 dark:border-white/10">
+                <h2 className="flex items-center text-lg font-bold mb-4">
+                  <PenTool className="w-5 h-5 mr-2 text-evolw-accent" /> HR Signature
+                </h2>
+                <div className="space-y-4">
+                  <p className="text-sm text-evolw-gray-500">
+                    Upload a transparent PNG of the authorized signature. It will be saved automatically for future use.
+                  </p>
+                  
+                  {data.hrSignature && (
+                    <div className="border border-evolw-gray-200 dark:border-white/10 rounded-lg p-4 bg-evolw-gray-50 dark:bg-black/50 mb-4 flex justify-center">
+                      <img src={data.hrSignature} alt="Signature" className="h-12 object-contain" />
+                    </div>
+                  )}
+
+                  <input 
+                    type="file" 
+                    accept="image/png, image/jpeg" 
+                    ref={fileInputRef} 
+                    onChange={handleSignatureUpload} 
+                    className="hidden" 
+                  />
+                  <button 
+                    onClick={() => fileInputRef.current?.click()}
+                    className="w-full flex items-center justify-center px-4 py-2.5 rounded-lg border-2 border-dashed border-evolw-gray-300 dark:border-white/20 text-evolw-gray-600 dark:text-gray-400 hover:border-evolw-accent hover:text-evolw-accent transition-colors font-medium text-sm"
+                  >
+                    <Upload className="w-4 h-4 mr-2" />
+                    {data.hrSignature ? 'Upload New Signature' : 'Upload Signature'}
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -246,9 +302,42 @@ export function AdminCertificates() {
             <div className="bg-white w-[297mm] h-[210mm] shadow-lg p-[30px] font-serif text-black shrink-0 relative overflow-hidden" style={{ fontFamily: '"Times New Roman", Times, serif' }}>
               
               <div className="border-[4px] border-slate-900 p-2 w-full h-full">
-                <div className="border-[2px] border-slate-300 w-full h-full flex flex-col items-center justify-center relative p-8">
+                <div className="border-[2px] border-slate-300 w-full h-full flex flex-col items-center justify-center relative p-8 overflow-hidden">
                   
-                  <div className="text-center mb-10">
+                  {/* Techy Background Design Preview */}
+                  <div className="absolute inset-0 z-0 opacity-[0.3] pointer-events-none">
+                    <svg viewBox="0 0 842 595" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M 0 100 L 150 100 L 200 150 L 200 250 L 250 300" fill="none" stroke="#93c5fd" strokeWidth="1.5" />
+                      <circle cx="250" cy="300" r="4" fill="#93c5fd" />
+                      <path d="M 0 150 L 100 150 L 120 170 L 120 400 L 150 430" fill="none" stroke="#93c5fd" strokeWidth="0.5" />
+                      <circle cx="150" cy="430" r="2" fill="#93c5fd" />
+                      <path d="M 50 595 L 50 500 L 150 400 L 300 400 L 350 350" fill="none" stroke="#93c5fd" strokeWidth="1" />
+                      <circle cx="350" cy="350" r="3" fill="none" stroke="#93c5fd" strokeWidth="1" />
+
+                      <path d="M 842 450 L 700 450 L 650 400 L 650 250 L 600 200" fill="none" stroke="#93c5fd" strokeWidth="1.5" />
+                      <circle cx="600" cy="200" r="4" fill="#93c5fd" />
+                      <path d="M 842 500 L 750 500 L 700 450 L 700 200 L 650 150" fill="none" stroke="#93c5fd" strokeWidth="0.5" />
+                      <circle cx="650" cy="150" r="2" fill="#93c5fd" />
+                      <path d="M 750 0 L 750 100 L 650 200 L 500 200 L 450 250" fill="none" stroke="#93c5fd" strokeWidth="1" />
+                      <circle cx="450" cy="250" r="3" fill="none" stroke="#93c5fd" strokeWidth="1" />
+                      
+                      <circle cx="50" cy="50" r="1" fill="#e2e8f0" />
+                      <circle cx="90" cy="50" r="1" fill="#e2e8f0" />
+                      <circle cx="130" cy="50" r="1" fill="#e2e8f0" />
+                      <circle cx="170" cy="50" r="1" fill="#e2e8f0" />
+                      <circle cx="210" cy="50" r="1" fill="#e2e8f0" />
+                      <circle cx="630" cy="550" r="1" fill="#e2e8f0" />
+                      <circle cx="670" cy="550" r="1" fill="#e2e8f0" />
+                      <circle cx="710" cy="550" r="1" fill="#e2e8f0" />
+                      <circle cx="750" cy="550" r="1" fill="#e2e8f0" />
+                      <circle cx="790" cy="550" r="1" fill="#e2e8f0" />
+                      
+                      <path d="M 350 480 L 492 480 L 492 500 L 350 500 Z" fill="none" stroke="#e2e8f0" strokeWidth="0.5" />
+                      <path d="M 352 482 L 358 482 M 490 498 L 484 498" fill="none" stroke="#93c5fd" strokeWidth="1" />
+                    </svg>
+                  </div>
+                  
+                  <div className="text-center mb-10 relative z-10">
                     <h1 className="text-5xl font-bold tracking-[0.2em] font-sans">EVOLW</h1>
                     <p className="text-xs text-gray-500 tracking-[0.2em] mt-1 font-sans">INNOVATION. EXCELLENCE. GROWTH.</p>
                   </div>
@@ -277,7 +366,14 @@ export function AdminCertificates() {
                     </div>
 
                     <div className="w-64 text-center">
-                      <div className="border-t border-black pt-2 mt-8">
+                      <div className="h-14 flex items-end justify-center mb-1">
+                        {data.hrSignature ? (
+                          <img src={data.hrSignature} alt="Signature" className="h-12 object-contain" />
+                        ) : (
+                          <div className="h-12"></div>
+                        )}
+                      </div>
+                      <div className="border-t border-black pt-2">
                         <p className="font-bold font-sans text-sm">Authorized Signatory</p>
                         <p className="text-xs text-gray-600 font-sans mt-1">Human Resources, EVOLW</p>
                       </div>
