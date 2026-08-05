@@ -4,7 +4,7 @@ import { SEO } from "../components/common/seo";
 import { Container } from "../components/ui/container";
 import { Button } from "../components/ui/button";
 import { RichText } from "../components/ui/rich-text";
-import { ArrowLeft, Briefcase, MapPin, CheckCircle, Upload } from "lucide-react";
+import { ArrowLeft, Briefcase, MapPin, CheckCircle, Upload, Sparkles, Loader2 } from "lucide-react";
 import { api, ApiError, fileToDataUrl, type Job } from "../lib/api";
 import { richTextToPlain } from "../lib/richText";
 import { breadcrumbSchema, jobPostingSchema } from "../lib/seo/schema";
@@ -35,6 +35,9 @@ export function JobDetails() {
   const [isSuccess, setIsSuccess] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  
+  const [isParsing, setIsParsing] = useState(false);
+  const [isGeneratingCoverLetter, setIsGeneratingCoverLetter] = useState(false);
 
   useEffect(() => {
     if (hash === "#apply") {
@@ -110,7 +113,7 @@ export function JobDetails() {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       if (file.size > 4 * 1024 * 1024) {
@@ -121,6 +124,55 @@ export function JobDetails() {
       if (errors.resume) {
         setErrors({ ...errors, resume: "" });
       }
+
+      try {
+        setIsParsing(true);
+        const resumeBase64 = await fileToDataUrl(file);
+        const result = await api.parseResume({ 
+          resumeBase64, 
+          resumeContentType: file.type 
+        });
+        
+        if (result.data) {
+          setFormData(prev => ({
+            ...prev,
+            name: result.data.name || prev.name,
+            email: result.data.email || prev.email,
+            phone: result.data.phone || prev.phone,
+            linkedin: result.data.linkedin || prev.linkedin,
+            portfolio: result.data.portfolio || prev.portfolio,
+            experience: result.data.experience || prev.experience,
+            skills: result.data.skills || prev.skills,
+          }));
+        }
+      } catch (err) {
+        console.error("Failed to parse resume:", err);
+      } finally {
+        setIsParsing(false);
+      }
+    }
+  };
+
+  const handleGenerateCoverLetter = async () => {
+    if (!job) return;
+    
+    setIsGeneratingCoverLetter(true);
+    try {
+      const result = await api.generateCoverLetter({
+        resumeData: formData as unknown as Record<string, string>,
+        jobTitle: job.title,
+        jobDescription: typeof job.description === 'string' ? job.description : richTextToPlain(job.description),
+        department: job.department
+      });
+      
+      if (result.coverLetter) {
+        setFormData(prev => ({ ...prev, message: result.coverLetter }));
+      }
+    } catch (err) {
+      console.error("Failed to generate cover letter:", err);
+      alert("Failed to generate cover letter. Please ensure Groq API key is configured.");
+    } finally {
+      setIsGeneratingCoverLetter(false);
     }
   };
 
@@ -286,13 +338,19 @@ export function JobDetails() {
                         accept=".pdf,.doc,.docx"
                       />
                       <div className="w-12 h-12 rounded-full bg-white dark:bg-evolw-black shadow-sm flex items-center justify-center mb-4 text-evolw-accent">
-                        <Upload className="w-5 h-5" />
+                        {isParsing ? (
+                          <Loader2 className="w-5 h-5 animate-spin" />
+                        ) : (
+                          <Upload className="w-5 h-5" />
+                        )}
                       </div>
                       <p className="font-semibold mb-1 text-center">
-                        {resumeFile ? resumeFile.name : "Click to upload your resume"}
+                        {isParsing ? "Analyzing resume..." : resumeFile ? resumeFile.name : "Click to upload your resume"}
                       </p>
                       <p className="text-sm text-evolw-gray-500 text-center">
-                        {resumeFile
+                        {isParsing 
+                          ? "Extracting details..."
+                          : resumeFile
                           ? `${(resumeFile.size / 1024 / 1024).toFixed(2)} MB`
                           : "PDF, DOC, or DOCX (Max 4MB)"}
                       </p>
@@ -388,7 +446,31 @@ export function JobDetails() {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Cover Letter / Message (Optional)</label>
+                    <div className="flex items-center justify-between">
+                      <label className="text-sm font-medium">Cover Letter / Message (Optional)</label>
+                      <button
+                        type="button"
+                        onClick={handleGenerateCoverLetter}
+                        disabled={isGeneratingCoverLetter || !formData.name}
+                        className={`text-xs font-medium flex items-center gap-1 px-3 py-1.5 rounded-full transition-colors ${
+                          formData.name 
+                            ? "bg-purple-100 text-purple-700 hover:bg-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:hover:bg-purple-900/50" 
+                            : "bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-white/5 dark:text-gray-600"
+                        }`}
+                      >
+                        {isGeneratingCoverLetter ? (
+                          <>
+                            <Loader2 className="w-3 h-3 animate-spin" />
+                            Generating...
+                          </>
+                        ) : (
+                          <>
+                            <Sparkles className="w-3 h-3" />
+                            Generate with AI
+                          </>
+                        )}
+                      </button>
+                    </div>
                     <textarea
                       rows={5}
                       value={formData.message}

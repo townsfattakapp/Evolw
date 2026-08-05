@@ -312,6 +312,20 @@ export const api = {
       auth: true,
     });
   },
+
+  parseResume(payload: { resumeBase64: string; resumeContentType?: string }) {
+    return apiRequest<{ data: Record<string, string> }>('/api/parse-resume', {
+      method: 'POST',
+      body: payload,
+    });
+  },
+
+  generateCoverLetter(payload: { resumeData: Record<string, string>; jobTitle: string; jobDescription: string; department?: string }) {
+    return apiRequest<{ coverLetter: string }>('/api/generate-cover-letter', {
+      method: 'POST',
+      body: payload,
+    });
+  },
 };
 
 export function fileToDataUrl(file: File): Promise<string> {
