@@ -1,0 +1,19 @@
+{
+  "hero": {
+    "badge": "Software • Products • Technology",
+    "titleLine1": "We build technology",
+    "titleLine2": "that moves businesses",
+    "titleHighlight": "forward.",
+    "subtitle": "EVOLW designs and builds modern software products, digital platforms and technology infrastructure for businesses ready to scale."
+  },
+  "jobs": [
+    {
+      "id": "1738743123456",
+      "title": "Senior Frontend Engineer",
+      "department": "Engineering",
+      "location": "Remote, India",
+      "type": "Full-time",
+      "description": "We are looking for an experienced Senior Frontend Engineer to build beautiful, highly scalable digital platforms using React and modern web technologies. You will lead architectural decisions and shape the user experience."
+    }
+  ]
+}

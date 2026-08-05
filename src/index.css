@@ -1,0 +1,57 @@
+@import "tailwindcss";
+
+@theme {
+  /* Premium Neutral Palette (Slate/Zinc vibe) */
+  --color-evolw-black: #09090b;
+  --color-evolw-gray-900: #18181b;
+  --color-evolw-gray-800: #27272a;
+  --color-evolw-gray-700: #3f3f46;
+  --color-evolw-gray-600: #52525b;
+  --color-evolw-gray-500: #71717a;
+  --color-evolw-gray-400: #a1a1aa;
+  --color-evolw-gray-300: #d4d4d8;
+  --color-evolw-gray-200: #e4e4e7;
+  --color-evolw-gray-100: #f4f4f5;
+  --color-evolw-gray-50: #fafafa;
+  
+  /* Restrained Accent (Slightly muted, sophisticated blue) */
+  --color-evolw-accent: #2563eb;
+  --color-evolw-accent-dark: #1d4ed8;
+  
+  /* Typography */
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: 'Outfit', system-ui, -apple-system, sans-serif;
+}
+
+@custom-variant dark (&:is(.dark *));
+
+@layer base {
+  :root {
+    --background: #ffffff;
+    --foreground: #09090b;
+  }
+  
+  .dark {
+    --background: #09090b;
+    --foreground: #ffffff;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-evolw-gray-200 dark:border-evolw-gray-800;
+  }
+  body {
+    @apply bg-[var(--background)] text-[var(--foreground)] antialiased selection:bg-evolw-accent selection:text-white font-sans;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  
+  /* Typography as the Hero */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display tracking-tight font-semibold text-balance;
+  }
+  
+  p {
+    @apply leading-relaxed;
+  }
+}
