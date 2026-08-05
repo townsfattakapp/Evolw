@@ -9,6 +9,8 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { fadeInUp, staggerContainer } from "../lib/animations";
 import { useContent } from "../context/ContentContext";
+import { PAGE_SEO } from "../lib/seo/site";
+import { breadcrumbSchema } from "../lib/seo/schema";
 
 const ICON_MAP: Record<string, any> = {
   "Local Commerce": Store,
@@ -60,7 +62,16 @@ export function Products() {
 
   return (
     <>
-      <SEO title="Products | EVOLW" description="Technology products built around real-world problems." />
+      <SEO
+        title={PAGE_SEO.products.title}
+        description={PAGE_SEO.products.description}
+        path={PAGE_SEO.products.path}
+        keywords={PAGE_SEO.products.keywords}
+        jsonLd={breadcrumbSchema([
+          { name: "Home", path: "/" },
+          { name: "Products", path: "/products" },
+        ])}
+      />
 
       {/* Hero */}
       <section className="pt-32 pb-24 md:pt-72 md:pb-48 bg-white dark:bg-evolw-black overflow-hidden">
@@ -151,10 +162,22 @@ export function Products() {
               <motion.div variants={fadeInUp} className="lg:w-1/2 w-full relative h-[500px] md:h-[600px] flex items-center justify-center mt-10 lg:mt-0">
                 <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-evolw-accent/10 rounded-full blur-[100px] opacity-70"></div>
                 <div className="absolute left-1/2 -translate-x-2/3 top-1/2 -translate-y-1/2 w-[240px] md:w-[280px] h-[500px] md:h-[580px] rounded-[3rem] border-[16px] border-[#222] overflow-hidden shadow-2xl z-10 bg-white transform -rotate-6 hover:rotate-0 transition-all duration-700">
-                  <img src={appHome} alt="App Home Screen" className="object-cover w-full h-full" />
+                  <img
+                    src={appHome}
+                    alt="Fattakse mobile app home screen for local commerce"
+                    className="object-cover w-full h-full"
+                    loading="lazy"
+                    decoding="async"
+                  />
                 </div>
                 <div className="absolute left-1/2 -translate-x-1/3 top-1/2 -translate-y-1/2 w-[240px] md:w-[280px] h-[500px] md:h-[580px] rounded-[3rem] border-[16px] border-[#222] overflow-hidden shadow-2xl z-20 bg-white transform rotate-6 translate-y-10 hover:rotate-0 hover:translate-y-0 transition-all duration-700 hidden sm:block">
-                  <img src={appSuccess} alt="App Success Screen" className="object-cover w-full h-full" />
+                  <img
+                    src={appSuccess}
+                    alt="Fattakse app order success confirmation screen"
+                    className="object-cover w-full h-full"
+                    loading="lazy"
+                    decoding="async"
+                  />
                 </div>
               </motion.div>
             </motion.div>

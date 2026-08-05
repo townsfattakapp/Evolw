@@ -1,10 +1,10 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { randomUUID } from 'crypto';
-import { requireAdmin } from './_lib/auth';
-import { ensureSchema } from './_lib/db';
-import { handleOptions, json, logError, methodNotAllowed, readBody } from './_lib/http';
-import { mapApplication, normalizeApplicationStatus } from './_lib/mappers';
-import { deleteResume, parseDataUrl, uploadResume } from './_lib/storage';
+import { requireAdmin } from './_lib/auth.js';
+import { ensureSchema } from './_lib/db.js';
+import { handleOptions, json, logError, methodNotAllowed, readBody } from './_lib/http.js';
+import { mapApplication, normalizeApplicationStatus } from './_lib/mappers.js';
+import { deleteResume, parseDataUrl, uploadResume } from './_lib/storage.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (handleOptions(req, res)) return;

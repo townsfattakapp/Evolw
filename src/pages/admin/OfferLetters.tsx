@@ -166,33 +166,33 @@ export function AdminOfferLetters() {
   const isIntern = data.employmentType === 'Internship';
 
   return (
-    <div className="flex flex-col h-full overflow-hidden">
+    <div className="flex flex-col min-h-0 -m-3 sm:-m-6 lg:-m-10 h-[calc(100dvh-3.5rem)] sm:h-[calc(100dvh-4rem)] lg:h-[calc(100dvh-5rem)] overflow-hidden bg-evolw-gray-50 dark:bg-evolw-black">
       
       {/* Tabs */}
-      <div className="flex border-b border-evolw-gray-200 dark:border-white/5 mb-4">
+      <div className="flex border-b border-evolw-gray-200 dark:border-white/10 shrink-0 bg-white dark:bg-evolw-slate px-2 sm:px-4">
         <button 
           onClick={() => setActiveTab('builder')}
-          className={`px-6 py-3 font-semibold text-sm ${activeTab === 'builder' ? 'border-b-2 border-evolw-accent text-evolw-accent' : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'}`}
+          className={`px-4 sm:px-6 py-3 font-semibold text-sm ${activeTab === 'builder' ? 'border-b-2 border-evolw-accent text-evolw-accent' : 'text-evolw-gray-500 dark:text-evolw-gray-400 hover:text-evolw-black dark:hover:text-white'}`}
         >
           <div className="flex items-center"><FileText className="w-4 h-4 mr-2" /> Builder</div>
         </button>
         <button 
           onClick={() => setActiveTab('history')}
-          className={`px-6 py-3 font-semibold text-sm ${activeTab === 'history' ? 'border-b-2 border-evolw-accent text-evolw-accent' : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'}`}
+          className={`px-4 sm:px-6 py-3 font-semibold text-sm ${activeTab === 'history' ? 'border-b-2 border-evolw-accent text-evolw-accent' : 'text-evolw-gray-500 dark:text-evolw-gray-400 hover:text-evolw-black dark:hover:text-white'}`}
         >
           <div className="flex items-center"><History className="w-4 h-4 mr-2" /> History</div>
         </button>
       </div>
 
       {activeTab === 'history' ? (
-        <div className="p-8 overflow-y-auto">
-          <h2 className="text-2xl font-bold mb-6 text-evolw-black dark:text-white">Generated Offer Letters</h2>
+        <div className="p-4 sm:p-8 overflow-y-auto">
+          <h2 className="text-xl sm:text-2xl font-bold mb-6 text-evolw-black dark:text-white">Generated Offer Letters</h2>
           {history.length === 0 ? (
             <p className="text-evolw-gray-500 dark:text-evolw-gray-400">No offer letters have been generated yet.</p>
           ) : (
             <div className="grid gap-4">
               {history.map((h, i) => (
-                <div key={i} className="bg-white dark:bg-evolw-gray-900 p-5 rounded-xl border border-evolw-gray-200 dark:border-white/10 flex justify-between items-center">
+                <div key={i} className="bg-white dark:bg-evolw-slate p-4 sm:p-5 rounded-xl border border-evolw-gray-200 dark:border-white/10 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
                   <div>
                     <div className="font-bold text-lg text-evolw-black dark:text-white">{h.candidateName}</div>
                     <div className="text-sm text-evolw-gray-500 dark:text-evolw-gray-400 mt-0.5">{h.designation} • <span className="font-medium">{h.employmentType}</span></div>
@@ -222,20 +222,20 @@ export function AdminOfferLetters() {
           )}
         </div>
       ) : (
-        <div className="flex flex-1 overflow-hidden print:bg-white print:m-0 print:p-0 print:fixed print:inset-0 print:z-50 print:overflow-visible">
-          {/* Left Panel - Editor (Hidden on Print) */}
-          <div className="w-1/2 h-full border-r border-evolw-gray-200 dark:border-white/5 overflow-y-auto p-8 print:hidden">
+        <div className="flex flex-1 min-h-0 flex-col lg:flex-row overflow-hidden print:bg-white print:m-0 print:p-0 print:fixed print:inset-0 print:z-50 print:overflow-visible">
+          {/* Left Panel - Editor */}
+          <div className="w-full lg:w-1/2 lg:h-full border-b lg:border-b-0 lg:border-r border-evolw-gray-200 dark:border-white/10 overflow-y-auto p-4 sm:p-6 lg:p-8 print:hidden bg-white dark:bg-evolw-slate">
             
-            <div className="flex items-center justify-between mb-8">
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6 sm:mb-8">
               <div>
-                <h1 className="text-3xl font-bold mb-2">Offer Letter Builder</h1>
-                <p className="text-evolw-gray-500">Generate Full-Time and Internship offer letters.</p>
+                <h1 className="text-2xl sm:text-3xl font-bold mb-2 text-evolw-black dark:text-white">Offer Letter Builder</h1>
+                <p className="text-evolw-gray-500 dark:text-evolw-gray-400 text-sm sm:text-base">Generate Full-Time and Internship offer letters.</p>
               </div>
-              <div className="flex space-x-3">
+              <div className="flex flex-wrap gap-2 sm:gap-3">
                 <button 
                   onClick={saveOfferLetter}
                   disabled={isSaving}
-                  className="flex items-center bg-green-600 text-white px-4 py-2 rounded-xl font-semibold hover:bg-green-700 transition-colors shadow-sm disabled:opacity-50"
+                  className="flex items-center bg-green-600 text-white px-4 py-2 rounded-xl font-semibold hover:bg-green-700 transition-colors shadow-sm disabled:opacity-50 text-sm"
                 >
                   <Save className="w-4 h-4 mr-2" />
                   {isSaving ? 'Saving...' : 'Save Data'}
@@ -244,7 +244,7 @@ export function AdminOfferLetters() {
                   <PDFDownloadLink
                     document={<OfferLetterPDF data={data} />}
                     fileName={`Offer_Letter_${data.candidateName.replace(/\s+/g, '_')}.pdf`}
-                    className="flex items-center bg-evolw-accent text-white px-4 py-2 rounded-xl font-semibold hover:bg-blue-600 transition-colors shadow-sm"
+                    className="flex items-center bg-evolw-accent text-white px-4 py-2 rounded-xl font-semibold hover:bg-blue-600 transition-colors shadow-sm text-sm"
                   >
                     {/* @ts-ignore */}
                     {({ loading }) => (
@@ -271,7 +271,7 @@ export function AdminOfferLetters() {
                   <User className="w-5 h-5 mr-2 text-evolw-accent" /> Candidate Details
                 </h2>
                 <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium mb-1">Employment Type</label>
                       <select name="employmentType" value={data.employmentType} onChange={handleChange} className="w-full p-2.5 rounded-lg border dark:bg-evolw-black dark:border-white/10">
@@ -284,7 +284,7 @@ export function AdminOfferLetters() {
                       <input type="text" name="candidateName" value={data.candidateName} onChange={handleChange} className="w-full p-2.5 rounded-lg border dark:bg-evolw-black dark:border-white/10" placeholder="John Doe" />
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium mb-1">Phone</label>
                       <input type="text" name="phone" value={data.phone} onChange={handleChange} className="w-full p-2.5 rounded-lg border dark:bg-evolw-black dark:border-white/10" placeholder="+91 9876543210" />
@@ -306,7 +306,7 @@ export function AdminOfferLetters() {
                   <Briefcase className="w-5 h-5 mr-2 text-evolw-accent" /> Job Details
                 </h2>
                 <div className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium mb-1">Designation</label>
                       <input type="text" name="designation" value={data.designation} onChange={handleChange} className="w-full p-2.5 rounded-lg border dark:bg-evolw-black dark:border-white/10" placeholder="Software Engineer" />
@@ -316,7 +316,7 @@ export function AdminOfferLetters() {
                       <input type="text" name="department" value={data.department} onChange={handleChange} className="w-full p-2.5 rounded-lg border dark:bg-evolw-black dark:border-white/10" placeholder="Engineering" />
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium mb-1">Date of Joining</label>
                       <input type="date" name="doj" value={data.doj} onChange={handleChange} className="w-full p-2.5 rounded-lg border dark:bg-evolw-black dark:border-white/10" />
@@ -326,7 +326,7 @@ export function AdminOfferLetters() {
                       <input type="text" name="reportingTo" value={data.reportingTo} onChange={handleChange} className="w-full p-2.5 rounded-lg border dark:bg-evolw-black dark:border-white/10" placeholder="Manager" />
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium mb-1">Probation (Months)</label>
                       <input type="number" name="probation" value={data.probation} onChange={handleChange} className="w-full p-2.5 rounded-lg border dark:bg-evolw-black dark:border-white/10" disabled={isIntern} />
@@ -387,7 +387,7 @@ export function AdminOfferLetters() {
           </div>
 
           {/* Right Panel - Live Preview / Printable A4 */}
-          <div className="w-1/2 h-full overflow-y-auto bg-evolw-gray-100 dark:bg-black p-8 print:w-full print:p-0 print:m-0 print:overflow-visible flex justify-center">
+          <div className="w-full lg:w-1/2 lg:h-full overflow-y-auto bg-evolw-gray-100 dark:bg-evolw-black p-4 sm:p-8 print:w-full print:p-0 print:m-0 print:overflow-visible flex justify-center">
             
             <div id="offer-letter-content" className="bg-white w-[210mm] min-h-[297mm] shadow-lg print:shadow-none p-12 text-black font-serif mx-auto relative overflow-visible print:absolute print:left-0 print:top-0">
               

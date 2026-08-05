@@ -3,11 +3,26 @@ import { Container } from "../components/ui/container";
 import { Section } from "../components/ui/section";
 import { motion } from "framer-motion";
 import { fadeInUp, staggerContainer } from "../lib/animations";
+import { PAGE_SEO } from "../lib/seo/site";
+import { aboutPageSchema, breadcrumbSchema, organizationSchema } from "../lib/seo/schema";
 
 export function About() {
   return (
     <>
-      <SEO title="About | EVOLW" description="Learn about EVOLW, our mission, and our engineering philosophy." />
+      <SEO
+        title={PAGE_SEO.about.title}
+        description={PAGE_SEO.about.description}
+        path={PAGE_SEO.about.path}
+        keywords={PAGE_SEO.about.keywords}
+        jsonLd={[
+          aboutPageSchema(),
+          organizationSchema(),
+          breadcrumbSchema([
+            { name: "Home", path: "/" },
+            { name: "About", path: "/about" },
+          ]),
+        ]}
+      />
       
       {/* Hyper-Minimalist Hero */}
       <section className="pt-48 pb-32 md:pt-72 md:pb-48 bg-white dark:bg-evolw-black overflow-hidden">

@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { Plus, Trash2, Edit3, Save, Briefcase, Eye, EyeOff } from "lucide-react";
 import { api, ApiError, type Job, type JobStatus } from "../../lib/api";
+import { sanitizeRichText } from "../../lib/richText";
+import { RichTextEditor } from "../../components/ui/rich-text-editor";
 import { useNavigate } from "react-router-dom";
 
 const emptyForm: Omit<Job, "id"> = {
@@ -58,7 +60,7 @@ export function AdminJobs() {
         department: formData.department,
         location: formData.location,
         type: formData.type,
-        description: formData.description,
+        description: sanitizeRichText(formData.description),
         status: formData.status,
       });
       setFormData({ ...emptyForm });
@@ -83,7 +85,7 @@ export function AdminJobs() {
         department: formData.department,
         location: formData.location,
         type: formData.type,
-        description: formData.description,
+        description: sanitizeRichText(formData.description),
         status: formData.status,
       });
       setIsEditing(null);
@@ -137,10 +139,10 @@ export function AdminJobs() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto space-y-8">
+    <div className="max-w-5xl mx-auto space-y-6 sm:space-y-8 text-evolw-black dark:text-white">
       <div>
-        <h2 className="text-3xl font-bold tracking-tight mb-2">Manage Careers</h2>
-        <p className="text-evolw-gray-500">
+        <h2 className="text-2xl sm:text-3xl font-bold tracking-tight mb-2 text-evolw-black dark:text-white">Manage Careers</h2>
+        <p className="text-evolw-gray-500 dark:text-evolw-gray-400 text-sm sm:text-base">
           Post and edit job openings. Published jobs appear live on the Careers page instantly.
         </p>
       </div>
@@ -154,15 +156,15 @@ export function AdminJobs() {
         </div>
       )}
 
-      <div className="bg-white dark:bg-evolw-slate rounded-3xl border border-evolw-gray-200 dark:border-white/5 overflow-hidden shadow-sm">
-        <div className="p-6 border-b border-evolw-gray-200 dark:border-white/5 bg-evolw-gray-50/50 dark:bg-white/5 flex items-center space-x-3">
+      <div className="bg-white dark:bg-evolw-slate rounded-2xl sm:rounded-3xl border border-evolw-gray-200 dark:border-white/10 overflow-hidden shadow-sm">
+        <div className="p-4 sm:p-6 border-b border-evolw-gray-200 dark:border-white/10 bg-evolw-gray-50/50 dark:bg-white/5 flex items-center space-x-3">
           <div className="p-2 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg">
             <Briefcase className="w-5 h-5" />
           </div>
-          <h3 className="font-semibold text-lg">{isEditing ? "Edit Job Opening" : "Post a New Job"}</h3>
+          <h3 className="font-semibold text-base sm:text-lg text-evolw-black dark:text-white">{isEditing ? "Edit Job Opening" : "Post a New Job"}</h3>
         </div>
 
-        <div className="p-8">
+        <div className="p-4 sm:p-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div className="space-y-2">
               <label className="text-sm font-semibold">Job Title</label>
@@ -223,14 +225,14 @@ export function AdminJobs() {
           </div>
 
           <div className="space-y-2 mb-6">
-            <label className="text-sm font-semibold">Short Description</label>
-            <textarea
+            <label className="text-sm font-semibold">Job Description</label>
+            <RichTextEditor
+              key={isEditing ?? "new"}
               value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              rows={3}
-              className="w-full px-4 py-3 rounded-xl border bg-evolw-gray-50 dark:bg-evolw-black focus:ring-2 focus:ring-evolw-accent border-evolw-gray-200 dark:border-white/10 outline-none resize-none"
-              placeholder="Brief overview of the role..."
-            ></textarea>
+              onChange={(description) => setFormData({ ...formData, description })}
+              placeholder="Paste from ChatGPT or write the full role description. Bold, lists, and headings are preserved…"
+              minHeightClassName="min-h-[260px]"
+            />
           </div>
 
           <div className="flex space-x-4">

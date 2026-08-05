@@ -34,14 +34,14 @@ export function AdminDashboard() {
   ];
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto">
+    <div className="space-y-6 sm:space-y-8 max-w-7xl mx-auto text-evolw-black dark:text-white">
       
       {/* Welcome Banner */}
-      <div className="bg-gradient-to-r from-evolw-accent to-blue-600 rounded-3xl p-8 md:p-12 text-white shadow-xl relative overflow-hidden">
+      <div className="bg-gradient-to-r from-evolw-accent to-blue-600 rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-12 text-white shadow-xl relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
         <div className="relative z-10">
-          <h2 className="text-3xl font-bold mb-2 text-white">Welcome back to the Command Center</h2>
-          <p className="text-blue-100 max-w-xl text-lg">
+          <h2 className="text-2xl sm:text-3xl font-bold mb-2 text-white">Welcome back to the Command Center</h2>
+          <p className="text-blue-100 max-w-xl text-base sm:text-lg">
             Manage your platform, review leads, generate offer letters and certificates — all from here.
           </p>
         </div>
@@ -54,9 +54,9 @@ export function AdminDashboard() {
       )}
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {stats.map((stat, i) => (
-          <div key={i} className="bg-white dark:bg-evolw-gray-900 p-6 rounded-3xl border border-evolw-gray-200 dark:border-white/5 shadow-sm hover:shadow-md transition-shadow">
+          <div key={i} className="bg-white dark:bg-evolw-slate p-5 sm:p-6 rounded-2xl sm:rounded-3xl border border-evolw-gray-200 dark:border-white/10 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex justify-between items-start mb-4">
               <div className="p-3 bg-evolw-gray-50 dark:bg-white/5 rounded-xl border border-evolw-gray-100 dark:border-white/5">
                 <stat.icon className="w-6 h-6 text-evolw-accent" />
@@ -72,9 +72,9 @@ export function AdminDashboard() {
       </div>
 
       {/* Activity Section */}
-      <div className="bg-white dark:bg-evolw-gray-900 p-8 rounded-3xl border border-evolw-gray-200 dark:border-white/5 shadow-sm">
-        <div className="flex justify-between items-center mb-8">
-          <h3 className="font-bold text-xl text-evolw-black dark:text-white">Recent Lead Activity</h3>
+      <div className="bg-white dark:bg-evolw-slate p-5 sm:p-8 rounded-2xl sm:rounded-3xl border border-evolw-gray-200 dark:border-white/10 shadow-sm">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6 sm:mb-8">
+          <h3 className="font-bold text-lg sm:text-xl text-evolw-black dark:text-white">Recent Lead Activity</h3>
           <Link to="/admin/contacts" className="text-evolw-accent font-medium hover:underline flex items-center text-sm">
             View All <ArrowRight className="ml-1 w-4 h-4" />
           </Link>
@@ -87,15 +87,15 @@ export function AdminDashboard() {
         ) : (
           <div className="space-y-4">
             {recentLeads.map((lead, i) => (
-              <div key={i} className="flex items-center space-x-5 p-5 rounded-2xl border border-evolw-gray-100 dark:border-white/5 hover:bg-evolw-gray-50 dark:hover:bg-white/5 transition-colors cursor-pointer">
-                <div className="w-12 h-12 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-evolw-accent border border-blue-100 dark:border-blue-800/30">
+              <div key={i} className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-5 p-4 sm:p-5 rounded-2xl border border-evolw-gray-100 dark:border-white/10 hover:bg-evolw-gray-50 dark:hover:bg-white/5 transition-colors">
+                <div className="w-12 h-12 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-evolw-accent border border-blue-100 dark:border-blue-800/30 shrink-0">
                   <MessageSquare className="w-5 h-5" />
                 </div>
-                <div className="flex-1">
-                  <p className="font-semibold text-lg text-evolw-black dark:text-white">{lead.name}</p>
-                  <p className="text-sm text-evolw-gray-500 dark:text-evolw-gray-400">{lead.company} • {lead.service || lead.subject}</p>
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-base sm:text-lg text-evolw-black dark:text-white truncate">{lead.name}</p>
+                  <p className="text-sm text-evolw-gray-500 dark:text-evolw-gray-400 truncate">{lead.company} • {lead.service || lead.subject}</p>
                 </div>
-                <div className="text-sm font-medium text-evolw-gray-400 dark:text-evolw-gray-500 bg-evolw-gray-100 dark:bg-white/5 px-3 py-1 rounded-full">
+                <div className="text-sm font-medium text-evolw-gray-400 dark:text-evolw-gray-500 bg-evolw-gray-100 dark:bg-white/5 px-3 py-1 rounded-full w-fit">
                   {lead.date || lead.createdAt?.split("T")[0]}
                 </div>
               </div>

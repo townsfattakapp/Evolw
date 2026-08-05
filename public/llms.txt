@@ -1,0 +1,34 @@
+# EVOLW — https://www.evolw.in
+> EVOLW is a technology engineering company specializing in custom software development, web platforms, mobile apps, cloud solutions, AI products, and digital transformation.
+
+## Company
+- Name: EVOLW
+- Website: https://www.evolw.in
+- Email: hello@evolw.in
+- Phone: +91 92092 50725
+- Location: Waraseoni, Balaghat, Madhya Pradesh, India
+- Focus: Software engineering, product engineering, tech consulting
+
+## Products
+- Fattakse: Business / local commerce platform — see https://www.evolw.in/products and https://fattakse.in
+
+## Services
+- Software Engineering: https://www.evolw.in/services#software
+- Web Platforms: https://www.evolw.in/services#web
+- Product Design: https://www.evolw.in/services#product
+- Tech Consulting: https://www.evolw.in/services#consulting
+- Continuous Support: https://www.evolw.in/services#support
+
+## Key pages
+- Home: https://www.evolw.in/
+- Products: https://www.evolw.in/products
+- Services: https://www.evolw.in/services
+- About: https://www.evolw.in/about
+- Careers: https://www.evolw.in/careers
+- Contact: https://www.evolw.in/contact
+- Certificate verification: https://www.evolw.in/verify
+- Privacy: https://www.evolw.in/privacy
+- Terms: https://www.evolw.in/terms
+
+## Contact for projects
+Email hello@evolw.in or use https://www.evolw.in/contact

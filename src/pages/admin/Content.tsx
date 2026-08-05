@@ -45,19 +45,19 @@ export function AdminContent() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
+    <div className="max-w-4xl mx-auto space-y-6 sm:space-y-8 text-evolw-black dark:text-white">
       <div>
-        <h2 className="text-3xl font-bold tracking-tight mb-2">Content Editor</h2>
-        <p className="text-evolw-gray-500">Edit the text on your live website. Changes sync to the database immediately.</p>
+        <h2 className="text-2xl sm:text-3xl font-bold tracking-tight mb-2 text-evolw-black dark:text-white">Content Editor</h2>
+        <p className="text-evolw-gray-500 dark:text-evolw-gray-400 text-sm sm:text-base">Edit the text on your live website. Changes sync to the database immediately.</p>
       </div>
 
-      <form onSubmit={handleSave} className="bg-white dark:bg-evolw-slate rounded-3xl border border-evolw-gray-200 dark:border-white/5 overflow-hidden shadow-sm">
-        <div className="p-6 border-b border-evolw-gray-200 dark:border-white/5 flex justify-between items-center bg-evolw-gray-50/50 dark:bg-white/5">
+      <form onSubmit={handleSave} className="bg-white dark:bg-evolw-slate rounded-2xl sm:rounded-3xl border border-evolw-gray-200 dark:border-white/10 overflow-hidden shadow-sm">
+        <div className="p-4 sm:p-6 border-b border-evolw-gray-200 dark:border-white/10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-evolw-gray-50/50 dark:bg-white/5">
           <div className="flex items-center space-x-3">
             <div className="p-2 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg">
               <Edit3 className="w-5 h-5" />
             </div>
-            <h3 className="font-semibold text-lg">Homepage Hero Section</h3>
+            <h3 className="font-semibold text-base sm:text-lg text-evolw-black dark:text-white">Homepage Hero Section</h3>
           </div>
           
           <button 
@@ -85,18 +85,18 @@ export function AdminContent() {
           </button>
         </div>
         
-        <div className="p-8 space-y-6">
+        <div className="p-4 sm:p-8 space-y-6">
           <div className="grid grid-cols-1 gap-6">
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-evolw-gray-700 dark:text-gray-300">Top Badge Text</label>
+              <label className="text-sm font-semibold text-evolw-gray-700 dark:text-evolw-gray-300">Top Badge Text</label>
               <input 
                 type="text" 
                 name="badge"
                 value={formData.badge}
                 onChange={handleChange}
-                className="w-full px-4 py-3 rounded-xl border bg-evolw-gray-50 dark:bg-evolw-black focus:outline-none focus:ring-2 focus:ring-evolw-accent border-evolw-gray-200 dark:border-white/10 transition-all"
+                className="w-full px-4 py-3 rounded-xl border bg-evolw-gray-50 dark:bg-evolw-black focus:outline-none focus:ring-2 focus:ring-evolw-accent border-evolw-gray-200 dark:border-white/10 transition-all text-evolw-black dark:text-white"
               />
-              <p className="text-xs text-evolw-gray-500">The small pill badge above the main title.</p>
+              <p className="text-xs text-evolw-gray-500 dark:text-evolw-gray-400">The small pill badge above the main title.</p>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

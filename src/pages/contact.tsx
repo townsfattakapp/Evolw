@@ -4,6 +4,8 @@ import { Container } from "../components/ui/container";
 import { Phone, MapPin, Mail, ArrowRight, CheckCircle2, Sparkles } from "lucide-react";
 import { motion, AnimatePresence, type Transition, type Variants } from "framer-motion";
 import { api, ApiError } from "../lib/api";
+import { PAGE_SEO } from "../lib/seo/site";
+import { contactPageSchema, localBusinessSchema, breadcrumbSchema } from "../lib/seo/schema";
 
 const ease = [0.32, 0.72, 0, 1] as const;
 
@@ -120,7 +122,20 @@ export function Contact() {
 
   return (
     <>
-      <SEO title="Contact | EVOLW" description="Let's build something extraordinary together. Reach out to the EVOLW engineering team." />
+      <SEO
+        title={PAGE_SEO.contact.title}
+        description={PAGE_SEO.contact.description}
+        path={PAGE_SEO.contact.path}
+        keywords={PAGE_SEO.contact.keywords}
+        jsonLd={[
+          contactPageSchema(),
+          localBusinessSchema(),
+          breadcrumbSchema([
+            { name: "Home", path: "/" },
+            { name: "Contact", path: "/contact" },
+          ]),
+        ]}
+      />
 
       {/* ─── HERO ─────────────────────────────────── */}
       <section className="relative min-h-[60vh] flex items-end bg-evolw-black overflow-hidden pt-40 pb-20 md:pt-56 md:pb-32">

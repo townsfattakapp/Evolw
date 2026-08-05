@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { requireAdmin } from './_lib/auth';
-import { ensureSchema } from './_lib/db';
-import { handleOptions, json, logError, methodNotAllowed, readBody } from './_lib/http';
+import { requireAdmin } from './_lib/auth.js';
+import { ensureSchema } from './_lib/db.js';
+import { handleOptions, json, logError, methodNotAllowed, readBody } from './_lib/http.js';
 
 const DEFAULT_CONTENT = {
   hero: {

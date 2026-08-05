@@ -9,14 +9,38 @@ import appHome from "../assets/fattakse_home.jpg";
 import appSuccess from "../assets/fattakse_success.jpg";
 import { useContent } from "../context/ContentContext";
 import { fadeInUp, staggerContainer } from "../lib/animations";
+import { PAGE_SEO } from "../lib/seo/site";
+import {
+  organizationSchema,
+  websiteSchema,
+  localBusinessSchema,
+  faqSchema,
+  serviceSchemas,
+  HOME_FAQS,
+  breadcrumbSchema,
+} from "../lib/seo/schema";
 
 export function Home() {
   const { content } = useContent();
   const { hero } = content;
+  const page = PAGE_SEO.home;
 
   return (
     <>
-      <SEO />
+      <SEO
+        title={page.title}
+        description={page.description}
+        path={page.path}
+        keywords={page.keywords}
+        jsonLd={[
+          organizationSchema(),
+          websiteSchema(),
+          localBusinessSchema(),
+          faqSchema(HOME_FAQS),
+          ...serviceSchemas(),
+          breadcrumbSchema([{ name: "Home", path: "/" }]),
+        ]}
+      />
       
       {/* Hyper-Minimalist Hero Section */}
       <section className="relative pt-48 pb-32 md:pt-72 md:pb-56 overflow-hidden bg-white dark:bg-evolw-black">
@@ -153,12 +177,65 @@ export function Home() {
             className="flex justify-center items-center gap-8 md:gap-16 mt-32"
           >
             <div className="w-[300px] md:w-[420px] h-auto rounded-[3rem] overflow-hidden border-[16px] border-evolw-gray-900 shadow-2xl relative">
-              <img src={appHome} alt="Fattakse Home App" className="w-full h-auto" />
+              <img
+                src={appHome}
+                alt="Fattakse mobile app home screen for local commerce and business operations"
+                className="w-full h-auto"
+                loading="lazy"
+                decoding="async"
+                width={420}
+                height={840}
+              />
             </div>
             <div className="w-[280px] md:w-[380px] h-auto rounded-[3rem] overflow-hidden border-[16px] border-evolw-gray-900 shadow-2xl relative mt-40 hidden md:block">
-              <img src={appSuccess} alt="Fattakse Success UI" className="w-full h-auto" />
+              <img
+                src={appSuccess}
+                alt="Fattakse app success confirmation interface"
+                className="w-full h-auto"
+                loading="lazy"
+                decoding="async"
+                width={380}
+                height={760}
+              />
             </div>
           </motion.div>
+        </Container>
+      </Section>
+
+      {/* AI / SEO FAQ — semantic answers for search & AI overviews */}
+      <Section className="bg-white dark:bg-evolw-black border-t border-evolw-gray-200 dark:border-white/5 py-24 md:py-32">
+        <Container>
+          <div className="max-w-3xl mx-auto">
+            <h2 className="text-3xl md:text-5xl font-bold tracking-tighter mb-10 text-evolw-black dark:text-white text-center">
+              Frequently asked questions
+            </h2>
+            <dl className="space-y-8">
+              {HOME_FAQS.map((faq) => (
+                <div key={faq.question}>
+                  <dt className="text-xl font-semibold text-evolw-black dark:text-white mb-2">
+                    {faq.question}
+                  </dt>
+                  <dd className="text-lg text-evolw-gray-500 dark:text-evolw-gray-400 leading-relaxed">
+                    {faq.answer}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+            <div className="mt-12 flex flex-wrap justify-center gap-4 text-sm font-semibold">
+              <Link to="/services" className="text-evolw-accent hover:underline">
+                Our services
+              </Link>
+              <Link to="/products" className="text-evolw-accent hover:underline">
+                Products
+              </Link>
+              <Link to="/about" className="text-evolw-accent hover:underline">
+                About EVOLW
+              </Link>
+              <Link to="/contact" className="text-evolw-accent hover:underline">
+                Contact us
+              </Link>
+            </div>
+          </div>
         </Container>
       </Section>
     </>

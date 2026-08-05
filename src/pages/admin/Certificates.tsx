@@ -117,33 +117,33 @@ export function AdminCertificates() {
   };
 
   return (
-    <div className="flex flex-col h-full overflow-hidden">
+    <div className="flex flex-col min-h-0 -m-3 sm:-m-6 lg:-m-10 h-[calc(100dvh-3.5rem)] sm:h-[calc(100dvh-4rem)] lg:h-[calc(100dvh-5rem)] overflow-hidden bg-evolw-gray-50 dark:bg-evolw-black">
       
       {/* Tabs */}
-      <div className="flex border-b border-evolw-gray-200 dark:border-white/5 mb-4">
+      <div className="flex border-b border-evolw-gray-200 dark:border-white/10 shrink-0 bg-white dark:bg-evolw-slate px-2 sm:px-4">
         <button 
           onClick={() => setActiveTab('builder')}
-          className={`px-6 py-3 font-semibold text-sm ${activeTab === 'builder' ? 'border-b-2 border-evolw-accent text-evolw-accent' : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'}`}
+          className={`px-4 sm:px-6 py-3 font-semibold text-sm ${activeTab === 'builder' ? 'border-b-2 border-evolw-accent text-evolw-accent' : 'text-evolw-gray-500 dark:text-evolw-gray-400 hover:text-evolw-black dark:hover:text-white'}`}
         >
           <div className="flex items-center"><Award className="w-4 h-4 mr-2" /> Builder</div>
         </button>
         <button 
           onClick={() => setActiveTab('history')}
-          className={`px-6 py-3 font-semibold text-sm ${activeTab === 'history' ? 'border-b-2 border-evolw-accent text-evolw-accent' : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'}`}
+          className={`px-4 sm:px-6 py-3 font-semibold text-sm ${activeTab === 'history' ? 'border-b-2 border-evolw-accent text-evolw-accent' : 'text-evolw-gray-500 dark:text-evolw-gray-400 hover:text-evolw-black dark:hover:text-white'}`}
         >
           <div className="flex items-center"><History className="w-4 h-4 mr-2" /> History</div>
         </button>
       </div>
 
       {activeTab === 'history' ? (
-        <div className="p-8 overflow-y-auto">
-          <h2 className="text-2xl font-bold mb-6 text-evolw-black dark:text-white">Generated Certificates</h2>
+        <div className="p-4 sm:p-8 overflow-y-auto">
+          <h2 className="text-xl sm:text-2xl font-bold mb-6 text-evolw-black dark:text-white">Generated Certificates</h2>
           {history.length === 0 ? (
             <p className="text-evolw-gray-500 dark:text-evolw-gray-400">No certificates have been generated yet.</p>
           ) : (
             <div className="grid gap-4">
               {history.map((h, i) => (
-                <div key={i} className="bg-white dark:bg-evolw-gray-900 p-5 rounded-xl border border-evolw-gray-200 dark:border-white/10 flex justify-between items-center">
+                <div key={i} className="bg-white dark:bg-evolw-slate p-4 sm:p-5 rounded-xl border border-evolw-gray-200 dark:border-white/10 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
                   <div>
                     <div className="font-bold text-lg text-evolw-black dark:text-white">{h.internName}</div>
                     <div className="text-sm text-evolw-gray-500 dark:text-evolw-gray-400 mt-0.5">{h.role} Intern</div>
@@ -173,13 +173,13 @@ export function AdminCertificates() {
           )}
         </div>
       ) : (
-        <div className="flex flex-1 overflow-hidden print:bg-white print:m-0 print:p-0 print:fixed print:inset-0 print:z-50 print:overflow-visible">
+        <div className="flex flex-1 min-h-0 flex-col lg:flex-row overflow-hidden print:bg-white print:m-0 print:p-0 print:fixed print:inset-0 print:z-50 print:overflow-visible">
           {/* Left Panel - Editor */}
-          <div className="w-1/3 h-full border-r border-evolw-gray-200 dark:border-white/5 overflow-y-auto p-8 print:hidden shrink-0">
+          <div className="w-full lg:w-1/3 lg:h-full border-b lg:border-b-0 lg:border-r border-evolw-gray-200 dark:border-white/10 overflow-y-auto p-4 sm:p-6 lg:p-8 print:hidden shrink-0 bg-white dark:bg-evolw-slate">
             
-            <div className="mb-8">
-              <h1 className="text-3xl font-bold mb-2">Certificate Builder</h1>
-              <p className="text-evolw-gray-500">Generate internship completion certificates.</p>
+            <div className="mb-6 sm:mb-8">
+              <h1 className="text-2xl sm:text-3xl font-bold mb-2 text-evolw-black dark:text-white">Certificate Builder</h1>
+              <p className="text-evolw-gray-500 dark:text-evolw-gray-400 text-sm sm:text-base">Generate internship completion certificates.</p>
             </div>
 
             <div className="flex space-x-3 mb-8">
@@ -299,7 +299,7 @@ export function AdminCertificates() {
           </div>
 
           {/* Right Panel - Live Preview */}
-          <div className="flex-1 h-full overflow-y-auto bg-evolw-gray-100 dark:bg-black p-8 flex items-center justify-center">
+          <div className="flex-1 min-h-[50vh] lg:h-full overflow-y-auto bg-evolw-gray-100 dark:bg-evolw-black p-4 sm:p-8 flex items-center justify-center">
             
             {/* HTML Approximation of the Landscape PDF */}
             <div className="bg-white w-[297mm] h-[210mm] shadow-lg p-[30px] font-serif text-black shrink-0 relative overflow-hidden" style={{ fontFamily: '"Times New Roman", Times, serif' }}>

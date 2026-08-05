@@ -3,6 +3,7 @@
 @theme {
   /* Premium Neutral Palette (Slate/Zinc vibe) */
   --color-evolw-black: #09090b;
+  --color-evolw-slate: #121214;
   --color-evolw-gray-900: #18181b;
   --color-evolw-gray-800: #27272a;
   --color-evolw-gray-700: #3f3f46;
@@ -122,4 +123,96 @@ input[type="number"] {
 .dark input[type="time"],
 .dark input[type="number"] {
   color-scheme: dark;
+}
+
+/* Rich text (job descriptions pasted from ChatGPT, etc.) */
+.evolw-rich-text {
+  line-height: 1.7;
+  color: inherit;
+}
+
+.evolw-rich-text > * + * {
+  margin-top: 0.75em;
+}
+
+.evolw-rich-text p {
+  margin: 0;
+}
+
+.evolw-rich-text strong,
+.evolw-rich-text b {
+  font-weight: 700;
+  color: inherit;
+}
+
+.evolw-rich-text em,
+.evolw-rich-text i {
+  font-style: italic;
+}
+
+.evolw-rich-text ul,
+.evolw-rich-text ol {
+  margin: 0.5em 0;
+  padding-left: 1.35em;
+}
+
+.evolw-rich-text ul {
+  list-style: disc;
+}
+
+.evolw-rich-text ol {
+  list-style: decimal;
+}
+
+.evolw-rich-text li {
+  margin: 0.25em 0;
+}
+
+.evolw-rich-text li p {
+  margin: 0;
+}
+
+.evolw-rich-text h1,
+.evolw-rich-text h2,
+.evolw-rich-text h3,
+.evolw-rich-text h4 {
+  margin: 1em 0 0.4em;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  color: inherit;
+}
+
+.evolw-rich-text h1 { font-size: 1.5em; }
+.evolw-rich-text h2 { font-size: 1.25em; }
+.evolw-rich-text h3 { font-size: 1.1em; }
+
+.evolw-rich-text blockquote {
+  margin: 0.75em 0;
+  padding-left: 1em;
+  border-left: 3px solid #d4d4d8;
+  color: #52525b;
+}
+
+.dark .evolw-rich-text blockquote {
+  border-left-color: #3f3f46;
+  color: #a1a1aa;
+}
+
+.evolw-rich-text a {
+  color: #2563eb;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+  color: #a1a1aa;
+}
+
+.dark .ProseMirror p.is-editor-empty:first-child::before {
+  color: #52525b;
 }

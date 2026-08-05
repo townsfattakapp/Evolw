@@ -6,6 +6,8 @@ import { Button } from "../components/ui/button";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { fadeInUp, staggerContainer } from "../lib/animations";
+import { PAGE_SEO } from "../lib/seo/site";
+import { serviceSchemas, breadcrumbSchema } from "../lib/seo/schema";
 
 const SERVICES = [
   {
@@ -53,21 +55,33 @@ const SERVICES = [
 export function Services() {
   return (
     <>
-      <SEO title="Services | EVOLW" description="Comprehensive software engineering and technology services." />
+      <SEO
+        title={PAGE_SEO.services.title}
+        description={PAGE_SEO.services.description}
+        path={PAGE_SEO.services.path}
+        keywords={PAGE_SEO.services.keywords}
+        jsonLd={[
+          ...serviceSchemas(),
+          breadcrumbSchema([
+            { name: "Home", path: "/" },
+            { name: "Services", path: "/services" },
+          ]),
+        ]}
+      />
       
       {/* Hyper-Minimalist Hero */}
-      <section className="pt-48 pb-32 md:pt-72 md:pb-48 bg-white dark:bg-evolw-black overflow-hidden">
+      <section className="pt-32 pb-20 md:pt-72 md:pb-48 bg-white dark:bg-evolw-black overflow-hidden">
         <Container>
           <motion.div 
-            className="max-w-5xl mx-auto"
+            className="max-w-5xl mx-auto text-center md:text-left"
             initial="initial"
             animate="whileInView"
             variants={staggerContainer}
           >
-            <motion.h1 variants={fadeInUp} className="text-6xl md:text-8xl lg:text-[7.5rem] font-bold tracking-tighter mb-12 text-evolw-black dark:text-white leading-[1.05]">
+            <motion.h1 variants={fadeInUp} className="text-4xl sm:text-5xl md:text-8xl lg:text-[7.5rem] font-bold tracking-tighter mb-6 md:mb-12 text-evolw-black dark:text-white leading-[1.1] md:leading-[1.05] text-balance">
               Engineering for complex scale.
             </motion.h1>
-            <motion.p variants={fadeInUp} className="text-2xl md:text-3xl text-evolw-gray-500 dark:text-evolw-gray-400 font-medium tracking-tight max-w-3xl leading-relaxed text-balance">
+            <motion.p variants={fadeInUp} className="text-lg sm:text-xl md:text-3xl text-evolw-gray-500 dark:text-evolw-gray-400 font-medium tracking-tight max-w-3xl mx-auto md:mx-0 leading-relaxed text-balance">
               We partner with businesses to provide deep technical expertise, from initial architecture to ongoing platform support.
             </motion.p>
           </motion.div>
@@ -75,19 +89,20 @@ export function Services() {
       </section>
 
       {/* Services Bento Grid */}
-      <Section className="bg-evolw-gray-50 dark:bg-[#050505] py-40 border-t border-evolw-gray-200 dark:border-white/5">
+      <Section className="bg-evolw-gray-50 dark:bg-[#050505] py-20 md:py-40 border-t border-evolw-gray-200 dark:border-white/5">
         <Container>
           <motion.div 
             initial="initial"
             whileInView="whileInView"
             variants={staggerContainer}
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 auto-rows-fr"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8 auto-rows-fr"
           >
             {SERVICES.map((service) => (
               <motion.div 
                 key={service.id} 
                 variants={fadeInUp}
-                className={`${service.span} p-12 md:p-16 rounded-[2rem] border border-evolw-gray-200 dark:border-white/5 hover:border-evolw-gray-300 dark:hover:border-white/20 hover:shadow-2xl transition-all duration-700 relative overflow-hidden group flex flex-col justify-between min-h-[350px] ${service.bg}`}
+                className={`${service.span} p-8 sm:p-10 md:p-16 rounded-[1.5rem] md:rounded-[2rem] border border-evolw-gray-200 dark:border-white/5 hover:border-evolw-gray-300 dark:hover:border-white/20 hover:shadow-2xl transition-all duration-700 relative overflow-hidden group flex flex-col justify-between min-h-[280px] md:min-h-[350px] ${service.bg}`}
+                id={service.id}
               >
                 {/* For black box, add gradient */}
                 {service.bg.includes('bg-evolw-black text-white') && (
@@ -95,14 +110,14 @@ export function Services() {
                 )}
                 
                 <div className="relative z-10">
-                  <service.icon className={`w-12 h-12 mb-10 transition-transform duration-500 group-hover:scale-110 ${service.bg.includes('text-white') ? 'text-white' : 'text-evolw-gray-900 dark:text-white'}`} strokeWidth={1.5} />
-                  <h3 className="text-4xl font-bold mb-6 tracking-tighter leading-tight">{service.title}</h3>
-                  <p className={`text-xl font-medium max-w-md leading-relaxed ${service.bg.includes('text-white') ? 'text-white/70' : 'text-evolw-gray-500 dark:text-evolw-gray-400'}`}>
+                  <service.icon className={`w-10 h-10 md:w-12 md:h-12 mb-6 md:mb-10 transition-transform duration-500 group-hover:scale-110 ${service.bg.includes('text-white') ? 'text-white' : 'text-evolw-gray-900 dark:text-white'}`} strokeWidth={1.5} />
+                  <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-4 md:mb-6 tracking-tighter leading-tight">{service.title}</h3>
+                  <p className={`text-base sm:text-lg md:text-xl font-medium max-w-md leading-relaxed ${service.bg.includes('text-white') ? 'text-white/70' : 'text-evolw-gray-500 dark:text-evolw-gray-400'}`}>
                     {service.description}
                   </p>
                 </div>
                 
-                <Link to="/contact" className={`relative z-10 inline-flex items-center font-semibold mt-12 group-hover:translate-x-2 transition-transform duration-500 ${service.bg.includes('text-white') ? 'text-white' : 'text-evolw-accent'}`}>
+                <Link to="/contact" className={`relative z-10 inline-flex items-center font-semibold mt-8 md:mt-12 group-hover:translate-x-2 transition-transform duration-500 ${service.bg.includes('text-white') ? 'text-white' : 'text-evolw-accent'}`}>
                   Discover <ArrowRight className="ml-3 w-5 h-5" />
                 </Link>
               </motion.div>
@@ -112,22 +127,28 @@ export function Services() {
       </Section>
       
       {/* High Contrast CTA */}
-      <Section className="bg-white dark:bg-evolw-black py-40">
+      <Section className="bg-white dark:bg-evolw-black py-20 md:py-40">
         <Container>
           <motion.div 
             initial="initial"
             whileInView="whileInView"
             variants={staggerContainer}
-            className="bg-evolw-black text-white rounded-[3rem] p-16 md:p-32 text-center relative overflow-hidden"
+            className="bg-evolw-black text-white rounded-[1.75rem] sm:rounded-[2.5rem] md:rounded-[3rem] px-6 py-12 sm:px-10 sm:py-16 md:p-32 text-center relative overflow-hidden"
           >
             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-evolw-gray-900 via-evolw-black to-evolw-black opacity-50"></div>
-            <div className="relative z-10 max-w-4xl mx-auto">
-              <motion.h2 variants={fadeInUp} className="text-5xl md:text-7xl font-bold mb-10 tracking-tighter leading-[1.1]">Ready to build?</motion.h2>
-              <motion.p variants={fadeInUp} className="text-2xl text-white/70 font-medium tracking-tight mb-16 max-w-2xl mx-auto leading-relaxed text-balance">
+            <div className="relative z-10 max-w-4xl mx-auto flex flex-col items-center">
+              <motion.h2 variants={fadeInUp} className="text-3xl sm:text-4xl md:text-7xl font-bold mb-6 md:mb-10 tracking-tighter leading-[1.1] text-balance">
+                Ready to build?
+              </motion.h2>
+              <motion.p variants={fadeInUp} className="text-base sm:text-lg md:text-2xl text-white/70 font-medium tracking-tight mb-8 md:mb-16 max-w-2xl mx-auto leading-relaxed text-balance">
                 Let's discuss how our engineering team can architect your next major platform.
               </motion.p>
-              <motion.div variants={fadeInUp}>
-                <Button asChild size="lg" className="h-16 px-12 text-lg rounded-full bg-white text-evolw-black hover:bg-evolw-gray-200">
+              <motion.div variants={fadeInUp} className="w-full flex justify-center">
+                <Button
+                  asChild
+                  size="lg"
+                  className="h-12 sm:h-14 md:h-16 w-full sm:w-auto px-8 sm:px-12 text-base md:text-lg rounded-full bg-white text-evolw-black hover:bg-evolw-gray-200"
+                >
                   <Link to="/contact">Contact Engineering</Link>
                 </Button>
               </motion.div>

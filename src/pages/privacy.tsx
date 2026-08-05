@@ -1,11 +1,21 @@
 import { SEO } from "../components/common/seo";
 import { Container } from "../components/ui/container";
 import { Section } from "../components/ui/section";
+import { PAGE_SEO } from "../lib/seo/site";
+import { breadcrumbSchema } from "../lib/seo/schema";
 
 export function Privacy() {
   return (
     <>
-      <SEO title="Privacy Policy | EVOLW" />
+      <SEO
+        title={PAGE_SEO.privacy.title}
+        description={PAGE_SEO.privacy.description}
+        path={PAGE_SEO.privacy.path}
+        jsonLd={breadcrumbSchema([
+          { name: "Home", path: "/" },
+          { name: "Privacy Policy", path: "/privacy" },
+        ])}
+      />
       <Section className="pt-32 pb-20 md:pt-40 md:pb-32 bg-white dark:bg-evolw-black min-h-screen">
         <Container>
           <div className="max-w-3xl mx-auto prose prose-lg dark:prose-invert">

@@ -3,8 +3,11 @@ import { useParams, useNavigate, Link, useLocation } from "react-router-dom";
 import { SEO } from "../components/common/seo";
 import { Container } from "../components/ui/container";
 import { Button } from "../components/ui/button";
+import { RichText } from "../components/ui/rich-text";
 import { ArrowLeft, Briefcase, MapPin, CheckCircle, Upload } from "lucide-react";
 import { api, ApiError, fileToDataUrl, type Job } from "../lib/api";
+import { richTextToPlain } from "../lib/richText";
+import { breadcrumbSchema, jobPostingSchema } from "../lib/seo/schema";
 
 export function JobDetails() {
   const { id } = useParams<{ id: string }>();
@@ -67,12 +70,18 @@ export function JobDetails() {
   }, [id]);
 
   if (isLoading) {
-    return <div className="min-h-screen pt-32 pb-20 flex items-center justify-center">Loading...</div>;
+    return (
+      <div className="min-h-screen pt-32 pb-20 flex items-center justify-center">
+        <SEO title="Loading role | EVOLW Careers" path="/careers" noindex />
+        Loading...
+      </div>
+    );
   }
 
   if (loadError) {
     return (
       <div className="min-h-screen pt-32 pb-20 flex flex-col items-center justify-center text-center px-4">
+        <SEO title="Unable to load role | EVOLW Careers" path="/careers" noindex />
         <h1 className="text-4xl font-bold mb-4">Unable to load role</h1>
         <p className="text-evolw-gray-500 mb-8">{loadError}</p>
         <Button onClick={() => navigate("/careers")}>Back to Careers</Button>
@@ -83,6 +92,7 @@ export function JobDetails() {
   if (!job) {
     return (
       <div className="min-h-screen pt-32 pb-20 flex flex-col items-center justify-center text-center px-4">
+        <SEO title="Job Not Found | EVOLW Careers" path="/careers" noindex />
         <h1 className="text-4xl font-bold mb-4">Job Not Found</h1>
         <p className="text-evolw-gray-500 mb-8">This position may have been filled or no longer exists.</p>
         <Button onClick={() => navigate("/careers")}>Back to Careers</Button>
@@ -155,7 +165,31 @@ export function JobDetails() {
 
   return (
     <>
-      <SEO title={`${job.title} | Careers | EVOLW`} description={`Apply for ${job.title} at EVOLW.`} />
+      <SEO
+        title={`${job.title} | Careers | EVOLW`}
+        description={
+          richTextToPlain(job.description).slice(0, 160) ||
+          `Apply for ${job.title} at EVOLW — ${job.department}, ${job.location}, ${job.type}.`
+        }
+        path={`/careers/${job.id}`}
+        keywords={[job.title, job.department, "EVOLW careers", "software jobs"]}
+        jsonLd={[
+          jobPostingSchema({
+            id: job.id,
+            title: job.title,
+            description: richTextToPlain(job.description) || job.title,
+            location: job.location,
+            type: job.type,
+            department: job.department,
+            datePosted: job.createdAt?.split("T")[0],
+          }),
+          breadcrumbSchema([
+            { name: "Home", path: "/" },
+            { name: "Careers", path: "/careers" },
+            { name: job.title, path: `/careers/${job.id}` },
+          ]),
+        ]}
+      />
 
       <div className="min-h-screen pt-32 pb-20 bg-evolw-gray-50 dark:bg-evolw-black">
         <Container>
@@ -196,10 +230,11 @@ export function JobDetails() {
                 </Button>
               </div>
 
-              <div className="prose prose-lg dark:prose-invert max-w-none">
-                <p className="text-xl leading-relaxed text-evolw-gray-700 dark:text-evolw-gray-300">
-                  {job.description}
-                </p>
+              <div className="max-w-none">
+                <RichText
+                  html={job.description}
+                  className="text-lg md:text-xl text-evolw-gray-700 dark:text-evolw-gray-300"
+                />
               </div>
             </div>
 

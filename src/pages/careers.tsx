@@ -3,15 +3,27 @@ import { SEO } from "../components/common/seo";
 import { Container } from "../components/ui/container";
 import { Section } from "../components/ui/section";
 import { Button } from "../components/ui/button";
+import { RichText } from "../components/ui/rich-text";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { fadeInUp, staggerContainer } from "../lib/animations";
 import { api, ApiError, type Job } from "../lib/api";
+import { PAGE_SEO } from "../lib/seo/site";
+import { breadcrumbSchema } from "../lib/seo/schema";
 
 export function Careers() {
   return (
     <>
-      <SEO title="Careers | EVOLW" description="Join our engineering team and build technology that matters." />
+      <SEO
+        title={PAGE_SEO.careers.title}
+        description={PAGE_SEO.careers.description}
+        path={PAGE_SEO.careers.path}
+        keywords={PAGE_SEO.careers.keywords}
+        jsonLd={breadcrumbSchema([
+          { name: "Home", path: "/" },
+          { name: "Careers", path: "/careers" },
+        ])}
+      />
       
       {/* Hyper-Minimalist Hero */}
       <section className="pt-32 pb-24 md:pt-72 md:pb-48 bg-white dark:bg-evolw-black overflow-hidden">
@@ -178,9 +190,10 @@ function JobsList() {
                 </span>
               </div>
               <h3 className="text-3xl md:text-4xl font-bold mb-4 md:mb-6 tracking-tighter text-evolw-black dark:text-white group-hover:text-evolw-accent transition-colors">{job.title}</h3>
-              <p className="text-lg md:text-xl font-medium text-evolw-gray-500 dark:text-evolw-gray-400 leading-relaxed max-w-2xl">
-                {job.description}
-              </p>
+              <RichText
+                html={job.description}
+                className="text-base md:text-lg font-medium text-evolw-gray-500 dark:text-evolw-gray-400 max-w-2xl"
+              />
             </div>
             <div className="shrink-0 mt-4 md:mt-0 flex flex-col sm:flex-row gap-3 md:gap-4 w-full md:w-auto">
               <Button asChild size="lg" variant="outline" className="h-12 md:h-14 px-8 rounded-full border-evolw-gray-200 dark:border-white/10 hover:bg-evolw-gray-50 dark:hover:bg-white/5 bg-transparent w-full sm:w-auto">

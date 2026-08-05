@@ -1,11 +1,21 @@
 import { SEO } from "../components/common/seo";
 import { Container } from "../components/ui/container";
 import { Section } from "../components/ui/section";
+import { PAGE_SEO } from "../lib/seo/site";
+import { breadcrumbSchema } from "../lib/seo/schema";
 
 export function Terms() {
   return (
     <>
-      <SEO title="Terms of Service | EVOLW" />
+      <SEO
+        title={PAGE_SEO.terms.title}
+        description={PAGE_SEO.terms.description}
+        path={PAGE_SEO.terms.path}
+        jsonLd={breadcrumbSchema([
+          { name: "Home", path: "/" },
+          { name: "Terms of Service", path: "/terms" },
+        ])}
+      />
       <Section className="pt-32 pb-20 md:pt-40 md:pb-32 bg-white dark:bg-evolw-black min-h-screen">
         <Container>
           <div className="max-w-3xl mx-auto prose prose-lg dark:prose-invert">

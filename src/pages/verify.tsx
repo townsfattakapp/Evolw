@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { Search, CheckCircle, XCircle, ShieldCheck, Award } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { api } from '../lib/api';
+import { SEO } from '../components/common/seo';
+import { PAGE_SEO } from '../lib/seo/site';
+import { breadcrumbSchema } from '../lib/seo/schema';
 
 interface CertificateVerifyData {
   internName?: string;
@@ -39,6 +42,15 @@ export function VerifyCertificate() {
 
   return (
     <div className="min-h-screen bg-evolw-gray-50 flex flex-col">
+      <SEO
+        title={PAGE_SEO.verify.title}
+        description={PAGE_SEO.verify.description}
+        path={PAGE_SEO.verify.path}
+        jsonLd={breadcrumbSchema([
+          { name: 'Home', path: '/' },
+          { name: 'Verify Certificate', path: '/verify' },
+        ])}
+      />
       {/* Simple Header */}
       <header className="bg-white border-b border-evolw-gray-200 px-8 h-20 flex items-center justify-between shadow-sm shrink-0">
         <Link to="/" className="text-2xl font-bold tracking-tight text-evolw-black hover:text-evolw-accent transition-colors">EVOLW</Link>
