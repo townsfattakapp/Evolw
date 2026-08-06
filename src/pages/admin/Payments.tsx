@@ -29,8 +29,8 @@ export function Payments() {
   }, [searchParams]);
 
   const { data: payments = [], isLoading: loadingPayments } = useSWR(
-    "/api/payments",
-    () => api.getPayments(),
+    "billing:payments",
+    () => api.getPayments() as Promise<any[]>,
     {
       onError: (err) => {
         if (err instanceof ApiError && (err.status === 401 || err.status === 403)) {
@@ -41,15 +41,17 @@ export function Payments() {
   );
 
   const { data: invoices = [], isLoading: loadingInvoices } = useSWR(
-    "/api/invoices?open=true",
-    () => api.getInvoices(undefined, { open: true })
+    "billing:invoices:open",
+    () => api.getInvoices(undefined, { open: true }) as Promise<any[]>
   );
 
   const loading = loadingPayments || loadingInvoices;
+  const invoiceList = Array.isArray(invoices) ? invoices : [];
+  const paymentList = Array.isArray(payments) ? payments : [];
 
   const selectedInvoice = useMemo(
-    () => invoices.find((i) => i.id === form.invoice_id) || null,
-    [invoices, form.invoice_id]
+    () => invoiceList.find((i: any) => i.id === form.invoice_id) || null,
+    [invoiceList, form.invoice_id]
   );
 
   const handleSave = async (e: React.FormEvent) => {
@@ -58,7 +60,7 @@ export function Payments() {
     try {
       await api.recordPayment({
         invoice_id: form.invoice_id,
-        amount: parseFloat(form.amount),
+        amount: Number(form.amount),
         payment_method: form.payment_method,
         date: form.date,
         transaction_id: form.transaction_id || undefined,
@@ -73,8 +75,9 @@ export function Payments() {
         transaction_id: "",
         notes: "",
       });
-      mutate("/api/payments");
-      mutate("/api/invoices?open=true");
+      mutate("billing:payments");
+      mutate("billing:invoices:open");
+      mutate("billing:invoices");
     } catch (err) {
       alert(err instanceof ApiError ? err.message : "Failed to record payment");
     } finally {
@@ -100,7 +103,7 @@ export function Payments() {
           <div className="flex justify-center p-12">
             <Loader2 className="w-8 h-8 animate-spin text-evolw-accent" />
           </div>
-        ) : payments.length === 0 ? (
+        ) : paymentList.length === 0 ? (
           <div className="text-center p-12">
             <Wallet className="w-8 h-8 text-evolw-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium mb-1">No payments found</h3>
@@ -120,7 +123,7 @@ export function Payments() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-evolw-gray-200 dark:divide-white/10 text-evolw-black dark:text-white">
-                {payments.map((p) => (
+                {paymentList.map((p: any) => (
                   <tr key={p.id} className="hover:bg-evolw-gray-50/50 dark:hover:bg-white/5">
                     <td className="px-6 py-4 font-medium text-evolw-accent">{p.reference_number}</td>
                     <td className="px-6 py-4">{formatDate(p.date)}</td>
@@ -156,7 +159,7 @@ export function Payments() {
                 required
                 value={form.invoice_id}
                 onChange={(e) => {
-                  const inv = invoices.find((i) => i.id === e.target.value);
+                  const inv = invoiceList.find((i: any) => i.id === e.target.value);
                   setForm({
                     ...form,
                     invoice_id: e.target.value,
@@ -166,13 +169,13 @@ export function Payments() {
                 className="w-full px-4 py-2.5 border rounded-xl dark:border-white/10 dark:bg-black/20"
               >
                 <option value="">Select open invoice...</option>
-                {invoices.map((inv) => (
+                {invoiceList.map((inv: any) => (
                   <option key={inv.id} value={inv.id}>
                     {inv.invoice_number} — {inv.client_name} (due {formatMoney(inv.balance_due, inv.currency)})
                   </option>
                 ))}
               </select>
-              {invoices.length === 0 && (
+              {invoiceList.length === 0 && (
                 <p className="text-xs text-amber-600 mt-1">No open invoices. Mark an invoice as Sent first.</p>
               )}
             </div>

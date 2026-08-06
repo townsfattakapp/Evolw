@@ -10,8 +10,8 @@ export function Invoices() {
   const [search, setSearch] = useState("");
 
   const { data: invoices = [], isLoading: loading } = useSWR(
-    "/api/invoices",
-    () => api.getInvoices(),
+    "billing:invoices",
+    () => api.getInvoices() as Promise<any[]>,
     {
       onError: (err) => {
         if (err instanceof ApiError && (err.status === 401 || err.status === 403)) {
@@ -21,8 +21,9 @@ export function Invoices() {
     }
   );
 
-  const filtered = invoices.filter(
-    (i) =>
+  const list = Array.isArray(invoices) ? invoices : [];
+  const filtered = list.filter(
+    (i: any) =>
       i.invoice_number?.toLowerCase().includes(search.toLowerCase()) ||
       i.client_name?.toLowerCase().includes(search.toLowerCase())
   );
@@ -67,7 +68,7 @@ export function Invoices() {
         ) : (
           <>
             <div className="md:hidden divide-y divide-evolw-gray-100 dark:divide-white/10">
-              {filtered.map((inv) => (
+              {filtered.map((inv: any) => (
                 <Link key={inv.id} to={`/admin/invoices/${inv.id}`} className="block p-4 space-y-2">
                   <p className="font-semibold text-evolw-accent">{inv.invoice_number}</p>
                   <p className="font-medium">{inv.client_name}</p>
@@ -96,7 +97,7 @@ export function Invoices() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-evolw-gray-200 dark:divide-white/10 text-evolw-black dark:text-white">
-                  {filtered.map((inv) => (
+                  {filtered.map((inv: any) => (
                     <tr
                       key={inv.id}
                       className="hover:bg-evolw-gray-50/50 dark:hover:bg-white/5 cursor-pointer"

@@ -12,8 +12,8 @@ export function Quotations() {
   const [convertingId, setConvertingId] = useState<string | null>(null);
 
   const { data: quotations = [], isLoading: loading } = useSWR(
-    "/api/quotations",
-    () => api.getQuotations(),
+    "billing:quotations",
+    () => api.getQuotations() as Promise<any[]>,
     {
       onError: (err) => {
         if (err instanceof ApiError && (err.status === 401 || err.status === 403)) {
@@ -29,7 +29,7 @@ export function Quotations() {
       setConvertingId(id);
       await api.updateQuotationStatus(id, "Approved");
       const result = await api.convertQuotationToInvoice(id);
-      mutate("/api/quotations");
+      mutate("billing:quotations");
       navigate(`/admin/invoices/${result.id}`);
     } catch (err) {
       alert(err instanceof ApiError ? err.message : "Conversion failed");
@@ -38,8 +38,9 @@ export function Quotations() {
     }
   };
 
-  const filtered = quotations.filter(
-    (q) =>
+  const list = Array.isArray(quotations) ? quotations : [];
+  const filtered = list.filter(
+    (q: any) =>
       q.quotation_number?.toLowerCase().includes(search.toLowerCase()) ||
       q.client_name?.toLowerCase().includes(search.toLowerCase())
   );
@@ -84,7 +85,7 @@ export function Quotations() {
         ) : (
           <>
             <div className="md:hidden divide-y divide-evolw-gray-100 dark:divide-white/10">
-              {filtered.map((qtn) => (
+              {filtered.map((qtn: any) => (
                 <div key={qtn.id} className="p-4 space-y-2">
                   <Link to={`/admin/quotations/${qtn.id}`} className="font-semibold text-evolw-accent">
                     {qtn.quotation_number}
@@ -112,7 +113,7 @@ export function Quotations() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-evolw-gray-200 dark:divide-white/10 text-evolw-black dark:text-white">
-                  {filtered.map((qtn) => (
+                  {filtered.map((qtn: any) => (
                     <tr key={qtn.id} className="hover:bg-evolw-gray-50/50 dark:hover:bg-white/5">
                       <td className="px-6 py-4 font-medium text-evolw-accent">
                         <Link to={`/admin/quotations/${qtn.id}`} className="hover:underline">

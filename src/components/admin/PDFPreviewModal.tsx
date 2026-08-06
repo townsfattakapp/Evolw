@@ -1,9 +1,9 @@
 import { X, Download } from "lucide-react";
-import { PDFDownloadLink, PDFViewer } from "@react-pdf/renderer";
+import { PDFDownloadLink, PDFViewer, type DocumentProps } from "@react-pdf/renderer";
 import { useEffect, useState, type ReactElement } from "react";
 
 interface PDFPreviewModalProps {
-  document: ReactElement;
+  document: ReactElement<DocumentProps>;
   onClose: () => void;
   title?: string;
   fileName?: string;
