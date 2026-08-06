@@ -52,7 +52,61 @@
     </noscript>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <style>
+        .seo-skeleton {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          min-height: 100vh;
+          background-color: #09090b;
+          color: #ffffff;
+          font-family: 'Inter', system-ui, sans-serif;
+          text-align: center;
+          padding: 2rem;
+        }
+        .seo-skeleton h1 {
+          font-size: 3rem;
+          font-weight: 700;
+          letter-spacing: -0.05em;
+          margin-bottom: 1.5rem;
+          line-height: 1.1;
+          max-width: 64rem;
+        }
+        .seo-skeleton p {
+          font-size: 1.25rem;
+          color: #a1a1aa;
+          max-width: 48rem;
+          margin-bottom: 2rem;
+          line-height: 1.6;
+        }
+        .seo-skeleton-nav {
+          display: flex;
+          gap: 1.5rem;
+          font-size: 0.875rem;
+          font-weight: 600;
+          color: #e4e4e7;
+          flex-wrap: wrap;
+          justify-content: center;
+        }
+        .seo-skeleton-nav a {
+          color: inherit;
+          text-decoration: none;
+        }
+      </style>
+      <div class="seo-skeleton">
+        <h1>EVOLW | Custom Software, Web &amp; Mobile App Development</h1>
+        <p>EVOLW designs and builds modern software products, web platforms, mobile apps, cloud infrastructure, and AI solutions that help businesses scale.</p>
+        <div class="seo-skeleton-nav">
+          <a href="/products">Products</a>
+          <a href="/services">Services</a>
+          <a href="/about">About</a>
+          <a href="/careers">Careers</a>
+          <a href="/contact">Contact us</a>
+        </div>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
