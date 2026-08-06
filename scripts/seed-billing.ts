@@ -1,12 +1,22 @@
 import { neon } from '@neondatabase/serverless';
 
-// Load environment variables for local execution if not running inside a framework
-// Assuming --env-file=.env.local is used with node/tsx
+/**
+ * LOCAL DEMO SEED ONLY — never run against production without CONFIRM_SEED=1.
+ * Prefer: CONFIRM_SEED=1 npx tsx --env-file=.env.local scripts/seed-billing.ts
+ */
 
 const DATABASE_URL = process.env.DATABASE_URL;
 
 if (!DATABASE_URL) {
   console.error("Missing DATABASE_URL");
+  process.exit(1);
+}
+
+if (process.env.CONFIRM_SEED !== '1') {
+  console.error(
+    "Refusing to seed. This inserts fake clients (Acme/Stark/Globex).\n" +
+      "Set CONFIRM_SEED=1 only for local/dev databases."
+  );
   process.exit(1);
 }
 
