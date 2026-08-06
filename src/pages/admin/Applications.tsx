@@ -159,11 +159,27 @@ export function AdminApplications() {
 
   const statusClass = (status: string) => {
     const s = status.toLowerCase();
-    if (s === "new") return "bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400";
-    if (s === "reviewing") return "bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400";
-    if (s === "shortlisted") return "bg-violet-100 text-violet-700 dark:bg-violet-500/20 dark:text-violet-400";
-    if (s === "hired") return "bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400";
-    return "bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400";
+    if (s === "new")
+      return "bg-sky-100 text-sky-800 border border-sky-300 dark:bg-sky-500/25 dark:text-sky-300 dark:border-sky-500/40 ring-1 ring-sky-200/80 dark:ring-sky-400/20";
+    if (s === "reviewing")
+      return "bg-amber-100 text-amber-900 border border-amber-300 dark:bg-amber-500/25 dark:text-amber-300 dark:border-amber-500/40 ring-1 ring-amber-200/80 dark:ring-amber-400/20";
+    if (s === "shortlisted")
+      return "bg-violet-100 text-violet-900 border border-violet-300 dark:bg-violet-500/25 dark:text-violet-300 dark:border-violet-500/40 ring-1 ring-violet-200/80 dark:ring-violet-400/20";
+    if (s === "hired")
+      return "bg-emerald-100 text-emerald-900 border border-emerald-300 dark:bg-emerald-500/25 dark:text-emerald-300 dark:border-emerald-500/40 ring-1 ring-emerald-200/80 dark:ring-emerald-400/20";
+    if (s === "rejected")
+      return "bg-rose-100 text-rose-900 border border-rose-300 dark:bg-rose-500/25 dark:text-rose-300 dark:border-rose-500/40 ring-1 ring-rose-200/80 dark:ring-rose-400/20";
+    return "bg-evolw-gray-100 text-evolw-gray-700 border border-evolw-gray-300 dark:bg-white/10 dark:text-evolw-gray-300 dark:border-white/15";
+  };
+
+  const statusDot = (status: string) => {
+    const s = status.toLowerCase();
+    if (s === "new") return "bg-sky-500";
+    if (s === "reviewing") return "bg-amber-500";
+    if (s === "shortlisted") return "bg-violet-500";
+    if (s === "hired") return "bg-emerald-500";
+    if (s === "rejected") return "bg-rose-500";
+    return "bg-evolw-gray-400";
   };
 
   return (
@@ -207,15 +223,22 @@ export function AdminApplications() {
           <div className="relative w-full md:w-auto">
             <button
               onClick={() => setIsFilterOpen(!isFilterOpen)}
-              className="w-full md:w-auto flex items-center justify-center space-x-2 px-4 py-3 rounded-xl text-sm font-semibold bg-white dark:bg-evolw-black border border-evolw-gray-200 dark:border-white/10 hover:bg-evolw-gray-50 dark:hover:bg-white/5 transition-colors shadow-sm text-evolw-black dark:text-white"
+              className={`w-full md:w-auto flex items-center justify-center space-x-2 px-4 py-3 rounded-xl text-sm font-semibold border transition-colors shadow-sm ${
+                statusFilter === "All"
+                  ? "bg-white dark:bg-evolw-black border-evolw-gray-200 dark:border-white/10 text-evolw-black dark:text-white hover:bg-evolw-gray-50 dark:hover:bg-white/5"
+                  : statusClass(statusFilter)
+              }`}
             >
               <Filter className="w-4 h-4" />
+              {statusFilter !== "All" && (
+                <span className={`w-2 h-2 rounded-full ${statusDot(statusFilter)}`} />
+              )}
               <span>Status: {statusFilter}</span>
             </button>
 
             {isFilterOpen && (
-              <div className="absolute left-0 md:left-auto md:right-0 mt-2 w-full md:w-48 bg-white dark:bg-evolw-black border border-evolw-gray-200 dark:border-white/10 rounded-xl shadow-lg z-10 overflow-hidden">
-                <div className="py-1">
+              <div className="absolute left-0 md:left-auto md:right-0 mt-2 w-full md:w-52 bg-white dark:bg-evolw-black border border-evolw-gray-200 dark:border-white/10 rounded-xl shadow-lg z-10 overflow-hidden">
+                <div className="py-1.5">
                   {["All", ...STATUS_OPTIONS].map((status) => (
                     <button
                       key={status}
@@ -223,13 +246,16 @@ export function AdminApplications() {
                         setStatusFilter(status);
                         setIsFilterOpen(false);
                       }}
-                      className={`block w-full text-left px-4 py-2 text-sm hover:bg-evolw-gray-50 dark:hover:bg-white/5 text-evolw-black dark:text-white ${
-                        statusFilter === status
-                          ? "font-bold text-evolw-accent bg-blue-50 dark:bg-blue-900/20"
-                          : ""
-                      }`}
+                      className={`flex w-full items-center gap-2.5 text-left px-4 py-2.5 text-sm transition-colors hover:bg-evolw-gray-50 dark:hover:bg-white/5 ${
+                        statusFilter === status ? "font-bold" : "font-medium"
+                      } text-evolw-black dark:text-white`}
                     >
-                      {status}
+                      {status === "All" ? (
+                        <span className="w-2.5 h-2.5 rounded-full bg-evolw-gray-300 dark:bg-evolw-gray-600" />
+                      ) : (
+                        <span className={`w-2.5 h-2.5 rounded-full ${statusDot(status)}`} />
+                      )}
+                      <span className="capitalize">{status}</span>
                     </button>
                   ))}
                 </div>
@@ -300,7 +326,8 @@ export function AdminApplications() {
                     <select
                       value={STATUS_OPTIONS.includes(status as (typeof STATUS_OPTIONS)[number]) ? status : "new"}
                       onChange={(e) => updateAppStatus(app, e.target.value)}
-                      className={`w-full px-3 py-2 rounded-xl text-xs font-bold uppercase tracking-wider appearance-none cursor-pointer outline-none ${statusClass(status)}`}
+                      data-status={STATUS_OPTIONS.includes(status as (typeof STATUS_OPTIONS)[number]) ? status : "new"}
+                      className="status-select w-full px-3 py-2.5 rounded-xl text-xs appearance-none cursor-pointer outline-none shadow-sm"
                     >
                       {STATUS_OPTIONS.map((s) => (
                         <option key={s} value={s}>
@@ -353,7 +380,8 @@ export function AdminApplications() {
                         <select
                           value={STATUS_OPTIONS.includes(status as (typeof STATUS_OPTIONS)[number]) ? status : "new"}
                           onChange={(e) => updateAppStatus(app, e.target.value)}
-                          className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider appearance-none cursor-pointer outline-none shadow-sm ${statusClass(status)}`}
+                          data-status={STATUS_OPTIONS.includes(status as (typeof STATUS_OPTIONS)[number]) ? status : "new"}
+                          className="status-select px-3.5 py-1.5 rounded-full text-xs appearance-none cursor-pointer outline-none shadow-sm min-w-[8.5rem]"
                         >
                           {STATUS_OPTIONS.map((s) => (
                             <option key={s} value={s}>

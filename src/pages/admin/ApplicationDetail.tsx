@@ -167,15 +167,6 @@ export function AdminApplicationDetail() {
     }
   };
 
-  const statusClass = (status: string) => {
-    const s = (status || "new").toLowerCase();
-    if (s === "new") return "bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400";
-    if (s === "reviewing") return "bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400";
-    if (s === "shortlisted") return "bg-violet-100 text-violet-700 dark:bg-violet-500/20 dark:text-violet-400";
-    if (s === "hired") return "bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400";
-    return "bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400";
-  };
-
   if (loading) {
     return <div className="p-8 text-center text-evolw-gray-500">Loading application details...</div>;
   }
@@ -215,7 +206,8 @@ export function AdminApplicationDetail() {
           <select
             value={STATUS_OPTIONS.includes(currentStatus as any) ? currentStatus : "new"}
             onChange={(e) => updateStatus(e.target.value)}
-            className={`px-4 py-2 rounded-xl text-sm font-bold uppercase tracking-wider appearance-none cursor-pointer outline-none shadow-sm ${statusClass(currentStatus)}`}
+            data-status={STATUS_OPTIONS.includes(currentStatus as any) ? currentStatus : "new"}
+            className="status-select px-4 py-2.5 rounded-xl text-sm appearance-none cursor-pointer outline-none shadow-sm min-w-[9rem]"
           >
             {STATUS_OPTIONS.map((s) => (
               <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>

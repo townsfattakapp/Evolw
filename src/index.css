@@ -112,6 +112,77 @@ textarea::placeholder {
   opacity: 1;
 }
 
+/* Colored status selects (admin) — beat global select !important colors */
+select.status-select {
+  border-width: 1px;
+  border-style: solid;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+select.status-select[data-status="new"] {
+  color: #075985 !important;
+  -webkit-text-fill-color: #075985 !important;
+  background-color: #e0f2fe !important;
+  border-color: #7dd3fc;
+}
+select.status-select[data-status="reviewing"] {
+  color: #92400e !important;
+  -webkit-text-fill-color: #92400e !important;
+  background-color: #fef3c7 !important;
+  border-color: #fcd34d;
+}
+select.status-select[data-status="shortlisted"] {
+  color: #5b21b6 !important;
+  -webkit-text-fill-color: #5b21b6 !important;
+  background-color: #ede9fe !important;
+  border-color: #c4b5fd;
+}
+select.status-select[data-status="hired"] {
+  color: #065f46 !important;
+  -webkit-text-fill-color: #065f46 !important;
+  background-color: #d1fae5 !important;
+  border-color: #6ee7b7;
+}
+select.status-select[data-status="rejected"] {
+  color: #9f1239 !important;
+  -webkit-text-fill-color: #9f1239 !important;
+  background-color: #ffe4e6 !important;
+  border-color: #fda4af;
+}
+
+.dark select.status-select[data-status="new"] {
+  color: #7dd3fc !important;
+  -webkit-text-fill-color: #7dd3fc !important;
+  background-color: rgba(14, 165, 233, 0.22) !important;
+  border-color: rgba(56, 189, 248, 0.45);
+}
+.dark select.status-select[data-status="reviewing"] {
+  color: #fcd34d !important;
+  -webkit-text-fill-color: #fcd34d !important;
+  background-color: rgba(245, 158, 11, 0.22) !important;
+  border-color: rgba(251, 191, 36, 0.45);
+}
+.dark select.status-select[data-status="shortlisted"] {
+  color: #c4b5fd !important;
+  -webkit-text-fill-color: #c4b5fd !important;
+  background-color: rgba(139, 92, 246, 0.22) !important;
+  border-color: rgba(167, 139, 250, 0.45);
+}
+.dark select.status-select[data-status="hired"] {
+  color: #6ee7b7 !important;
+  -webkit-text-fill-color: #6ee7b7 !important;
+  background-color: rgba(16, 185, 129, 0.22) !important;
+  border-color: rgba(52, 211, 153, 0.45);
+}
+.dark select.status-select[data-status="rejected"] {
+  color: #fda4af !important;
+  -webkit-text-fill-color: #fda4af !important;
+  background-color: rgba(244, 63, 94, 0.22) !important;
+  border-color: rgba(251, 113, 133, 0.45);
+}
+
 /* Date/number color-scheme for browser native pickers */
 input[type="date"],
 input[type="time"],
