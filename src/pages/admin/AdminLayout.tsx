@@ -12,6 +12,11 @@ import {
   Menu,
   X,
   Briefcase,
+  Receipt,
+  FileSpreadsheet,
+  Wallet,
+  Building2,
+  PieChart,
 } from "lucide-react";
 import { ThemeToggle } from "../../components/theme-toggle";
 import { SEO } from "../../components/common/seo";
@@ -25,6 +30,15 @@ const navItems = [
   { name: "Job Applications", path: "/admin/applications", icon: Users },
   { name: "Offer Letters", path: "/admin/offer-letters", icon: FileText },
   { name: "Intern Certificates", path: "/admin/certificates", icon: Award },
+];
+
+const billingNavItems = [
+  { name: "Billing Dashboard", path: "/admin/billing", icon: PieChart },
+  { name: "Clients", path: "/admin/clients", icon: Building2 },
+  { name: "Quotations", path: "/admin/quotations", icon: FileSpreadsheet },
+  { name: "Invoices", path: "/admin/invoices", icon: Receipt },
+  { name: "Payments", path: "/admin/payments", icon: Wallet },
+  { name: "Billing Settings", path: "/admin/billing-settings", icon: Settings },
 ];
 
 function pageTitle(pathname: string): string {
@@ -77,7 +91,8 @@ function SidebarNav({
           Menu
         </p>
         {navItems.map((item) => {
-          const isActive = pathname.includes(item.path);
+          const isActive =
+            pathname === item.path || pathname.startsWith(`${item.path}/`);
           return (
             <Link
               key={item.name}
@@ -86,7 +101,31 @@ function SidebarNav({
               className={`flex items-center space-x-3 px-3 sm:px-4 py-3 rounded-xl transition-all duration-200 ${
                 isActive
                   ? "bg-evolw-accent text-white shadow-md shadow-evolw-accent/20"
-                  : "text-evolw-gray-600 dark:text-evolw-gray-300 hover:bg-evolw-gray-100 dark:hover:bg-white/10"
+                  : "text-evolw-gray-700 dark:text-evolw-gray-200 hover:bg-evolw-gray-100 dark:hover:bg-white/10"
+              }`}
+            >
+              <item.icon className="w-5 h-5 shrink-0" />
+              <span className="font-medium text-sm sm:text-base">{item.name}</span>
+            </Link>
+          );
+        })}
+
+        <p className="text-[10px] sm:text-xs font-bold text-evolw-black dark:text-white tracking-[0.14em] uppercase mt-6 mb-3 px-2 flex items-center gap-2">
+          <span className="inline-block w-1.5 h-1.5 rounded-full bg-evolw-accent" />
+          Billing & Finance
+        </p>
+        {billingNavItems.map((item) => {
+          const isActive =
+            pathname === item.path || pathname.startsWith(`${item.path}/`);
+          return (
+            <Link
+              key={item.name}
+              to={item.path}
+              onClick={onNavigate}
+              className={`flex items-center space-x-3 px-3 sm:px-4 py-3 rounded-xl transition-all duration-200 ${
+                isActive
+                  ? "bg-evolw-accent text-white shadow-md shadow-evolw-accent/20"
+                  : "text-evolw-gray-700 dark:text-evolw-gray-200 hover:bg-evolw-gray-100 dark:hover:bg-white/10"
               }`}
             >
               <item.icon className="w-5 h-5 shrink-0" />

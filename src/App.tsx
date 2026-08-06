@@ -23,6 +23,15 @@ import { AdminApplicationDetail } from "./pages/admin/ApplicationDetail";
 import { AdminOfferLetters } from "./pages/admin/OfferLetters";
 import { AdminCertificates } from "./pages/admin/Certificates";
 import { AdminProducts } from "./pages/admin/Products";
+import { BillingDashboard } from "./pages/admin/BillingDashboard";
+import { BillingSettings } from "./pages/admin/BillingSettings";
+import { Clients } from "./pages/admin/Clients";
+import { ClientDetail } from "./pages/admin/ClientDetail";
+import { Quotations } from "./pages/admin/Quotations";
+import { QuotationEditor } from "./pages/admin/QuotationEditor";
+import { Invoices } from "./pages/admin/Invoices";
+import { InvoiceEditor } from "./pages/admin/InvoiceEditor";
+import { Payments } from "./pages/admin/Payments";
 import { JobDetails } from "./pages/JobDetails";
 
 import { ThemeProvider } from "./components/theme-provider";
@@ -62,6 +71,20 @@ function App() {
             <Route path="offer-letters" element={<AdminOfferLetters />} />
             <Route path="certificates" element={<AdminCertificates />} />
             <Route path="products" element={<AdminProducts />} />
+            
+            {/* Billing & Finance Routes */}
+            <Route path="billing" element={<BillingDashboard />} />
+            <Route path="clients" element={<Clients />} />
+            <Route path="clients/:id" element={<ClientDetail />} />
+            <Route path="quotations" element={<Quotations />} />
+            <Route path="quotations/new" element={<QuotationEditor />} />
+            <Route path="quotations/:id" element={<QuotationEditor />} />
+            <Route path="invoices" element={<Invoices />} />
+            <Route path="invoices/new" element={<InvoiceEditor />} />
+            <Route path="invoices/:id" element={<InvoiceEditor />} />
+            <Route path="payments" element={<Payments />} />
+            <Route path="billing-settings" element={<BillingSettings />} />
+            
             {/* Catch-all redirect for missing admin routes (e.g. /admin/users) */}
             <Route path="*" element={<AdminDashboard />} />
           </Route>

@@ -345,7 +345,242 @@ export const api = {
       body: payload,
     });
   },
+
+  // ── Billing & Finance ──────────────────────────────────────────
+
+  getBillingDashboard() {
+    return apiRequest<BillingDashboardStats>('/api/billing?resource=dashboard', { auth: true });
+  },
+
+  getBillingSettings() {
+    return apiRequest<CompanySettings>('/api/billing?resource=settings', { auth: true });
+  },
+
+  saveBillingSettings(settings: Partial<CompanySettings>) {
+    return apiRequest<{ success: boolean; settings: CompanySettings }>('/api/billing?resource=settings', {
+      method: 'PUT',
+      body: settings,
+      auth: true,
+    });
+  },
+
+  getClients(id?: string) {
+    const q = id
+      ? `?resource=clients&id=${encodeURIComponent(id)}`
+      : '?resource=clients';
+    return apiRequest<BillingClient | BillingClient[]>(`/api/billing${q}`, { auth: true });
+  },
+
+  saveClient(client: Partial<BillingClient> & { company_name: string; email: string }) {
+    return apiRequest<{ success: boolean; client: BillingClient }>('/api/billing?resource=clients', {
+      method: client.id ? 'PUT' : 'POST',
+      body: client,
+      auth: true,
+    });
+  },
+
+  deleteClient(id: string) {
+    return apiRequest<{ success: boolean; message?: string }>('/api/billing?resource=clients', {
+      method: 'DELETE',
+      body: { id },
+      auth: true,
+    });
+  },
+
+  getProjects(opts?: { id?: string; client_id?: string }) {
+    const params = new URLSearchParams({ resource: 'projects' });
+    if (opts?.id) params.set('id', opts.id);
+    if (opts?.client_id) params.set('client_id', opts.client_id);
+    return apiRequest<BillingProject | BillingProject[]>(`/api/billing?${params}`, { auth: true });
+  },
+
+  saveProject(project: Partial<BillingProject> & { name: string; client_id: string }) {
+    return apiRequest<{ success: boolean; project?: BillingProject }>('/api/billing?resource=projects', {
+      method: project.id ? 'PUT' : 'POST',
+      body: project,
+      auth: true,
+    });
+  },
+
+  getQuotations(id?: string) {
+    const q = id
+      ? `?resource=quotations&id=${encodeURIComponent(id)}`
+      : '?resource=quotations';
+    return apiRequest<any>(`/api/billing${q}`, { auth: true });
+  },
+
+  saveQuotation(payload: Record<string, unknown>) {
+    return apiRequest<{ success: boolean; id: string; quotation_number?: string }>(
+      '/api/billing?resource=quotations',
+      {
+        method: payload.id ? 'PUT' : 'POST',
+        body: payload,
+        auth: true,
+      }
+    );
+  },
+
+  updateQuotationStatus(id: string, status: string) {
+    return apiRequest<{ success: boolean }>('/api/billing?resource=quotations', {
+      method: 'POST',
+      body: { action: 'UPDATE_STATUS', id, status },
+      auth: true,
+    });
+  },
+
+  deleteQuotation(id: string) {
+    return apiRequest<{ success: boolean }>('/api/billing?resource=quotations', {
+      method: 'DELETE',
+      body: { id },
+      auth: true,
+    });
+  },
+
+  getInvoices(id?: string, opts?: { open?: boolean }) {
+    const params = new URLSearchParams({ resource: 'invoices' });
+    if (id) params.set('id', id);
+    if (opts?.open) params.set('open', '1');
+    return apiRequest<any>(`/api/billing?${params}`, { auth: true });
+  },
+
+  saveInvoice(payload: Record<string, unknown>) {
+    return apiRequest<{ success: boolean; id: string; invoice_number?: string }>(
+      '/api/billing?resource=invoices',
+      {
+        method: payload.id ? 'PUT' : 'POST',
+        body: payload,
+        auth: true,
+      }
+    );
+  },
+
+  convertQuotationToInvoice(quotation_id: string) {
+    return apiRequest<{ success: boolean; id: string; invoice_number: string }>(
+      '/api/billing?resource=invoices',
+      {
+        method: 'POST',
+        body: { action: 'CONVERT_QUOTATION', quotation_id },
+        auth: true,
+      }
+    );
+  },
+
+  updateInvoiceStatus(id: string, status: string) {
+    return apiRequest<{ success: boolean }>('/api/billing?resource=invoices', {
+      method: 'POST',
+      body: { action: 'UPDATE_STATUS', id, status },
+      auth: true,
+    });
+  },
+
+  deleteInvoice(id: string) {
+    return apiRequest<{ success: boolean }>('/api/billing?resource=invoices', {
+      method: 'DELETE',
+      body: { id },
+      auth: true,
+    });
+  },
+
+  getPayments(invoice_id?: string) {
+    const params = new URLSearchParams({ resource: 'payments' });
+    if (invoice_id) params.set('invoice_id', invoice_id);
+    return apiRequest<any[]>(`/api/billing?${params}`, { auth: true });
+  },
+
+  recordPayment(payload: {
+    invoice_id: string;
+    amount: number;
+    payment_method: string;
+    date?: string;
+    transaction_id?: string;
+    notes?: string;
+  }) {
+    return apiRequest<{ success: boolean; id: string; reference_number: string }>(
+      '/api/billing?resource=payments',
+      {
+        method: 'POST',
+        body: payload,
+        auth: true,
+      }
+    );
+  },
 };
+
+export interface CompanySettings {
+  id?: string;
+  brand_name?: string;
+  legal_name?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  billing_address?: string;
+  website?: string;
+  gstin?: string;
+  pan?: string;
+  state?: string;
+  country?: string;
+  pin_code?: string;
+  default_currency?: string;
+  default_tax_rate?: number;
+  quotation_prefix?: string;
+  invoice_prefix?: string;
+  receipt_prefix?: string;
+  default_payment_terms?: string;
+  default_quotation_validity?: number;
+  default_notes?: string;
+  default_terms?: string;
+  bank_name?: string;
+  account_holder?: string;
+  account_number?: string;
+  ifsc_code?: string;
+  upi_id?: string;
+  [key: string]: unknown;
+}
+
+export interface BillingClient {
+  id?: string;
+  company_name: string;
+  contact_person?: string | null;
+  email: string;
+  phone?: string | null;
+  website?: string | null;
+  gstin?: string | null;
+  pan?: string | null;
+  billing_address?: string | null;
+  city?: string | null;
+  state?: string | null;
+  country?: string | null;
+  pin_code?: string | null;
+  notes?: string | null;
+  payment_terms?: string | null;
+  status?: string;
+  [key: string]: unknown;
+}
+
+export interface BillingProject {
+  id?: string;
+  client_id: string;
+  name: string;
+  code?: string | null;
+  description?: string | null;
+  status?: string;
+  estimated_value?: number | null;
+  [key: string]: unknown;
+}
+
+export interface BillingDashboardStats {
+  totalInvoicedAmount: number;
+  totalReceived: number;
+  outstanding: number;
+  openInvoices: number;
+  totalQuotationValue: number;
+  approvedQuotationValue: number;
+  pendingQuotations: number;
+  activeClients: number;
+  recentPayments: any[];
+  recentInvoices: any[];
+  recentQuotations: any[];
+}
 
 export function fileToDataUrl(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
