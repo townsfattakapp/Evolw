@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { SEO } from "../components/common/seo";
 import { Container } from "../components/ui/container";
 import { Phone, MapPin, Mail, ArrowRight, CheckCircle2, Sparkles } from "lucide-react";
@@ -51,17 +52,20 @@ const services = [
   "Software Development",
   "Web Applications",
   "Product Engineering",
+  "AI Integrated Products",
   "Tech Consulting",
   "Careers",
   "Other",
 ];
 
 export function Contact() {
+  const [searchParams] = useSearchParams();
+  const helpFromQuery = searchParams.get("help") || "";
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
-    help: "",
+    help: helpFromQuery && services.includes(helpFromQuery) ? helpFromQuery : "",
     message: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});

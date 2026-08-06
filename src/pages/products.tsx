@@ -10,7 +10,12 @@ import { motion } from "framer-motion";
 import { fadeInUp, staggerContainer } from "../lib/animations";
 import { useContent } from "../context/ContentContext";
 import { PAGE_SEO } from "../lib/seo/site";
-import { breadcrumbSchema } from "../lib/seo/schema";
+import {
+  breadcrumbSchema,
+  fattakseBrandSchema,
+  fattakseProductSchema,
+  organizationSchema,
+} from "../lib/seo/schema";
 
 const ICON_MAP: Record<string, any> = {
   "Local Commerce": Store,
@@ -67,10 +72,16 @@ export function Products() {
         description={PAGE_SEO.products.description}
         path={PAGE_SEO.products.path}
         keywords={PAGE_SEO.products.keywords}
-        jsonLd={breadcrumbSchema([
-          { name: "Home", path: "/" },
-          { name: "Products", path: "/products" },
-        ])}
+        jsonLd={[
+          organizationSchema(),
+          fattakseBrandSchema(),
+          fattakseProductSchema(),
+          breadcrumbSchema([
+            { name: "Home", path: "/" },
+            { name: "Products", path: "/products" },
+            { name: "Fattakse — A Unit of EVOLW", path: "/products" },
+          ]),
+        ]}
       />
 
       {/* Hero */}

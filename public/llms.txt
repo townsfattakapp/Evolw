@@ -1,5 +1,5 @@
 # EVOLW — https://www.evolw.in
-> EVOLW is a technology engineering company specializing in custom software development, web platforms, mobile apps, cloud solutions, AI products, and digital transformation.
+> EVOLW is a technology engineering company specializing in custom software development, web platforms, mobile apps, cloud solutions, AI products, and digital transformation. Maker of Fattakse — A Unit of EVOLW.
 
 ## Company
 - Name: EVOLW
@@ -7,16 +7,21 @@
 - Email: hello@evolw.in
 - Phone: +91 92092 50725
 - Location: Waraseoni, Balaghat, Madhya Pradesh, India
-- Focus: Software engineering, product engineering, tech consulting
+- Focus: Software engineering, product engineering, tech consulting, AI-integrated products
 
 ## Products
-- Fattakse: Business / local commerce platform — see https://www.evolw.in/products and https://fattakse.in
+- Fattakse — A Unit of EVOLW: Connected commerce platform for local businesses (ordering, inventory, POS, real-time operations)
+  - Product page: https://www.evolw.in/products
+  - Product site: https://fattakse.in
+  - iOS: https://apps.apple.com/in/app/fattakse/id6785628271
+  - Android: https://play.google.com/store/apps/details?id=com.fattakse.user&hl=en_IN
 
 ## Services
 - Software Engineering: https://www.evolw.in/services#software
 - Web Platforms: https://www.evolw.in/services#web
 - Product Design: https://www.evolw.in/services#product
 - Tech Consulting: https://www.evolw.in/services#consulting
+- AI Integrated Products: https://www.evolw.in/services#ai
 - Continuous Support: https://www.evolw.in/services#support
 
 ## Key pages

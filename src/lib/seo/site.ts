@@ -5,12 +5,27 @@
 
 export const SITE_URL = 'https://www.evolw.in';
 
+/** Flagship product — a unit of EVOLW */
+export const FATTAKSE = {
+  name: 'Fattakse',
+  alternateName: 'Fattakse — A Unit of EVOLW',
+  tagline: 'A Unit of EVOLW',
+  description:
+    'Fattakse is a unit of EVOLW — a connected commerce platform that brings local businesses, customers, and commerce infrastructure together with ordering, inventory, POS, and real-time operations.',
+  url: 'https://fattakse.in',
+  pagePath: '/products',
+  appStoreUrl: 'https://apps.apple.com/in/app/fattakse/id6785628271',
+  playStoreUrl: 'https://play.google.com/store/apps/details?id=com.fattakse.user&hl=en_IN',
+  applicationCategory: 'BusinessApplication',
+  operatingSystem: 'iOS, Android, Web',
+} as const;
+
 export const SITE = {
   name: 'EVOLW',
   legalName: 'EVOLW',
   tagline: 'Technology built to move businesses forward',
   description:
-    'EVOLW is a technology engineering company specializing in custom software development, web platforms, mobile apps, cloud solutions, AI-powered products, and digital transformation for businesses in India and worldwide.',
+    'EVOLW is a technology engineering company specializing in custom software development, web platforms, mobile apps, cloud solutions, and AI-powered products. Maker of Fattakse — A Unit of EVOLW — a connected commerce platform for local businesses.',
   url: SITE_URL,
   locale: 'en_IN',
   language: 'en',
@@ -28,7 +43,7 @@ export const SITE = {
     addressCountry: 'IN',
   },
   sameAs: [
-    // Add social profiles when available
+    FATTAKSE.url,
   ] as string[],
   ogImage: `${SITE_URL}/og-default.png`,
   logo: `${SITE_URL}/favicon.svg`,
@@ -44,6 +59,9 @@ export const SITE = {
     'technology consulting',
     'product engineering',
     'EVOLW',
+    'Fattakse',
+    'Fattakse A Unit of EVOLW',
+    'local commerce platform',
     'India software company',
   ],
 } as const;
@@ -74,31 +92,43 @@ export const PAGE_SEO: Record<
     path: '/',
     title: 'EVOLW | Custom Software, Web & Mobile App Development Company',
     description:
-      'EVOLW designs and builds modern software products, web platforms, mobile apps, cloud infrastructure, and AI solutions that help businesses scale. Engineering excellence for digital transformation.',
+      'EVOLW designs and builds modern software products, web platforms, mobile apps, and AI solutions. Home of Fattakse — A Unit of EVOLW — a connected commerce platform for local businesses.',
     keywords: [
       'software development company',
       'custom software',
       'web development',
       'mobile app development',
       'digital transformation',
+      'Fattakse',
+      'Fattakse A Unit of EVOLW',
     ],
   },
   products: {
     path: '/products',
-    title: 'Products | Fattakse & Business Software by EVOLW',
+    title: 'Fattakse — A Unit of EVOLW | Products',
     description:
-      'Explore EVOLW technology products including Fattakse — platforms built for real-world commerce, operations, and business scale. Product engineering that solves operational bottlenecks.',
-    keywords: ['business software', 'Fattakse', 'SaaS products', 'commerce platform'],
+      'Fattakse — A Unit of EVOLW. Connected commerce for local businesses: ordering, inventory, POS, and real-time operations. Explore EVOLW products built for real-world scale.',
+    keywords: [
+      'Fattakse',
+      'Fattakse A Unit of EVOLW',
+      'local commerce platform',
+      'business software',
+      'SaaS products',
+      'commerce app India',
+      'EVOLW products',
+    ],
   },
   services: {
     path: '/services',
     title: 'Software Development & Engineering Services | EVOLW',
     description:
-      'EVOLW engineering services: custom software development, web platforms, product design, tech consulting, and continuous support. Enterprise-grade technology for complex scale.',
+      'EVOLW engineering services: custom software, web platforms, AI-integrated products, product design, tech consulting, and continuous support. Enterprise-grade technology for complex scale.',
     keywords: [
       'software engineering services',
       'custom software development',
       'web application development',
+      'AI integrated products',
+      'AI software development',
       'tech consulting',
       'product engineering',
     ],
@@ -107,8 +137,13 @@ export const PAGE_SEO: Record<
     path: '/about',
     title: 'About EVOLW | Engineering-First Technology Company',
     description:
-      'EVOLW is an Indian MSME focused on building scalable digital products, business software, and technology infrastructure. Learn our mission, vision, and engineering principles.',
-    keywords: ['about EVOLW', 'technology company India', 'software engineering firm'],
+      'EVOLW is an Indian MSME focused on building scalable digital products, business software, and technology infrastructure — including Fattakse, a unit of EVOLW. Learn our mission, vision, and engineering principles.',
+    keywords: [
+      'about EVOLW',
+      'technology company India',
+      'software engineering firm',
+      'Fattakse A Unit of EVOLW',
+    ],
   },
   careers: {
     path: '/careers',

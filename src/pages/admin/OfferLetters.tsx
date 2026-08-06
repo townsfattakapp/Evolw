@@ -398,7 +398,7 @@ export function AdminOfferLetters() {
                   <p className="text-xs text-gray-500 mt-1 uppercase tracking-widest font-sans">Waraseoni, Dist Balaghat , M.P India</p>
                 </div>
                 <div className="text-right text-sm text-gray-500 font-sans">
-                  <p>contact@evolw.in</p>
+                  <p>hello@evolw.in</p>
                   <p>www.evolw.in</p>
                 </div>
               </div>

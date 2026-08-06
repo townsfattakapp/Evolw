@@ -16,6 +16,8 @@ import {
   localBusinessSchema,
   faqSchema,
   serviceSchemas,
+  fattakseProductSchema,
+  fattakseBrandSchema,
   HOME_FAQS,
   breadcrumbSchema,
 } from "../lib/seo/schema";
@@ -36,6 +38,8 @@ export function Home() {
           organizationSchema(),
           websiteSchema(),
           localBusinessSchema(),
+          fattakseBrandSchema(),
+          fattakseProductSchema(),
           faqSchema(HOME_FAQS),
           ...serviceSchemas(),
           breadcrumbSchema([{ name: "Home", path: "/" }]),

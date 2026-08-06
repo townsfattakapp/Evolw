@@ -26,9 +26,9 @@ const defaultContent: ContentState = {
     {
       id: 'fattakse',
       name: 'Fattakse',
-      tagline: 'A Unit of Evolw',
+      tagline: 'A Unit of EVOLW',
       description:
-        'A connected commerce platform designed to bring local businesses, customers and commerce infrastructure together natively.',
+        'Fattakse — A Unit of EVOLW. A connected commerce platform designed to bring local businesses, customers and commerce infrastructure together natively.',
       websiteUrl: 'https://fattakse.in',
       appStoreUrl: 'https://apps.apple.com/in/app/fattakse/id6785628271',
       playStoreUrl: 'https://play.google.com/store/apps/details?id=com.fattakse.user&hl=en_IN',

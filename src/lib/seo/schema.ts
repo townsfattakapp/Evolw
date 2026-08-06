@@ -1,4 +1,4 @@
-import { SITE, absoluteUrl } from './site';
+import { SITE, FATTAKSE, absoluteUrl } from './site';
 
 export type JsonLd = Record<string, unknown> | Record<string, unknown>[];
 
@@ -40,6 +40,19 @@ export function organizationSchema() {
       },
     ],
     sameAs: SITE.sameAs,
+    brand: {
+      '@type': 'Brand',
+      '@id': `${SITE.url}/#fattakse-brand`,
+      name: FATTAKSE.name,
+      alternateName: FATTAKSE.alternateName,
+      url: FATTAKSE.url,
+      description: FATTAKSE.description,
+      slogan: FATTAKSE.tagline,
+    },
+    makesOffer: {
+      '@type': 'Offer',
+      itemOffered: { '@id': `${SITE.url}/#fattakse` },
+    },
     knowsAbout: [
       'Software Development',
       'Web Development',
@@ -49,10 +62,81 @@ export function organizationSchema() {
       'Enterprise Software',
       'Digital Transformation',
       'Product Engineering',
+      'Local Commerce',
+      'Fattakse',
     ],
     areaServed: {
       '@type': 'Place',
       name: 'Worldwide',
+    },
+  };
+}
+
+/** Fattakse — A Unit of EVOLW (SoftwareApplication + Brand) */
+export function fattakseProductSchema() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    '@id': `${SITE.url}/#fattakse`,
+    name: FATTAKSE.name,
+    alternateName: FATTAKSE.alternateName,
+    description: FATTAKSE.description,
+    url: FATTAKSE.url,
+    applicationCategory: FATTAKSE.applicationCategory,
+    operatingSystem: FATTAKSE.operatingSystem,
+    offers: {
+      '@type': 'Offer',
+      availability: 'https://schema.org/InStock',
+      price: '0',
+      priceCurrency: 'INR',
+      url: FATTAKSE.url,
+    },
+    downloadUrl: [FATTAKSE.appStoreUrl, FATTAKSE.playStoreUrl],
+    installUrl: FATTAKSE.playStoreUrl,
+    image: SITE.ogImage,
+    screenshot: SITE.ogImage,
+    featureList: [
+      'Local Commerce',
+      'Business OS',
+      'Smart Ordering',
+      'Live Inventory',
+      'Mobile POS',
+      'Real-time Data',
+    ],
+    publisher: { '@id': `${SITE.url}/#organization` },
+    provider: { '@id': `${SITE.url}/#organization` },
+    brand: {
+      '@type': 'Brand',
+      '@id': `${SITE.url}/#fattakse-brand`,
+      name: FATTAKSE.name,
+      alternateName: FATTAKSE.alternateName,
+      slogan: FATTAKSE.tagline,
+      url: FATTAKSE.url,
+    },
+    isPartOf: {
+      '@type': 'Organization',
+      '@id': `${SITE.url}/#organization`,
+      name: SITE.name,
+    },
+    sameAs: [FATTAKSE.url, FATTAKSE.appStoreUrl, FATTAKSE.playStoreUrl],
+  };
+}
+
+export function fattakseBrandSchema() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Brand',
+    '@id': `${SITE.url}/#fattakse-brand`,
+    name: FATTAKSE.name,
+    alternateName: FATTAKSE.alternateName,
+    slogan: FATTAKSE.tagline,
+    description: FATTAKSE.description,
+    url: FATTAKSE.url,
+    parentOrganization: {
+      '@type': 'Organization',
+      '@id': `${SITE.url}/#organization`,
+      name: SITE.name,
+      url: SITE.url,
     },
   };
 }
@@ -142,6 +226,12 @@ export function serviceSchemas() {
       description:
         'Strategic technology planning, stack selection, architecture design, and digital transformation advisory.',
       path: '/services#consulting',
+    },
+    {
+      name: 'AI Integrated Products',
+      description:
+        'AI features built into real products — assistants, automation, RAG, and decision support with production guardrails.',
+      path: '/services#ai',
     },
     {
       name: 'Continuous Support',
@@ -258,7 +348,7 @@ export const HOME_FAQS = [
   {
     question: 'What does EVOLW specialize in?',
     answer:
-      'EVOLW specializes in custom software development, web platforms, mobile applications, cloud engineering, AI-powered products, and digital transformation for businesses.',
+      'EVOLW specializes in custom software development, web platforms, mobile applications, cloud engineering, AI-powered products, and digital transformation for businesses. EVOLW also builds Fattakse — A Unit of EVOLW — a connected commerce platform for local businesses.',
   },
   {
     question: 'Where is EVOLW located?',
@@ -273,6 +363,11 @@ export const HOME_FAQS = [
   {
     question: 'Does EVOLW build mobile apps?',
     answer:
-      'Yes. EVOLW engineers web and mobile products, including platforms like Fattakse, with modern stacks and scalable architecture.',
+      'Yes. EVOLW engineers web and mobile products, including Fattakse — A Unit of EVOLW — with modern stacks and scalable architecture.',
+  },
+  {
+    question: 'What is Fattakse?',
+    answer:
+      'Fattakse is a unit of EVOLW — a connected commerce platform that helps local businesses with ordering, inventory, POS, and real-time operations. Learn more at evolw.in/products and fattakse.in.',
   },
 ];

@@ -64,7 +64,7 @@ export const OfferLetterPDF = ({ data }: { data: OfferData }) => {
             <Text style={styles.subtitle}>Waraseoni, Dist Balaghat, M.P, India</Text>
           </View>
           <View style={styles.headerRight}>
-            <Text>contact@evolw.in</Text>
+            <Text>hello@evolw.in</Text>
             <Text>www.evolw.in</Text>
           </View>
         </View>
