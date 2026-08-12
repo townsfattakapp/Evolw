@@ -152,6 +152,45 @@ export function Footer() {
                 </li>
               </ul>
             </div>
+            <div className="col-span-1 md:col-span-1">
+              <h4 className="font-display font-semibold text-lg tracking-tight text-evolw-black dark:text-white mb-6">
+                Community
+              </h4>
+              <ul className="space-y-4">
+                <li>
+                  <Link
+                    to="/community"
+                    className="text-evolw-gray-500 dark:text-evolw-gray-400 hover:text-evolw-accent dark:hover:text-white transition-colors font-medium"
+                  >
+                    Community Hub
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/community/open-source"
+                    className="text-evolw-gray-500 dark:text-evolw-gray-400 hover:text-evolw-accent dark:hover:text-white transition-colors font-medium"
+                  >
+                    Open Source
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/community/hackathons"
+                    className="text-evolw-gray-500 dark:text-evolw-gray-400 hover:text-evolw-accent dark:hover:text-white transition-colors font-medium"
+                  >
+                    Hackathons
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/community/events"
+                    className="text-evolw-gray-500 dark:text-evolw-gray-400 hover:text-evolw-accent dark:hover:text-white transition-colors font-medium"
+                  >
+                    Events
+                  </Link>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
 

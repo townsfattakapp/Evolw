@@ -26,6 +26,7 @@ const navItems = [
   { name: "Products", path: "/admin/products", icon: Package },
   { name: "Form Leads", path: "/admin/contacts", icon: MessageSquare },
   { name: "Website Content", path: "/admin/content", icon: Settings },
+  { name: "Community Projects", path: "/admin/community/projects", icon: Users },
   { name: "Job Openings", path: "/admin/jobs", icon: Briefcase },
   { name: "Job Applications", path: "/admin/applications", icon: Users },
   { name: "Offer Letters", path: "/admin/offer-letters", icon: FileText },

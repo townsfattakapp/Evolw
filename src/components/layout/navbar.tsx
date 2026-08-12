@@ -14,6 +14,7 @@ const NAV_LINKS = [
   { name: "About", href: "/about" },
   { name: "Careers", href: "/careers" },
   { name: "Contact", href: "/contact" },
+  { name: "Community", href: "/community" },
 ];
 
 export function Navbar() {

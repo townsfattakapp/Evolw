@@ -11,6 +11,13 @@ import { Contact } from "./pages/contact";
 import { Privacy } from "./pages/privacy";
 import { Terms } from "./pages/terms";
 import { VerifyCertificate } from "./pages/verify";
+import { Community } from "./pages/community";
+import { OpenSource } from "./pages/community/OpenSource";
+import { GoodFirstIssues } from "./pages/community/GoodFirstIssues";
+import { ProjectListing } from "./pages/community/ProjectListing";
+import { ProjectDetail } from "./pages/community/ProjectDetail";
+import { Hackathons } from "./pages/community/Hackathons";
+import { Events } from "./pages/community/Events";
 
 import { AdminLogin } from "./pages/admin/Login";
 import { AdminLayout } from "./pages/admin/AdminLayout";
@@ -23,6 +30,7 @@ import { AdminApplicationDetail } from "./pages/admin/ApplicationDetail";
 import { AdminOfferLetters } from "./pages/admin/OfferLetters";
 import { AdminCertificates } from "./pages/admin/Certificates";
 import { AdminProducts } from "./pages/admin/Products";
+import { AdminCommunityProjects } from "./pages/admin/community/Projects";
 import { BillingDashboard } from "./pages/admin/BillingDashboard";
 import { BillingSettings } from "./pages/admin/BillingSettings";
 import { Clients } from "./pages/admin/Clients";
@@ -55,6 +63,13 @@ function App() {
             <Route path="contact" element={<Contact />} />
             <Route path="privacy" element={<Privacy />} />
             <Route path="terms" element={<Terms />} />
+            <Route path="community" element={<Community />} />
+            <Route path="community/open-source" element={<OpenSource />} />
+            <Route path="community/good-first-issues" element={<GoodFirstIssues />} />
+            <Route path="community/projects" element={<ProjectListing />} />
+            <Route path="community/projects/:slug" element={<ProjectDetail />} />
+            <Route path="community/hackathons" element={<Hackathons />} />
+            <Route path="community/events" element={<Events />} />
           </Route>
 
           <Route path="/verify" element={<VerifyCertificate />} />
@@ -71,6 +86,7 @@ function App() {
             <Route path="offer-letters" element={<AdminOfferLetters />} />
             <Route path="certificates" element={<AdminCertificates />} />
             <Route path="products" element={<AdminProducts />} />
+            <Route path="community/projects" element={<AdminCommunityProjects />} />
             
             {/* Billing & Finance Routes */}
             <Route path="billing" element={<BillingDashboard />} />

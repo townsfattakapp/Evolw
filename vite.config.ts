@@ -2,9 +2,22 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  server: {
+    open: '/community',
+    proxy: {
+      // Local APIs: run `npm run dev:api` (vercel dev on :3000)
+      // Or set VITE_API_PROXY=https://www.evolw.in to hit production APIs
+      '/api': {
+        // Default to production so `npm run dev` can load community data.
+        // Override with VITE_API_PROXY=http://127.0.0.1:3000 when using `npm run dev:api`.
+        target: process.env.VITE_API_PROXY || 'https://www.evolw.in',
+        changeOrigin: true,
+        secure: true,
+      },
+    },
+  },
   build: {
     target: 'es2022',
     cssCodeSplit: true,

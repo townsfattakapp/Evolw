@@ -1,6 +1,6 @@
 import { neon, type NeonQueryFunction } from '@neondatabase/serverless';
 
-const SCHEMA_VERSION = 'billing_v3';
+const SCHEMA_VERSION = 'community_v1';
 
 let schemaReady: Promise<void> | null = null;
 
@@ -49,6 +49,9 @@ async function bootstrapSchema(sql: NeonQueryFunction<false, false>): Promise<vo
   const { createBillingSchema } = await import('./billing-schema.js');
   await createBillingSchema(sql);
   await migrateBillingV3Columns(sql);
+
+  const { createCommunitySchema } = await import('./community-schema.js');
+  await createCommunitySchema(sql);
 
   await sql`
     CREATE TABLE IF NOT EXISTS schema_meta (

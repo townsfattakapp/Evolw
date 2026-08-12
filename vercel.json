@@ -1,6 +1,12 @@
 {
   "rewrites": [
     { "source": "/sitemap.xml", "destination": "/api/sitemap" },
+    { "source": "/api/health", "destination": "/api/community?resource=health" },
+    { "source": "/api/community/projects", "destination": "/api/community?resource=projects" },
+    { "source": "/api/community/hackathons", "destination": "/api/community?resource=hackathons" },
+    { "source": "/api/community/events", "destination": "/api/community?resource=events" },
+    { "source": "/api/community/discussions", "destination": "/api/community?resource=discussions" },
+    { "source": "/api/community/github", "destination": "/api/community?resource=github" },
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ],
   "headers": [
