@@ -1,20 +1,26 @@
 import { useEffect, useState } from 'react';
-import { Loader2, Plus, Trash2, X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Edit3, Loader2, Plus, Trash2, X } from 'lucide-react';
+import {
+  api,
+  ApiError,
+  type CommunityProject,
+} from '../../../lib/api';
 
-type Project = {
-  id: string;
+type ProjectForm = {
+  id?: string;
   slug: string;
   name: string;
-  tagline: string | null;
+  tagline: string;
   description: string;
-  technologies: string[] | null;
-  github_url: string | null;
-  live_url: string | null;
+  technologies: string;
+  github_url: string;
+  live_url: string;
   status: string;
-  looking_for: string[] | null;
+  looking_for: string;
 };
 
-const emptyForm = {
+const emptyForm: ProjectForm = {
   slug: '',
   name: '',
   tagline: '',
@@ -26,28 +32,62 @@ const emptyForm = {
   looking_for: '',
 };
 
-function authHeaders(): HeadersInit {
-  const token = localStorage.getItem('evolw_admin_auth');
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+function splitCsv(value: string) {
+  return value
+    .split(',')
+    .map((t) => t.trim())
+    .filter(Boolean);
+}
+
+function toForm(p: CommunityProject): ProjectForm {
   return {
-    'Content-Type': 'application/json',
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    id: p.id,
+    slug: p.slug,
+    name: p.name,
+    tagline: p.tagline || '',
+    description: p.description,
+    technologies: (p.technologies || []).join(', '),
+    github_url: p.github_url || '',
+    live_url: p.live_url || '',
+    status: p.status || 'Building',
+    looking_for: (p.looking_for || []).join(', '),
   };
 }
 
 export function AdminCommunityProjects() {
-  const [projects, setProjects] = useState<Project[]>([]);
+  const navigate = useNavigate();
+  const [projects, setProjects] = useState<CommunityProject[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState(emptyForm);
+  const [form, setForm] = useState<ProjectForm>(emptyForm);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleAuthFailure = (err: unknown) => {
+    if (err instanceof ApiError && (err.status === 401 || err.status === 403)) {
+      navigate('/admin');
+      return true;
+    }
+    return false;
+  };
 
   const load = async () => {
+    setLoading(true);
+    setError(null);
     try {
-      const res = await fetch('/api/community?resource=projects', { headers: authHeaders() });
-      const data = await res.json();
+      const data = await api.getCommunityProjects();
       setProjects(data.projects || []);
-    } catch (e) {
-      console.error(e);
+    } catch (err) {
+      if (handleAuthFailure(err)) return;
+      setError(err instanceof ApiError ? err.message : 'Failed to load projects');
     } finally {
       setLoading(false);
     }
@@ -57,46 +97,57 @@ export function AdminCommunityProjects() {
     load();
   }, []);
 
+  const openCreate = () => {
+    setForm(emptyForm);
+    setShowForm(true);
+  };
+
+  const openEdit = (p: CommunityProject) => {
+    setForm(toForm(p));
+    setShowForm(true);
+  };
+
   const save = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
+    setError(null);
+    const payload = {
+      slug: form.slug.trim() || slugify(form.name),
+      name: form.name.trim(),
+      tagline: form.tagline.trim() || null,
+      description: form.description.trim(),
+      github_url: form.github_url.trim() || null,
+      live_url: form.live_url.trim() || null,
+      status: form.status,
+      technologies: splitCsv(form.technologies),
+      looking_for: splitCsv(form.looking_for),
+    };
     try {
-      const res = await fetch('/api/community?resource=projects', {
-        method: 'POST',
-        headers: authHeaders(),
-        body: JSON.stringify({
-          ...form,
-          technologies: form.technologies
-            .split(',')
-            .map((t) => t.trim())
-            .filter(Boolean),
-          looking_for: form.looking_for
-            .split(',')
-            .map((t) => t.trim())
-            .filter(Boolean),
-        }),
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.error || 'Save failed');
+      if (form.id) {
+        await api.updateCommunityProject({ id: form.id, ...payload });
+      } else {
+        await api.createCommunityProject(payload);
       }
       setShowForm(false);
       setForm(emptyForm);
       await load();
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Save failed');
+      if (handleAuthFailure(err)) return;
+      setError(err instanceof ApiError ? err.message : 'Save failed');
     } finally {
       setSaving(false);
     }
   };
 
   const remove = async (id: string) => {
-    if (!confirm('Delete this project?')) return;
-    await fetch(`/api/community?resource=projects&id=${encodeURIComponent(id)}`, {
-      method: 'DELETE',
-      headers: authHeaders(),
-    });
-    await load();
+    if (!confirm('Delete this project? It will disappear from the public community page.')) return;
+    try {
+      await api.deleteCommunityProject(id);
+      await load();
+    } catch (err) {
+      if (handleAuthFailure(err)) return;
+      setError(err instanceof ApiError ? err.message : 'Delete failed');
+    }
   };
 
   return (
@@ -108,19 +159,25 @@ export function AdminCommunityProjects() {
         </div>
         <button
           type="button"
-          onClick={() => setShowForm(true)}
+          onClick={openCreate}
           className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-evolw-accent text-white text-sm font-semibold"
         >
           <Plus className="w-4 h-4" /> Add project
         </button>
       </div>
 
+      {error && (
+        <div className="rounded-xl border border-rose-200 dark:border-rose-900/50 bg-rose-50 dark:bg-rose-900/20 px-4 py-3 text-sm text-rose-700 dark:text-rose-300">
+          {error}
+        </div>
+      )}
+
       {loading ? (
         <div className="flex justify-center py-16">
           <Loader2 className="w-7 h-7 animate-spin text-evolw-accent" />
         </div>
       ) : projects.length === 0 ? (
-        <p className="text-evolw-gray-500">No projects yet. Seed runs automatically on first API boot.</p>
+        <p className="text-evolw-gray-500">No projects yet. Add one to show it on the public site.</p>
       ) : (
         <div className="grid gap-3">
           {projects.map((p) => (
@@ -128,20 +185,31 @@ export function AdminCommunityProjects() {
               key={p.id}
               className="flex items-center justify-between gap-4 rounded-2xl border border-evolw-gray-200 dark:border-white/10 bg-white dark:bg-evolw-slate p-4"
             >
-              <div>
-                <p className="font-semibold">
+              <div className="min-w-0">
+                <p className="font-semibold truncate">
                   {p.name}{' '}
                   <span className="text-xs font-medium text-evolw-accent">({p.status})</span>
                 </p>
-                <p className="text-sm text-evolw-gray-500">{p.slug}</p>
+                <p className="text-sm text-evolw-gray-500 truncate">{p.slug}</p>
               </div>
-              <button
-                type="button"
-                onClick={() => remove(p.id)}
-                className="p-2 rounded-lg text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10"
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
+              <div className="flex items-center gap-1 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => openEdit(p)}
+                  className="p-2 rounded-lg text-evolw-gray-600 dark:text-evolw-gray-300 hover:bg-evolw-gray-100 dark:hover:bg-white/10"
+                  aria-label="Edit project"
+                >
+                  <Edit3 className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => remove(p.id)}
+                  className="p-2 rounded-lg text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10"
+                  aria-label="Delete project"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
             </div>
           ))}
         </div>
@@ -152,18 +220,22 @@ export function AdminCommunityProjects() {
           <button className="absolute inset-0 bg-black/50" onClick={() => setShowForm(false)} aria-label="Close" />
           <form
             onSubmit={save}
-            className="relative z-10 w-full sm:max-w-lg bg-white dark:bg-evolw-slate rounded-t-2xl sm:rounded-2xl border border-evolw-gray-200 dark:border-white/10 p-6 space-y-3"
+            className="relative z-10 w-full sm:max-w-lg max-h-[90dvh] overflow-y-auto bg-white dark:bg-evolw-slate rounded-t-2xl sm:rounded-2xl border border-evolw-gray-200 dark:border-white/10 p-6 space-y-3"
           >
             <div className="flex justify-between items-center mb-2">
-              <h2 className="font-bold text-lg">New project</h2>
-              <button type="button" onClick={() => setShowForm(false)} className="p-2 rounded-lg hover:bg-evolw-gray-100 dark:hover:bg-white/10">
+              <h2 className="font-bold text-lg">{form.id ? 'Edit project' : 'New project'}</h2>
+              <button
+                type="button"
+                onClick={() => setShowForm(false)}
+                className="p-2 rounded-lg hover:bg-evolw-gray-100 dark:hover:bg-white/10"
+              >
                 <X className="w-4 h-4" />
               </button>
             </div>
             {(
               [
-                ['slug', 'Slug *'],
                 ['name', 'Name *'],
+                ['slug', 'Slug *'],
                 ['tagline', 'Tagline'],
                 ['github_url', 'GitHub URL'],
                 ['live_url', 'Live URL'],
@@ -175,8 +247,19 @@ export function AdminCommunityProjects() {
                 <label className="block text-xs font-semibold text-evolw-gray-500 mb-1">{label}</label>
                 <input
                   required={key === 'slug' || key === 'name'}
-                  value={(form as any)[key]}
-                  onChange={(e) => setForm({ ...form, [key]: e.target.value })}
+                  value={form[key]}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setForm((prev) => ({
+                      ...prev,
+                      [key]: value,
+                      ...(key === 'name' && !prev.id && !prev.slug
+                        ? { slug: slugify(value) }
+                        : key === 'name' && !prev.id && prev.slug === slugify(prev.name)
+                          ? { slug: slugify(value) }
+                          : {}),
+                    }));
+                  }}
                   className="w-full px-3 py-2 rounded-xl border border-evolw-gray-200 dark:border-white/10 dark:bg-black/20"
                 />
               </div>
@@ -210,7 +293,7 @@ export function AdminCommunityProjects() {
               disabled={saving}
               className="w-full py-3 rounded-xl bg-evolw-accent text-white font-semibold disabled:opacity-50"
             >
-              {saving ? 'Saving…' : 'Create project'}
+              {saving ? 'Saving…' : form.id ? 'Update project' : 'Create project'}
             </button>
           </form>
         </div>

@@ -177,6 +177,34 @@ export async function handleCommunityHackathons(req: VercelRequest, res: VercelR
     return json(res, 201, { hackathon: rows[0] });
   }
 
+  if (req.method === 'PUT') {
+    if (!requireAdmin(req)) return json(res, 401, { error: 'Unauthorized' });
+    const body = readBody<any>(req);
+    if (!body?.id) return json(res, 400, { error: 'id is required' });
+    const rows = await sql`
+      UPDATE community_hackathons SET
+        slug = COALESCE(${body.slug || null}, slug),
+        title = COALESCE(${body.title || null}, title),
+        description = COALESCE(${body.description || null}, description),
+        organizer = COALESCE(${body.organizer ?? null}, organizer),
+        start_date = COALESCE(${body.start_date || null}, start_date),
+        end_date = COALESCE(${body.end_date || null}, end_date),
+        registration_deadline = COALESCE(${body.registration_deadline ?? null}, registration_deadline),
+        mode = COALESCE(${body.mode || null}, mode),
+        location = COALESCE(${body.location ?? null}, location),
+        prize_pool = COALESCE(${body.prize_pool ?? null}, prize_pool),
+        external_registration_url = COALESCE(${body.external_registration_url ?? null}, external_registration_url),
+        platform = COALESCE(${body.platform ?? null}, platform),
+        status = COALESCE(${body.status || null}, status),
+        tags = COALESCE(${Array.isArray(body.tags) ? body.tags : null}, tags),
+        updated_at = NOW()
+      WHERE id = ${body.id}
+      RETURNING *
+    `;
+    if (!rows.length) return json(res, 404, { error: 'Hackathon not found' });
+    return json(res, 200, { hackathon: rows[0] });
+  }
+
   if (req.method === 'DELETE') {
     if (!requireAdmin(req)) return json(res, 401, { error: 'Unauthorized' });
     const id = qstr(req.query.id) || readBody<any>(req)?.id;
@@ -240,6 +268,31 @@ export async function handleCommunityEvents(req: VercelRequest, res: VercelRespo
       RETURNING *
     `;
     return json(res, 201, { event: rows[0] });
+  }
+
+  if (req.method === 'PUT') {
+    if (!requireAdmin(req)) return json(res, 401, { error: 'Unauthorized' });
+    const body = readBody<any>(req);
+    if (!body?.id) return json(res, 400, { error: 'id is required' });
+    const rows = await sql`
+      UPDATE community_events SET
+        slug = COALESCE(${body.slug || null}, slug),
+        title = COALESCE(${body.title || null}, title),
+        description = COALESCE(${body.description || null}, description),
+        event_type = COALESCE(${body.event_type || null}, event_type),
+        speaker = COALESCE(${body.speaker ?? null}, speaker),
+        start_date = COALESCE(${body.start_date || null}, start_date),
+        end_date = COALESCE(${body.end_date ?? null}, end_date),
+        timezone = COALESCE(${body.timezone || null}, timezone),
+        location = COALESCE(${body.location ?? null}, location),
+        is_online = COALESCE(${typeof body.is_online === 'boolean' ? body.is_online : null}, is_online),
+        external_registration_url = COALESCE(${body.external_registration_url ?? null}, external_registration_url),
+        updated_at = NOW()
+      WHERE id = ${body.id}
+      RETURNING *
+    `;
+    if (!rows.length) return json(res, 404, { error: 'Event not found' });
+    return json(res, 200, { event: rows[0] });
   }
 
   if (req.method === 'DELETE') {

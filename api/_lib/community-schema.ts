@@ -75,15 +75,13 @@ export async function createCommunitySchema(sql: NeonQueryFunction<false, false>
     sql`CREATE INDEX IF NOT EXISTS idx_community_hackathons_dates ON community_hackathons(start_date)`,
     sql`CREATE INDEX IF NOT EXISTS idx_community_events_dates ON community_events(start_date)`,
   ]);
-
-  await seedCommunityIfEmpty(sql);
 }
 
-/** Showcase content for empty DBs — EVOLW-branded, not fake Acme data. */
-async function seedCommunityIfEmpty(sql: NeonQueryFunction<false, false>) {
-  const existing = await sql`SELECT COUNT(*)::int AS count FROM community_projects`;
-  if (Number(existing[0]?.count) > 0) return;
-
+/**
+ * Local/dev demo content only. Never call from production API paths.
+ * Use: npm run seed:community
+ */
+export async function seedCommunityDemo(sql: NeonQueryFunction<false, false>) {
   const projects = [
     {
       slug: 'evolw-website',

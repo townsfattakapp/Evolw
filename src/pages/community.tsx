@@ -9,30 +9,61 @@ import { SEO } from '../components/common/seo';
 import { communityApi } from '../lib/community-api';
 import type { DiscourseTopic } from '../lib/discourse';
 
+type HubProject = {
+  id: string;
+  slug: string;
+  name: string;
+  tagline: string | null;
+  status: string;
+  technologies: string[] | null;
+};
+
+type HubHackathon = {
+  id: string;
+  slug: string;
+  title: string;
+  description: string;
+  start_date: string;
+  end_date: string;
+  organizer: string | null;
+};
+
 export function Community() {
   const [trending, setTrending] = useState<DiscourseTopic[]>([]);
   const [topWeekly, setTopWeekly] = useState<DiscourseTopic[]>([]);
+  const [projects, setProjects] = useState<HubProject[]>([]);
+  const [hackathons, setHackathons] = useState<HubHackathon[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [discussionsUnavailable, setDiscussionsUnavailable] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const [trendingData, topData] = await Promise.all([
+      const [discussionsResult, projectsResult, hackathonsResult] = await Promise.allSettled([
+        Promise.all([
           communityApi.discussions('latest', '6'),
           communityApi.discussions('top', '6'),
-        ]);
+        ]),
+        communityApi.projects(),
+        communityApi.hackathons(),
+      ]);
 
+      if (discussionsResult.status === 'fulfilled') {
+        const [trendingData, topData] = discussionsResult.value;
         setTrending(trendingData.topics || []);
         setTopWeekly(topData.topics || []);
-        if (trendingData.degraded && trendingData.message) {
-          setError(trendingData.message);
-        }
-      } catch {
-        setError('Community discussions temporarily unavailable');
-      } finally {
-        setLoading(false);
+        setDiscussionsUnavailable(Boolean(trendingData.degraded));
+      } else {
+        setDiscussionsUnavailable(true);
       }
+
+      if (projectsResult.status === 'fulfilled') {
+        setProjects((projectsResult.value.projects || []).slice(0, 3));
+      }
+      if (hackathonsResult.status === 'fulfilled') {
+        setHackathons((hackathonsResult.value.hackathons || []).slice(0, 2));
+      }
+
+      setLoading(false);
     };
 
     fetchData();
@@ -142,39 +173,37 @@ export function Community() {
             </Button>
           </div>
 
-          {error && (
-            <div className="p-6 rounded-2xl bg-evolw-gray-50 dark:bg-white/5 border border-evolw-gray-200 dark:border-white/10 text-center mb-8">
-              <MessageSquare className="w-10 h-10 text-evolw-gray-300 dark:text-evolw-gray-600 mx-auto mb-3" />
-              <p className="text-evolw-gray-500 dark:text-evolw-gray-400 mb-4">{error}</p>
-              <a
-                href={`${import.meta.env.VITE_COMMUNITY_BASE_URL || 'https://community.evolw.in'}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="Button asChild variant-outline"
-              >
-                Visit Community Directly
-              </a>
-            </div>
-          )}
-
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[...Array(6)].map((_, i) => <DiscussionSkeleton key={i} />)}
             </div>
-          ) : trending.length === 0 ? (
-            <div className="text-center py-16">
-              <MessageSquare className="w-12 h-12 text-evolw-gray-300 dark:text-evolw-gray-600 mx-auto mb-4" />
-              <p className="text-evolw-gray-500 dark:text-evolw-gray-400 font-medium">
-                No discussions yet. Be the first to start a conversation!
+          ) : discussionsUnavailable || trending.length === 0 ? (
+            <div className="p-8 rounded-2xl bg-evolw-gray-50 dark:bg-white/5 border border-evolw-gray-200 dark:border-white/10 text-center">
+              <MessageSquare className="w-10 h-10 text-evolw-gray-300 dark:text-evolw-gray-600 mx-auto mb-3" />
+              <p className="text-evolw-gray-600 dark:text-evolw-gray-300 font-medium mb-2">
+                {discussionsUnavailable
+                  ? 'Forum discussions are coming soon'
+                  : 'No discussions yet. Be the first to start a conversation!'}
               </p>
-              <a
-                href={`${import.meta.env.VITE_COMMUNITY_BASE_URL || 'https://community.evolw.in'}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-evolw-accent font-medium hover:underline"
-              >
-                Join Community <ArrowRight className="w-4 h-4 ml-2" />
-              </a>
+              <p className="text-sm text-evolw-gray-500 dark:text-evolw-gray-400 mb-5 max-w-md mx-auto">
+                {discussionsUnavailable
+                  ? 'Meanwhile, explore open-source projects, showcases, and hackathons below.'
+                  : 'Join the community to kick off the first thread.'}
+              </p>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                <Button asChild variant="outline" size="sm">
+                  <Link to="/community/projects">Browse projects</Link>
+                </Button>
+                <Button asChild variant="ghost" size="sm">
+                  <a
+                    href={`${import.meta.env.VITE_COMMUNITY_BASE_URL || 'https://community.evolw.in'}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Visit forum <ExternalLink className="w-3.5 h-3.5 ml-1" />
+                  </a>
+                </Button>
+              </div>
             </div>
           ) : (
             <motion.div
@@ -197,6 +226,128 @@ export function Community() {
           )}
         </Container>
       </Section>
+
+      {/* Featured projects (seeded / live data) */}
+      {projects.length > 0 && (
+        <Section className="py-16 sm:py-24 bg-evolw-gray-50 dark:bg-evolw-black/50">
+          <Container>
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12">
+              <div>
+                <h2 className="text-2xl sm:text-3xl font-bold text-evolw-black dark:text-white">
+                  Featured projects
+                </h2>
+                <p className="text-evolw-gray-500 dark:text-evolw-gray-400 mt-1">
+                  Live showcase from the community catalog
+                </p>
+              </div>
+              <Button asChild variant="ghost" size="sm">
+                <Link to="/community/projects" className="flex items-center gap-2 text-evolw-accent">
+                  View all <ArrowRight className="w-4 h-4" />
+                </Link>
+              </Button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {projects.map((project, i) => (
+                <motion.div
+                  key={project.id}
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.05, duration: 0.35 }}
+                >
+                  <Link
+                    to={`/community/projects/${project.slug}`}
+                    className="block h-full bg-white dark:bg-evolw-slate p-6 rounded-2xl border border-evolw-gray-200 dark:border-white/10 hover:border-evolw-accent/30 transition-colors"
+                  >
+                    <div className="flex items-center justify-between gap-3 mb-3">
+                      <span className="text-xs font-semibold uppercase tracking-wider text-evolw-accent">
+                        {project.status}
+                      </span>
+                      <GitBranch className="w-4 h-4 text-evolw-gray-400" />
+                    </div>
+                    <h3 className="font-bold text-lg text-evolw-black dark:text-white mb-2">
+                      {project.name}
+                    </h3>
+                    <p className="text-sm text-evolw-gray-500 dark:text-evolw-gray-400 line-clamp-2 mb-4">
+                      {project.tagline || 'Community project'}
+                    </p>
+                    {project.technologies && project.technologies.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5">
+                        {project.technologies.slice(0, 3).map((tech) => (
+                          <span
+                            key={tech}
+                            className="px-2 py-0.5 text-xs rounded-full bg-evolw-gray-100 dark:bg-white/10 text-evolw-gray-600 dark:text-evolw-gray-300"
+                          >
+                            {tech}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
+          </Container>
+        </Section>
+      )}
+
+      {/* Hackathons preview */}
+      {hackathons.length > 0 && (
+        <Section className="py-16 sm:py-24">
+          <Container>
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12">
+              <div>
+                <h2 className="text-2xl sm:text-3xl font-bold text-evolw-black dark:text-white">
+                  Upcoming hackathons
+                </h2>
+                <p className="text-evolw-gray-500 dark:text-evolw-gray-400 mt-1">
+                  Compete, ship, and get discovered
+                </p>
+              </div>
+              <Button asChild variant="ghost" size="sm">
+                <Link to="/community/hackathons" className="flex items-center gap-2 text-evolw-accent">
+                  View all <ArrowRight className="w-4 h-4" />
+                </Link>
+              </Button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {hackathons.map((hack, i) => (
+                <motion.div
+                  key={hack.id}
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.05, duration: 0.35 }}
+                  className="bg-white dark:bg-evolw-slate p-6 rounded-2xl border border-evolw-gray-200 dark:border-white/10"
+                >
+                  <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 text-sm font-semibold mb-3">
+                    <Calendar className="w-4 h-4" />
+                    {new Date(hack.start_date).toLocaleDateString(undefined, {
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric',
+                    })}
+                    {' – '}
+                    {new Date(hack.end_date).toLocaleDateString(undefined, {
+                      month: 'short',
+                      day: 'numeric',
+                      year: 'numeric',
+                    })}
+                  </div>
+                  <h3 className="font-bold text-xl text-evolw-black dark:text-white mb-2">{hack.title}</h3>
+                  <p className="text-sm text-evolw-gray-500 dark:text-evolw-gray-400 line-clamp-2 mb-4">
+                    {hack.description}
+                  </p>
+                  <Link
+                    to="/community/hackathons"
+                    className="text-sm font-medium text-evolw-accent inline-flex items-center gap-1 hover:underline"
+                  >
+                    Details <ArrowRight className="w-4 h-4" />
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
+          </Container>
+        </Section>
+      )}
 
       {/* Top This Week */}
       {topWeekly.length > 0 && (

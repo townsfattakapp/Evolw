@@ -31,6 +31,8 @@ import { AdminOfferLetters } from "./pages/admin/OfferLetters";
 import { AdminCertificates } from "./pages/admin/Certificates";
 import { AdminProducts } from "./pages/admin/Products";
 import { AdminCommunityProjects } from "./pages/admin/community/Projects";
+import { AdminCommunityHackathons } from "./pages/admin/community/Hackathons";
+import { AdminCommunityEvents } from "./pages/admin/community/Events";
 import { BillingDashboard } from "./pages/admin/BillingDashboard";
 import { BillingSettings } from "./pages/admin/BillingSettings";
 import { Clients } from "./pages/admin/Clients";
@@ -87,6 +89,8 @@ function App() {
             <Route path="certificates" element={<AdminCertificates />} />
             <Route path="products" element={<AdminProducts />} />
             <Route path="community/projects" element={<AdminCommunityProjects />} />
+            <Route path="community/hackathons" element={<AdminCommunityHackathons />} />
+            <Route path="community/events" element={<AdminCommunityEvents />} />
             
             {/* Billing & Finance Routes */}
             <Route path="billing" element={<BillingDashboard />} />

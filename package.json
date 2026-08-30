@@ -11,7 +11,8 @@
     "lint": "oxlint",
     "preview": "vite preview",
     "typecheck": "tsc -b --pretty false",
-    "seed:community": "CONFIRM_SEED=1 npx tsx --env-file=.env.local scripts/seed-community.ts"
+    "seed:community": "CONFIRM_SEED=1 npx tsx --env-file=.env.local scripts/seed-community.ts",
+    "purge:community-seed": "CONFIRM_PURGE=1 npx tsx --env-file=.env.local scripts/purge-community-seed.ts"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",

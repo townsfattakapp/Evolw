@@ -2,6 +2,7 @@ import type { VercelRequest, VercelResponse } from '@vercel/node';
 import Groq from 'groq-sdk';
 import { handleOptions, json, logError, readBody } from './_lib/http.js';
 import { requireAdmin } from './_lib/auth.js';
+import { createChatCompletionWithFallback } from './_lib/groq.js';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (handleOptions(req, res)) return;
@@ -47,9 +48,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         ${resumeText}
       `;
 
-      const chatCompletion = await groq.chat.completions.create({
+      const chatCompletion = await createChatCompletionWithFallback(groq, {
         messages: [{ role: 'user', content: prompt }],
-        model: 'llama-3.3-70b-versatile',
         temperature: 0.3,
       });
 
@@ -87,18 +87,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         ${resumeText}
       `;
 
-      const chatCompletion = await groq.chat.completions.create({
+      const chatCompletion = await createChatCompletionWithFallback(groq, {
         messages: [{ role: 'user', content: prompt }],
-        model: 'llama-3.3-70b-versatile',
         temperature: 0.1,
-        response_format: { type: 'json_object' }
+        response_format: { type: 'json_object' },
       });
 
       const responseText = chatCompletion.choices[0]?.message?.content || "{}";
       try {
         const parsedData = JSON.parse(responseText);
         return json(res, 200, { data: parsedData });
-      } catch (e) {
+      } catch {
         logError('parse-resume', 'Failed to parse JSON', { responseText });
         return json(res, 500, { error: 'Failed to parse resume correctly' });
       }
@@ -135,9 +134,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         Do not include placeholder brackets like [Your Name] or [Date] at the top, just output the main body of the cover letter.
       `;
 
-      const chatCompletion = await groq.chat.completions.create({
+      const chatCompletion = await createChatCompletionWithFallback(groq, {
         messages: [{ role: 'user', content: prompt }],
-        model: 'llama-3.1-8b-instant',
         temperature: 0.7,
       });
 

@@ -504,7 +504,166 @@ export const api = {
       }
     );
   },
+
+  // --- Community (admin) ---
+  getCommunityProjects(params?: Record<string, string>) {
+    const qs = new URLSearchParams({ resource: 'projects', ...(params || {}) });
+    return apiRequest<{ projects?: CommunityProject[]; project?: CommunityProject }>(
+      `/api/community?${qs}`
+    );
+  },
+
+  createCommunityProject(payload: Partial<CommunityProject> & { name: string; slug: string; description: string }) {
+    return apiRequest<{ project: CommunityProject }>('/api/community?resource=projects', {
+      method: 'POST',
+      body: payload,
+      auth: true,
+    });
+  },
+
+  updateCommunityProject(payload: Partial<CommunityProject> & { id: string }) {
+    return apiRequest<{ project: CommunityProject }>('/api/community?resource=projects', {
+      method: 'PUT',
+      body: payload,
+      auth: true,
+    });
+  },
+
+  deleteCommunityProject(id: string) {
+    return apiRequest<{ success: boolean }>(
+      `/api/community?resource=projects&id=${encodeURIComponent(id)}`,
+      { method: 'DELETE', auth: true }
+    );
+  },
+
+  getCommunityHackathons(params?: Record<string, string>) {
+    const qs = new URLSearchParams({ resource: 'hackathons', ...(params || {}) });
+    return apiRequest<{ hackathons?: CommunityHackathon[]; hackathon?: CommunityHackathon }>(
+      `/api/community?${qs}`
+    );
+  },
+
+  createCommunityHackathon(
+    payload: Partial<CommunityHackathon> & {
+      title: string;
+      slug: string;
+      description: string;
+      start_date: string;
+      end_date: string;
+    }
+  ) {
+    return apiRequest<{ hackathon: CommunityHackathon }>('/api/community?resource=hackathons', {
+      method: 'POST',
+      body: payload,
+      auth: true,
+    });
+  },
+
+  updateCommunityHackathon(payload: Partial<CommunityHackathon> & { id: string }) {
+    return apiRequest<{ hackathon: CommunityHackathon }>('/api/community?resource=hackathons', {
+      method: 'PUT',
+      body: payload,
+      auth: true,
+    });
+  },
+
+  deleteCommunityHackathon(id: string) {
+    return apiRequest<{ success: boolean }>(
+      `/api/community?resource=hackathons&id=${encodeURIComponent(id)}`,
+      { method: 'DELETE', auth: true }
+    );
+  },
+
+  getCommunityEvents(params?: Record<string, string>) {
+    const qs = new URLSearchParams({ resource: 'events', ...(params || {}) });
+    return apiRequest<{ events?: CommunityEvent[]; event?: CommunityEvent }>(
+      `/api/community?${qs}`
+    );
+  },
+
+  createCommunityEvent(
+    payload: Partial<CommunityEvent> & {
+      title: string;
+      slug: string;
+      description: string;
+      start_date: string;
+    }
+  ) {
+    return apiRequest<{ event: CommunityEvent }>('/api/community?resource=events', {
+      method: 'POST',
+      body: payload,
+      auth: true,
+    });
+  },
+
+  updateCommunityEvent(payload: Partial<CommunityEvent> & { id: string }) {
+    return apiRequest<{ event: CommunityEvent }>('/api/community?resource=events', {
+      method: 'PUT',
+      body: payload,
+      auth: true,
+    });
+  },
+
+  deleteCommunityEvent(id: string) {
+    return apiRequest<{ success: boolean }>(
+      `/api/community?resource=events&id=${encodeURIComponent(id)}`,
+      { method: 'DELETE', auth: true }
+    );
+  },
 };
+
+export interface CommunityProject {
+  id: string;
+  slug: string;
+  name: string;
+  tagline?: string | null;
+  description: string;
+  logo_url?: string | null;
+  technologies?: string[] | null;
+  github_url?: string | null;
+  live_url?: string | null;
+  status: string;
+  looking_for?: string[] | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface CommunityHackathon {
+  id: string;
+  slug: string;
+  title: string;
+  description: string;
+  organizer?: string | null;
+  start_date: string;
+  end_date: string;
+  registration_deadline?: string | null;
+  mode?: string;
+  location?: string | null;
+  prize_pool?: string | null;
+  external_registration_url?: string;
+  platform?: string | null;
+  status: string;
+  tags?: string[] | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface CommunityEvent {
+  id: string;
+  slug: string;
+  title: string;
+  description: string;
+  event_type: string;
+  speaker?: string | null;
+  start_date: string;
+  end_date?: string | null;
+  timezone?: string;
+  location?: string | null;
+  is_online?: boolean;
+  external_registration_url?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
 
 export interface CompanySettings {
   id?: string;
