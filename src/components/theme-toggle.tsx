@@ -40,7 +40,6 @@ export function ThemeToggle({ className }: { className?: string }) {
           )}
         />
       </span>
-      <span className="sr-only">Toggle theme</span>
     </LiquidGlass>
   )
 }

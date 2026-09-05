@@ -431,9 +431,15 @@ input[type="number"] {
   opacity: 0.8;
 }
 
-/* Keep content above glass layers */
-.liquid-glass > *:not(script) {
+/* Keep content above glass layers, without pulling out-of-flow children back in */
+.liquid-glass > *:not(script):not(.sr-only):not(.absolute):not(.fixed) {
   position: relative;
+  z-index: 3;
+}
+
+.liquid-glass > .sr-only,
+.liquid-glass > .absolute,
+.liquid-glass > .fixed {
   z-index: 3;
 }
 
