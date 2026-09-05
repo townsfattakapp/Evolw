@@ -333,7 +333,7 @@ export function SceneBackdrop({
         // Soft cool fog in light — less washout than pure white
         scene.fog = new THREE.FogExp2(
           dark ? 0x09090b : 0xe8eef5,
-          mobile ? (dark ? 0.028 : 0.016) : dark ? 0.018 : 0.01
+          mobile ? (dark ? 0.028 : 0.035) : dark ? 0.018 : 0.01
         );
 
         ambient.intensity = dark ? 0.35 : 0.55;
@@ -349,22 +349,30 @@ export function SceneBackdrop({
 
         const pMat = particles.material as import('three').PointsMaterial;
         pMat.blending = dark ? THREE.AdditiveBlending : THREE.NormalBlending;
-        pMat.opacity = dark ? 0.75 : 0.7;
-        pMat.size = mobile ? (dark ? 0.035 : 0.042) : dark ? 0.028 : 0.034;
+        pMat.opacity = dark
+          ? mobile
+            ? 0.55
+            : 0.75
+          : mobile
+            ? 0.28
+            : 0.7;
+        pMat.size = mobile ? (dark ? 0.03 : 0.026) : dark ? 0.028 : 0.034;
         paintParticles();
 
+        const wireBoost = dark ? 1 : mobile ? 0.55 : 1;
+        const ringBoost = dark ? 1 : mobile ? 0.6 : 1;
         wires.forEach((w, i) => {
           const line = w as import('three').LineSegments;
           const mat = line.material as import('three').LineBasicMaterial;
           const base = (mat.userData.baseOpacity as number) || 0.4;
-          mat.opacity = dark ? base : Math.min(1, base * 1.55);
+          mat.opacity = dark ? base : Math.min(1, base * 1.55) * wireBoost;
           mat.color.copy(pal[i % pal.length]);
         });
         rings.forEach((r, i) => {
           const mat = r.material as import('three').MeshStandardMaterial;
           const base = (mat.userData.baseOpacity as number) || 0.55;
-          mat.opacity = dark ? Math.max(base, 0.55) : Math.min(0.95, base * 1.25);
-          mat.emissiveIntensity = dark ? 0.22 : 0.08;
+          mat.opacity = (dark ? Math.max(base, 0.55) : Math.min(0.95, base * 1.25)) * ringBoost;
+          mat.emissiveIntensity = dark ? 0.22 : mobile ? 0.04 : 0.08;
           mat.metalness = dark ? 0.75 : 0.55;
           mat.roughness = dark ? 0.22 : 0.35;
           mat.color.copy(pal[(i + 1) % pal.length]);
@@ -373,8 +381,8 @@ export function SceneBackdrop({
         solids.forEach((s, i) => {
           const mat = s.material as import('three').MeshStandardMaterial;
           const base = (mat.userData.baseOpacity as number) || 0.7;
-          mat.opacity = dark ? base : Math.min(0.95, base * 1.15);
-          mat.emissiveIntensity = dark ? 0.12 : 0.05;
+          mat.opacity = (dark ? base : Math.min(0.95, base * 1.15)) * (mobile && !dark ? 0.65 : 1);
+          mat.emissiveIntensity = dark ? 0.12 : mobile ? 0.03 : 0.05;
           mat.metalness = dark ? 0.65 : 0.45;
           mat.roughness = dark ? 0.25 : 0.4;
           mat.color.copy(pal[i % pal.length]);

@@ -43,15 +43,15 @@ export function Navbar() {
     <header
       className={cn(
         "fixed top-0 z-50 w-full transition-all duration-500 ease-out",
-        isScrolled ? "py-2.5" : "py-4 sm:py-5"
+        isScrolled ? "py-2" : "py-3 sm:py-5"
       )}
     >
-      <Container>
+      <Container className="px-3 sm:px-6 lg:px-8">
         <LiquidGlass
           variant="nav"
+          interactive={false}
           className={cn(
-            "flex items-center justify-between gap-4 px-4 sm:px-5 py-2.5 sm:py-3",
-            isScrolled && "scale-[0.99]"
+            "flex items-center justify-between gap-3 sm:gap-4 px-3 sm:px-5 py-2 sm:py-3"
           )}
         >
           <Link to="/" className="flex items-center space-x-2 z-50 relative group shrink-0">

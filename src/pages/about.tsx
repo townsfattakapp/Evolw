@@ -26,19 +26,19 @@ export function About() {
       />
       
       {/* Hyper-Minimalist Hero */}
-      <section className="relative pt-40 pb-24 md:pt-56 md:pb-40 bg-transparent overflow-hidden">
+      <section className="relative pt-28 pb-16 sm:pt-40 sm:pb-24 md:pt-56 md:pb-40 bg-transparent overflow-hidden">
         <Container className="relative z-10">
-          <LiquidGlass variant="hero" className="max-w-5xl mx-auto">
+          <LiquidGlass variant="hero" interactive={false} className="max-w-5xl mx-auto">
             <motion.div 
               className="max-w-5xl"
               initial="initial"
               animate="whileInView"
               variants={staggerContainer}
             >
-              <motion.h1 variants={fadeInUp} className="text-5xl sm:text-6xl md:text-8xl lg:text-[7rem] font-bold tracking-tighter mb-10 text-evolw-black dark:text-white leading-[1.05]">
+              <motion.h1 variants={fadeInUp} className="text-[2.1rem] leading-[1.1] sm:text-6xl md:text-8xl lg:text-[7rem] font-bold tracking-tighter mb-6 sm:mb-10 text-evolw-black dark:text-white md:leading-[1.05]">
                 Technology should make business simpler, not more complicated.
               </motion.h1>
-              <motion.p variants={fadeInUp} className="text-xl md:text-3xl text-evolw-gray-700 dark:text-evolw-gray-300 font-medium tracking-tight max-w-3xl leading-relaxed text-balance">
+              <motion.p variants={fadeInUp} className="text-base sm:text-xl md:text-3xl text-evolw-gray-600 dark:text-evolw-gray-300 font-medium tracking-tight max-w-3xl leading-relaxed text-balance">
                 We are an engineering-first organization focused on designing scalable platforms that solve real operational bottlenecks.
               </motion.p>
             </motion.div>

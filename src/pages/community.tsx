@@ -99,9 +99,9 @@ export function Community() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-              className="mb-8"
+              className="mb-6 sm:mb-8"
             >
-              <span className="liquid-glass liquid-glass--chip inline-flex items-center gap-2 text-evolw-accent text-sm font-semibold uppercase tracking-wider">
+              <span className="inline-flex items-center gap-2 rounded-full border border-evolw-accent/20 bg-evolw-accent/10 px-3.5 py-1.5 text-evolw-accent text-xs sm:text-sm font-semibold uppercase tracking-wider">
                 Developer Community
               </span>
             </motion.div>
@@ -110,7 +110,7 @@ export function Community() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-balance text-evolw-black dark:text-white mb-6"
+              className="text-[2.1rem] leading-[1.1] sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-balance text-evolw-black dark:text-white mb-4 sm:mb-6"
             >
               Build. Learn. Contribute. Grow.
             </motion.h1>
@@ -119,7 +119,7 @@ export function Community() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-              className="text-lg sm:text-xl text-evolw-gray-700 dark:text-evolw-gray-300 max-w-2xl mx-auto mb-10"
+              className="text-base sm:text-xl text-evolw-gray-600 dark:text-evolw-gray-300 max-w-2xl mx-auto mb-8 sm:mb-10"
             >
               A curated space for developers to discuss technology, share open-source contributions,
               showcase projects, discover hackathons, and accelerate their growth.
