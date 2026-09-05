@@ -2,15 +2,8 @@ import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate, Link, useLocation } from "react-router-dom";
 import { ArrowLeft, Mail, Phone, Calendar, Briefcase, Trash2, Globe, Link2, Star, FileText, Loader2, Download, Sparkles } from "lucide-react";
 import { api, ApiError, type Application } from "../../lib/api";
-import * as pdfjsLib from "pdfjs-dist";
+import { extractPdfText } from "../../lib/extract-pdf-text";
 import DOMPurify from "dompurify";
-
-if (typeof window !== "undefined") {
-  pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
-    "pdfjs-dist/build/pdf.worker.min.mjs",
-    import.meta.url
-  ).toString();
-}
 
 const STATUS_OPTIONS = ["new", "reviewing", "shortlisted", "rejected", "hired"] as const;
 
@@ -131,16 +124,7 @@ export function AdminApplicationDetail() {
       const response = await fetch(`/api/proxy-resume?url=${encodeURIComponent(app.resumeUrl)}`);
       if (!response.ok) throw new Error('Failed to load resume for summarization');
       const arrayBuffer = await response.arrayBuffer();
-      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-      const numPages = Math.min(pdf.numPages, 5); // Max 5 pages
-      let resumeText = "";
-      
-      for (let i = 1; i <= numPages; i++) {
-        const page = await pdf.getPage(i);
-        const content = await page.getTextContent();
-        const strings = content.items.map((item: any) => item.str);
-        resumeText += strings.join(" ") + "\n";
-      }
+      const resumeText = await extractPdfText(arrayBuffer, 5);
 
       if (!resumeText.trim()) throw new Error("Could not extract text from the PDF.");
 

@@ -30,7 +30,7 @@ export function Footer() {
   }, []);
 
   return (
-    <footer className="relative bg-white dark:bg-evolw-black pt-24 pb-12 overflow-hidden">
+    <footer className="relative liquid-glass liquid-glass--section border-t border-white/50 dark:border-white/10 pt-24 pb-12 overflow-hidden rounded-none">
       <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-evolw-gray-200 dark:via-white/20 to-transparent" />
 
       <div className="absolute -top-24 -left-24 w-96 h-96 bg-evolw-accent/5 rounded-full blur-3xl pointer-events-none hidden dark:block" />

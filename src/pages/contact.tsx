@@ -142,16 +142,16 @@ export function Contact() {
       />
 
       {/* ─── HERO ─────────────────────────────────── */}
-      <section className="relative min-h-[60vh] flex items-end bg-evolw-black overflow-hidden pt-40 pb-20 md:pt-56 md:pb-32">
+      <section className="relative min-h-[60vh] flex items-end bg-evolw-black/80 dark:bg-evolw-black/55 overflow-hidden pt-40 pb-20 md:pt-56 md:pb-32 backdrop-blur-[1px]">
         {/* Ambient blobs */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-[-10%] left-[-5%] w-[600px] h-[600px] rounded-full bg-evolw-accent/20 blur-[120px] opacity-60" />
-          <div className="absolute bottom-[-20%] right-[-5%] w-[500px] h-[500px] rounded-full bg-violet-600/20 blur-[120px] opacity-50" />
+        <div className="absolute inset-0 pointer-events-none z-[1]">
+          <div className="absolute top-[-10%] left-[-5%] w-[600px] h-[600px] rounded-full bg-evolw-accent/15 blur-[120px] opacity-50" />
+          <div className="absolute bottom-[-20%] right-[-5%] w-[500px] h-[500px] rounded-full bg-slate-400/10 blur-[120px] opacity-40" />
         </div>
 
         {/* Dot grid */}
         <div
-          className="absolute inset-0 pointer-events-none opacity-[0.06]"
+          className="absolute inset-0 pointer-events-none opacity-[0.06] z-[1]"
           style={{
             backgroundImage: "radial-gradient(circle, #fff 1px, transparent 1px)",
             backgroundSize: "40px 40px",
@@ -187,7 +187,7 @@ export function Contact() {
       </section>
 
       {/* ─── MAIN CONTENT ─────────────────────────── */}
-      <section className="bg-white dark:bg-evolw-black relative">
+      <section className="bg-transparent relative">
         <Container className="relative z-10">
           {/* Negative margin pulls the cards up over the hero */}
           <div className="relative -mt-12 pb-32 md:pb-48 grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 items-start">
@@ -203,7 +203,7 @@ export function Contact() {
               {contactInfo.map((item, i) => (
                 <motion.div key={i} variants={fadeUp}>
                   {item.href ? (
-                    <a href={item.href} className="group flex items-start gap-5 p-7 rounded-2xl bg-evolw-gray-50 dark:bg-white/5 border border-evolw-gray-100 dark:border-white/5 hover:border-evolw-gray-300 dark:hover:border-white/15 hover:shadow-lg transition-all duration-500">
+                    <a href={item.href} className="group flex items-start gap-5 p-7 rounded-2xl liquid-glass liquid-glass--panel hover:shadow-lg transition-all duration-500">
                       <div className="mt-0.5 w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: `${item.accent}18` }}>
                         <item.icon className="w-5 h-5" style={{ color: item.accent }} />
                       </div>
@@ -221,7 +221,7 @@ export function Contact() {
                       </div>
                     </a>
                   ) : (
-                    <div className="flex items-start gap-5 p-7 rounded-2xl bg-evolw-gray-50 dark:bg-white/5 border border-evolw-gray-100 dark:border-white/5">
+                    <div className="flex items-start gap-5 p-7 rounded-2xl liquid-glass liquid-glass--panel">
                       <div className="mt-0.5 w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: `${item.accent}18` }}>
                         <item.icon className="w-5 h-5" style={{ color: item.accent }} />
                       </div>
@@ -246,7 +246,7 @@ export function Contact() {
               transition={{ duration: 1, ease, delay: 0.15 } satisfies Transition}
               className="lg:col-span-2"
             >
-              <div className="bg-white dark:bg-[#0d0d0d] rounded-3xl border border-evolw-gray-100 dark:border-white/8 shadow-2xl overflow-hidden">
+              <div className="liquid-glass liquid-glass--dense rounded-3xl overflow-hidden shadow-2xl">
                 {/* Form Header */}
                 <div className="px-8 md:px-10 pt-8 md:pt-10 pb-6 border-b border-evolw-gray-100 dark:border-white/5 relative overflow-hidden">
                   <div className="absolute top-0 right-0 w-64 h-64 bg-evolw-accent/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />

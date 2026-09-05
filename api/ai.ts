@@ -4,6 +4,24 @@ import { handleOptions, json, logError, readBody } from './_lib/http.js';
 import { requireAdmin } from './_lib/auth.js';
 import { createChatCompletionWithFallback } from './_lib/groq.js';
 
+/** Normalize chat message content (string or content-part array from newer models). */
+function messageText(content: unknown): string {
+  if (typeof content === 'string') return content;
+  if (Array.isArray(content)) {
+    return content
+      .map((part) => {
+        if (typeof part === 'string') return part;
+        if (part && typeof part === 'object') {
+          const p = part as { text?: string; content?: string };
+          return p.text || p.content || '';
+        }
+        return '';
+      })
+      .join('');
+  }
+  return '';
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (handleOptions(req, res)) return;
 
@@ -53,7 +71,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         temperature: 0.3,
       });
 
-      const summaryHtml = chatCompletion.choices[0]?.message?.content || "";
+      const summaryHtml = messageText(chatCompletion.choices[0]?.message?.content);
       const cleanHtml = summaryHtml.replace(/^```html\n?/, '').replace(/\n?```$/, '').trim();
       return json(res, 200, { html: cleanHtml });
     }
@@ -93,7 +111,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         response_format: { type: 'json_object' },
       });
 
-      const responseText = chatCompletion.choices[0]?.message?.content || "{}";
+      const responseText = messageText(chatCompletion.choices[0]?.message?.content) || '{}';
       try {
         const parsedData = JSON.parse(responseText);
         return json(res, 200, { data: parsedData });
@@ -139,7 +157,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         temperature: 0.7,
       });
 
-      const coverLetter = chatCompletion.choices[0]?.message?.content || "";
+      const coverLetter = messageText(chatCompletion.choices[0]?.message?.content);
       return json(res, 200, { coverLetter });
     }
 

@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { fadeInUp, staggerContainer } from "../lib/animations";
 import { PAGE_SEO } from "../lib/seo/site";
 import { aboutPageSchema, breadcrumbSchema, organizationSchema } from "../lib/seo/schema";
+import { LiquidGlass } from "../components/ui/liquid-glass";
 
 export function About() {
   return (
@@ -25,21 +26,23 @@ export function About() {
       />
       
       {/* Hyper-Minimalist Hero */}
-      <section className="pt-48 pb-32 md:pt-72 md:pb-48 bg-white dark:bg-evolw-black overflow-hidden">
-        <Container>
-          <motion.div 
-            className="max-w-5xl mx-auto"
-            initial="initial"
-            animate="whileInView"
-            variants={staggerContainer}
-          >
-            <motion.h1 variants={fadeInUp} className="text-6xl md:text-8xl lg:text-[7rem] font-bold tracking-tighter mb-12 text-evolw-black dark:text-white leading-[1.05]">
-              Technology should make business simpler, not more complicated.
-            </motion.h1>
-            <motion.p variants={fadeInUp} className="text-2xl md:text-3xl text-evolw-gray-500 dark:text-evolw-gray-400 font-medium tracking-tight max-w-3xl leading-relaxed text-balance">
-              We are an engineering-first organization focused on designing scalable platforms that solve real operational bottlenecks.
-            </motion.p>
-          </motion.div>
+      <section className="relative pt-40 pb-24 md:pt-56 md:pb-40 bg-transparent overflow-hidden">
+        <Container className="relative z-10">
+          <LiquidGlass variant="hero" className="max-w-5xl mx-auto">
+            <motion.div 
+              className="max-w-5xl"
+              initial="initial"
+              animate="whileInView"
+              variants={staggerContainer}
+            >
+              <motion.h1 variants={fadeInUp} className="text-5xl sm:text-6xl md:text-8xl lg:text-[7rem] font-bold tracking-tighter mb-10 text-evolw-black dark:text-white leading-[1.05]">
+                Technology should make business simpler, not more complicated.
+              </motion.h1>
+              <motion.p variants={fadeInUp} className="text-xl md:text-3xl text-evolw-gray-700 dark:text-evolw-gray-300 font-medium tracking-tight max-w-3xl leading-relaxed text-balance">
+                We are an engineering-first organization focused on designing scalable platforms that solve real operational bottlenecks.
+              </motion.p>
+            </motion.div>
+          </LiquidGlass>
         </Container>
       </section>
 
@@ -80,7 +83,7 @@ export function About() {
       </Section>
 
       {/* Principles - Bento Grid */}
-      <Section className="bg-evolw-gray-50 dark:bg-evolw-gray-900 border-t border-evolw-gray-200 dark:border-white/5 py-40">
+      <Section className="bg-evolw-gray-50/55 dark:bg-evolw-gray-900/45 border-t border-evolw-gray-200 dark:border-white/5 py-40 backdrop-blur-[2px]">
         <Container>
           <motion.div 
             initial="initial"

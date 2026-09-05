@@ -10,6 +10,7 @@ import { motion } from "framer-motion";
 import { fadeInUp, staggerContainer } from "../lib/animations";
 import { useContent } from "../context/ContentContext";
 import { PAGE_SEO } from "../lib/seo/site";
+import { LiquidGlass } from "../components/ui/liquid-glass";
 import {
   breadcrumbSchema,
   fattakseBrandSchema,
@@ -85,21 +86,22 @@ export function Products() {
       />
 
       {/* Hero */}
-      <section className="pt-32 pb-24 md:pt-72 md:pb-48 bg-white dark:bg-evolw-black overflow-hidden">
-        <Container>
-          <motion.div
-            className="max-w-5xl mx-auto"
-            initial="initial"
-            animate="whileInView"
-            variants={staggerContainer}
-          >
-            <motion.h1 variants={fadeInUp} className="text-5xl sm:text-6xl md:text-8xl lg:text-[7.5rem] font-bold tracking-tighter mb-10 text-evolw-black dark:text-white leading-[1.1] md:leading-[1.05]">
-              Products built for real-world impact.
-            </motion.h1>
-            <motion.p variants={fadeInUp} className="text-xl md:text-3xl text-evolw-gray-500 dark:text-evolw-gray-400 font-medium tracking-tight max-w-3xl leading-relaxed text-balance">
-              We engineer platforms that connect businesses, modernize operations, and create unprecedented opportunities for scale.
-            </motion.p>
-          </motion.div>
+      <section className="relative pt-36 pb-24 md:pt-56 md:pb-40 bg-transparent overflow-hidden">
+        <Container className="relative z-10">
+          <LiquidGlass variant="hero" className="max-w-5xl mx-auto">
+            <motion.div
+              initial="initial"
+              animate="whileInView"
+              variants={staggerContainer}
+            >
+              <motion.h1 variants={fadeInUp} className="text-5xl sm:text-6xl md:text-8xl lg:text-[7.5rem] font-bold tracking-tighter mb-8 text-evolw-black dark:text-white leading-[1.1] md:leading-[1.05]">
+                Products built for real-world impact.
+              </motion.h1>
+              <motion.p variants={fadeInUp} className="text-xl md:text-3xl text-evolw-gray-700 dark:text-evolw-gray-300 font-medium tracking-tight max-w-3xl leading-relaxed text-balance">
+                We engineer platforms that connect businesses, modernize operations, and create unprecedented opportunities for scale.
+              </motion.p>
+            </motion.div>
+          </LiquidGlass>
         </Container>
       </section>
 
@@ -198,7 +200,7 @@ export function Products() {
 
       {/* Other Products Grid */}
       {otherProducts.length > 0 && (
-        <Section className="bg-evolw-gray-50 dark:bg-evolw-gray-900 py-24 md:py-40 border-t border-evolw-gray-200 dark:border-white/5">
+        <Section className="bg-evolw-gray-50/55 dark:bg-evolw-gray-900/45 py-24 md:py-40 border-t border-evolw-gray-200 dark:border-white/5 backdrop-blur-[2px]">
           <Container>
             <motion.div
               initial="initial"
@@ -244,7 +246,7 @@ export function Products() {
       )}
 
       {/* More Platforms CTA */}
-      <Section className="bg-evolw-gray-50 dark:bg-evolw-gray-900 py-24 md:py-40 border-t border-evolw-gray-200 dark:border-white/5">
+      <Section className="bg-evolw-gray-50/55 dark:bg-evolw-gray-900/45 py-24 md:py-40 border-t border-evolw-gray-200 dark:border-white/5 backdrop-blur-[2px]">
         <Container className="text-center">
           <motion.div
             initial="initial"

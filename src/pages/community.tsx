@@ -93,15 +93,15 @@ export function Community() {
 
       {/* Hero */}
       <Section className="relative overflow-hidden pt-20 pb-16 sm:pt-28 sm:pb-24">
-        <Container>
-          <div className="max-w-4xl mx-auto text-center">
+        <Container className="relative z-10">
+          <div className="liquid-glass liquid-glass--hero max-w-4xl mx-auto text-center">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
               className="mb-8"
             >
-              <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-evolw-accent/10 text-evolw-accent text-sm font-semibold uppercase tracking-wider">
+              <span className="liquid-glass liquid-glass--chip inline-flex items-center gap-2 text-evolw-accent text-sm font-semibold uppercase tracking-wider">
                 Developer Community
               </span>
             </motion.div>
@@ -119,7 +119,7 @@ export function Community() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-              className="text-lg sm:text-xl text-evolw-gray-500 dark:text-evolw-gray-400 max-w-2xl mx-auto mb-10"
+              className="text-lg sm:text-xl text-evolw-gray-700 dark:text-evolw-gray-300 max-w-2xl mx-auto mb-10"
             >
               A curated space for developers to discuss technology, share open-source contributions,
               showcase projects, discover hackathons, and accelerate their growth.
@@ -229,7 +229,7 @@ export function Community() {
 
       {/* Featured projects (seeded / live data) */}
       {projects.length > 0 && (
-        <Section className="py-16 sm:py-24 bg-evolw-gray-50 dark:bg-evolw-black/50">
+        <Section className="py-16 sm:py-24 bg-evolw-gray-50/55 dark:bg-evolw-black/40 backdrop-blur-[2px]">
           <Container>
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12">
               <div>
@@ -351,7 +351,7 @@ export function Community() {
 
       {/* Top This Week */}
       {topWeekly.length > 0 && (
-        <Section className="py-16 sm:py-24 bg-evolw-gray-50 dark:bg-evolw-black/50">
+        <Section className="py-16 sm:py-24 bg-evolw-gray-50/55 dark:bg-evolw-black/40 backdrop-blur-[2px]">
           <Container>
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-12">
               <div>

@@ -19,6 +19,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { fadeInUp, spring, staggerContainer } from "../lib/animations";
 import { PAGE_SEO } from "../lib/seo/site";
 import { serviceSchemas, breadcrumbSchema } from "../lib/seo/schema";
+import { LiquidGlass } from "../components/ui/liquid-glass";
 
 type ServiceDetail = {
   id: string;
@@ -42,7 +43,7 @@ const SERVICES: ServiceDetail[] = [
     icon: Code2,
     description: "End-to-end engineering of bespoke software systems.",
     span: "col-span-1 md:col-span-2 lg:col-span-2 row-span-1",
-    bg: "bg-white dark:bg-evolw-black",
+    bg: "liquid-glass liquid-glass--panel",
     contactValue: "Software Development",
     tagline: "Custom systems built for reliability at scale.",
     longDescription:
@@ -92,7 +93,7 @@ const SERVICES: ServiceDetail[] = [
     icon: Box,
     description: "Transforming concepts into market-ready products with scalable architecture.",
     span: "col-span-1 lg:col-span-1 row-span-1",
-    bg: "bg-white dark:bg-evolw-black",
+    bg: "liquid-glass liquid-glass--panel",
     contactValue: "Product Engineering",
     tagline: "From concept to a product users actually adopt.",
     longDescription:
@@ -117,7 +118,7 @@ const SERVICES: ServiceDetail[] = [
     icon: Cpu,
     description: "Strategic planning, stack selection, and architecture design.",
     span: "col-span-1 lg:col-span-1 row-span-1",
-    bg: "bg-white dark:bg-evolw-black",
+    bg: "liquid-glass liquid-glass--panel",
     contactValue: "Tech Consulting",
     tagline: "Clear technical decisions before expensive mistakes.",
     longDescription:
@@ -168,7 +169,7 @@ const SERVICES: ServiceDetail[] = [
     icon: HeadphonesIcon,
     description: "Long-term maintenance, security updates, and performance tuning.",
     span: "col-span-1 md:col-span-2 lg:col-span-3 row-span-1",
-    bg: "bg-evolw-gray-50 dark:bg-evolw-gray-900",
+    bg: "liquid-glass liquid-glass--dense",
     contactValue: "Other",
     tagline: "Keep what you shipped healthy, secure, and fast.",
     longDescription:
@@ -222,31 +223,32 @@ export function Services() {
         ]}
       />
 
-      <section className="pt-32 pb-20 md:pt-72 md:pb-48 bg-white dark:bg-evolw-black overflow-hidden">
-        <Container>
-          <motion.div
-            className="max-w-5xl mx-auto text-center md:text-left"
-            initial="initial"
-            animate="whileInView"
-            variants={staggerContainer}
-          >
-            <motion.h1
-              variants={fadeInUp}
-              className="text-4xl sm:text-5xl md:text-8xl lg:text-[7.5rem] font-bold tracking-tighter mb-6 md:mb-12 text-evolw-black dark:text-white leading-[1.1] md:leading-[1.05] text-balance"
+      <section className="relative pt-36 pb-20 md:pt-56 md:pb-40 bg-transparent overflow-hidden">
+        <Container className="relative z-10">
+          <LiquidGlass variant="hero" className="max-w-5xl mx-auto text-center md:text-left">
+            <motion.div
+              initial="initial"
+              animate="whileInView"
+              variants={staggerContainer}
             >
-              Engineering for complex scale.
-            </motion.h1>
-            <motion.p
-              variants={fadeInUp}
-              className="text-lg sm:text-xl md:text-3xl text-evolw-gray-500 dark:text-evolw-gray-400 font-medium tracking-tight max-w-3xl mx-auto md:mx-0 leading-relaxed text-balance"
-            >
-              We partner with businesses to provide deep technical expertise, from initial architecture to ongoing platform support.
-            </motion.p>
-          </motion.div>
+              <motion.h1
+                variants={fadeInUp}
+                className="text-4xl sm:text-5xl md:text-8xl lg:text-[7.5rem] font-bold tracking-tighter mb-6 md:mb-10 text-evolw-black dark:text-white leading-[1.1] md:leading-[1.05] text-balance"
+              >
+                Engineering for complex scale.
+              </motion.h1>
+              <motion.p
+                variants={fadeInUp}
+                className="text-lg sm:text-xl md:text-3xl text-evolw-gray-700 dark:text-evolw-gray-300 font-medium tracking-tight max-w-3xl mx-auto md:mx-0 leading-relaxed text-balance"
+              >
+                We partner with businesses to provide deep technical expertise, from initial architecture to ongoing platform support.
+              </motion.p>
+            </motion.div>
+          </LiquidGlass>
         </Container>
       </section>
 
-      <Section className="bg-evolw-gray-50 dark:bg-[#050505] py-20 md:py-40 border-t border-evolw-gray-200 dark:border-white/5">
+      <Section className="bg-evolw-gray-50/55 dark:bg-[#050505]/45 py-20 md:py-40 border-t border-evolw-gray-200 dark:border-white/5 backdrop-blur-[2px]">
         <Container>
           <motion.div
             initial="initial"
@@ -303,7 +305,7 @@ export function Services() {
         </Container>
       </Section>
 
-      <Section className="bg-white dark:bg-evolw-black py-20 md:py-40">
+      <Section className="bg-transparent py-20 md:py-40">
         <Container>
           <motion.div
             initial="initial"

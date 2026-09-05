@@ -39,7 +39,8 @@
     "resend": "^6.18.1",
     "swr": "^2.5.0",
     "tailwind-merge": "^3.6.0",
-    "tailwindcss": "^4.3.3"
+    "tailwindcss": "^4.3.3",
+    "three": "^0.185.1"
   },
   "devDependencies": {
     "@types/dompurify": "^3.0.5",
@@ -47,6 +48,7 @@
     "@types/pdfjs-dist": "^2.10.377",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
+    "@types/three": "^0.185.4",
     "@vercel/node": "^5.9.5",
     "@vitejs/plugin-react": "^6.0.4",
     "eslint": "^10.8.0",

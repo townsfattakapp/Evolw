@@ -12,14 +12,11 @@ import {
 import { api, ApiError, fileToDataUrl, type Job } from "../lib/api";
 import { richTextToPlain } from "../lib/richText";
 import { breadcrumbSchema, jobPostingSchema } from "../lib/seo/schema";
-import * as pdfjsLib from "pdfjs-dist";
+import { extractPdfText } from "../lib/extract-pdf-text";
+import { ensureReadableStreamAsyncIterator } from "../lib/readable-stream-async-iterator";
 
-// Use Vite's URL import to bundle the worker locally and respect CSP
 if (typeof window !== "undefined") {
-  pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
-    "pdfjs-dist/build/pdf.worker.min.mjs",
-    import.meta.url
-  ).toString();
+  ensureReadableStreamAsyncIterator();
 }
 
 function InputField({
@@ -181,14 +178,7 @@ export function JobDetails() {
 
         if (file.type === "application/pdf" || file.name.endsWith(".pdf")) {
           const arrayBuffer = await file.arrayBuffer();
-          const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-          const numPages = Math.min(pdf.numPages, 5);
-          for (let i = 1; i <= numPages; i++) {
-            const page = await pdf.getPage(i);
-            const content = await page.getTextContent();
-            const strings = content.items.map((item: any) => item.str);
-            resumeText += strings.join(" ") + "\n";
-          }
+          resumeText = await extractPdfText(arrayBuffer, 5);
         }
 
         if (resumeText.trim()) {

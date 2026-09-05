@@ -28,6 +28,7 @@ export default defineConfig({
       output: {
         manualChunks(id) {
           if (!id.includes('node_modules')) return
+          if (id.includes('three')) return 'three'
           if (id.includes('framer-motion')) return 'motion'
           if (id.includes('@tiptap') || id.includes('prosemirror')) return 'editor'
           if (id.includes('@react-pdf') || id.includes('html2pdf')) return 'pdf'
