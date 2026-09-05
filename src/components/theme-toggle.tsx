@@ -1,21 +1,46 @@
 import { Moon, Sun } from "lucide-react"
 import { useTheme } from "./theme-provider"
-import { Button } from "./ui/button"
+import { LiquidGlass } from "./ui/liquid-glass"
+import { cn } from "../lib/utils"
 
-export function ThemeToggle() {
+function prefersDark() {
+  return (
+    typeof window !== "undefined" &&
+    window.matchMedia("(prefers-color-scheme: dark)").matches
+  )
+}
+
+export function ThemeToggle({ className }: { className?: string }) {
   const { theme, setTheme } = useTheme()
+  const isDark = theme === "dark" || (theme === "system" && prefersDark())
 
   return (
-    <Button
-      variant="ghost"
-      size="icon"
-      onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-      className="text-evolw-gray-600 dark:text-evolw-gray-400 hover:text-evolw-gray-900 dark:hover:text-white rounded-full"
-      aria-label="Toggle theme"
+    <LiquidGlass
+      as="button"
+      variant="control"
+      type="button"
+      onClick={() => setTheme(isDark ? "light" : "dark")}
+      aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+      className={cn(
+        "grid h-10 w-10 shrink-0 place-items-center text-evolw-gray-700 dark:text-white/90",
+        className
+      )}
     >
-      <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-      <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+      <span className="relative block h-[18px] w-[18px]">
+        <Sun
+          className={cn(
+            "absolute inset-0 h-[18px] w-[18px] transition-all duration-500 ease-out",
+            isDark ? "-rotate-90 scale-0 opacity-0" : "rotate-0 scale-100 opacity-100"
+          )}
+        />
+        <Moon
+          className={cn(
+            "absolute inset-0 h-[18px] w-[18px] transition-all duration-500 ease-out",
+            isDark ? "rotate-0 scale-100 opacity-100" : "rotate-90 scale-0 opacity-0"
+          )}
+        />
+      </span>
       <span className="sr-only">Toggle theme</span>
-    </Button>
+    </LiquidGlass>
   )
 }

@@ -1,6 +1,7 @@
 import {
   useCallback,
   useRef,
+  type ButtonHTMLAttributes,
   type ElementType,
   type HTMLAttributes,
   type PointerEvent as ReactPointerEvent,
@@ -8,7 +9,15 @@ import {
 } from 'react';
 import { cn } from '../../lib/utils';
 
-type GlassVariant = 'regular' | 'clear' | 'hero' | 'chip' | 'nav' | 'dense' | 'panel';
+type GlassVariant =
+  | 'regular'
+  | 'clear'
+  | 'hero'
+  | 'chip'
+  | 'nav'
+  | 'dense'
+  | 'panel'
+  | 'control';
 
 const VARIANT: Record<GlassVariant, string> = {
   regular: 'liquid-glass liquid-glass--regular',
@@ -18,14 +27,19 @@ const VARIANT: Record<GlassVariant, string> = {
   nav: 'liquid-glass liquid-glass--nav',
   dense: 'liquid-glass liquid-glass--dense',
   panel: 'liquid-glass liquid-glass--panel',
+  control: 'liquid-glass liquid-glass--control',
 };
 
-type LiquidGlassProps = HTMLAttributes<HTMLElement> & {
-  variant?: GlassVariant;
-  as?: ElementType;
-  interactive?: boolean;
-  children?: ReactNode;
-};
+const REST_X = '30%';
+const REST_Y = '8%';
+
+type LiquidGlassProps = HTMLAttributes<HTMLElement> &
+  Pick<ButtonHTMLAttributes<HTMLButtonElement>, 'type' | 'disabled'> & {
+    variant?: GlassVariant;
+    as?: ElementType;
+    interactive?: boolean;
+    children?: ReactNode;
+  };
 
 /**
  * iOS 26 Liquid Glass — translucent, refractive, specular highlight tracks pointer.
@@ -58,8 +72,8 @@ export function LiquidGlass({
 
   const handleLeave = (e: ReactPointerEvent<HTMLElement>) => {
     onPointerLeave?.(e);
-    ref.current?.style.setProperty('--lg-x', '48%');
-    ref.current?.style.setProperty('--lg-y', '16%');
+    ref.current?.style.setProperty('--lg-x', REST_X);
+    ref.current?.style.setProperty('--lg-y', REST_Y);
   };
 
   return (
